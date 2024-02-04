@@ -104,7 +104,7 @@
 
                             <tr>
                                 <td class="table-light" colspan="2">
-                                    กรุณา Upload ใบสมัครโดยตั้งชือไฟล์เป็นชื่อของผู้สมัคร<br>
+                                    กรุณา Upload ใบสมัครโดยตั้งชื่อไฟล์เป็นชื่อของผู้สมัคร<br>
                                     Please upload your application by naming file as your name.
                                 </td>
                             </tr>

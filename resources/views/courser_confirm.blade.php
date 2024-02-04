@@ -240,7 +240,7 @@
 
                         <table class="table">
                             <tr>
-                                <td class="table-light" colspan="2">ชือผู้ติดต่อได้กรณีฉุกเฉิน/Emergency Contact Person</td>
+                                <td class="table-light" colspan="2">ชื่อผู้ติดต่อได้กรณีฉุกเฉิน/Emergency Contact Person</td>
                             </tr>
                             <tr>
                                 <td style="text-align: right; width: 35%">ชื่อจริง/Firstname <i class="req-in">*</i></td>
@@ -274,7 +274,7 @@
                     </div>
                     <div class="row pt-2">
                         <div class="col-lg-12 text-center">
-                            <button class="btn btn-primary"> ยืนยันข้อมูลผู่้สมัคร / Confirm Personal Information</button>
+                            <button class="btn btn-primary"> ยืนยันข้อมูลผู้สมัคร / Confirm Personal Information</button>
                         </div>
                     </div>
                 </div>
