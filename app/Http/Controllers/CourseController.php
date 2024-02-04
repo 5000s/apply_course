@@ -76,13 +76,15 @@ class CourseController extends Controller
        $date = $day.'-'.$month.'-'.$year;
        $birthDate = Carbon::parse($date);
 
+
        $now = Carbon::now();
        $course = Course::where("id",$course)->where("date_start",">=",$now)->first();
        $member = Member::where('name',$name)->where('surname',$lastname)->where('birthdate',$birthDate)->first();
 
+
         if ($request->has('cancel'))
         {
-            if ($member && $member->create_complete == 0){
+            if ($member && $member->create_complete == 99){
                 $member->delete();
             }
 
@@ -97,13 +99,13 @@ class CourseController extends Controller
            $member->name = $name;
            $member->surname = $lastname;
            $member->birthdate = $birthDate;
-           $member->create_complete = 0;
+           $member->create_complete = 99;
            $member->created_by = "ผู้สมัครสร้างเองจากหน้า web";
            $member->updated_by = "ผู้สมัครสร้างเองจากหน้า web";
            $member->save();
        }
 
-       if ($member->create_complete == 0 && !$request->has('confirm')){
+       if ($member->create_complete == 99 && !$request->has('confirm')){
            $data = [];
            $data['course'] = $course;
            $data['member'] = $member;
