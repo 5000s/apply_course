@@ -80,7 +80,7 @@ class CourseController extends Controller
        $course = Course::where("id",$course)->where("date_start",">=",$now)->first();
        $member = Member::where('name',$name)->where('surname',$lastname)->where('birthdate',$birthDate)->first();
 
-        if (Input::has('cancel') )
+        if ($request->has('cancel'))
         {
             if ($member && $member->create_complete == 0){
                 $member->delete();
@@ -103,7 +103,7 @@ class CourseController extends Controller
            $member->save();
        }
 
-       if ($member->create_complete == 0 && !Input::has('confirm') ){
+       if ($member->create_complete == 0 && !$request->has('confirm')){
            $data = [];
            $data['course'] = $course;
            $data['member'] = $member;
