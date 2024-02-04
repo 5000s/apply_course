@@ -16,6 +16,7 @@ use App\Http\Controllers\CourseController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MemberController;
 use App\Http\Controllers\PagesController;
+use App\Http\Controllers\UserController;
 
 
 Route::get('/', [PagesController::class, 'index'])->name('pages.index');
@@ -41,9 +42,11 @@ Route::get('profile/course', [CourseController::class, 'userCourse']);
 
 Route::get('admin/member', [CourseController::class, 'adminSearchMember']);
 Route::get('admin/member/course', [CourseController::class, 'adminMemberCourse']);
-Route::get('admin/login', 'UserController@login')->name("adminLogin");
-Route::post('admin/login', 'UserController@login');
-Route::get('admin/logout', 'UserController@logout');
+
+
+Route::get('admin/login', [UserController::class, 'login'] )->name("adminLogin");
+Route::post('admin/login', [UserController::class, 'login']);
+Route::get('admin/logout', [UserController::class, 'logout'] );
 
 
 
