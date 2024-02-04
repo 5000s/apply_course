@@ -93,10 +93,10 @@
                                         The Application Form need to write by your own
                                     </div>
                                     <div class="m-2">
-                                        <a href="{{asset("storage/form/person_application.pdf")}}" target="_blank"> ใบสมัครคอร์ส-บุคคลทั่วไป (Application Form – layperson).pdf</a>
+                                        <a href="{{asset("form/person_application.pdf")}}" target="_blank"> ใบสมัครคอร์ส-บุคคลทั่วไป (Application Form – layperson).pdf</a>
                                     </div>
                                     <div class="m-2">
-                                        <a href="{{asset("storage/form/monk_application.pdf")}}" target="_blank">  ใบสมัครคอร์ส-พระภิกษุ (Application Form – monks)
+                                        <a href="{{asset("form/monk_application.pdf")}}" target="_blank">  ใบสมัครคอร์ส-พระภิกษุ (Application Form – monks)
                                             .pdf</a>
                                     </div>
                                 </td>

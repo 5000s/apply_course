@@ -19,7 +19,7 @@
         </div>
         <div class="row justify-content-center">
             <div class="col-12 p-0 text-center">
-                <img style="width: 100%; max-width: 500px" src="{{asset("storage/images/".$location->image)}}"></img>
+                <img style="width: 100%; max-width: 500px" src="{{asset("images/".$location->image)}}"></img>
             </div>
         </div>
         <form action="{{url("member/search")}}" method="post" id="member_search">

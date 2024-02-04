@@ -14,7 +14,7 @@
                 <h3> {{$location->name}} {{$location->full_address}}</h3>
              </div>
             <div class="col-lg-8">
-                <img  src="{{asset("storage/images/".$location->image)}}" style="width: 100%;"/>
+                <img  src="{{asset("images/".$location->image)}}" style="width: 100%;"/>
             </div>
             <div class="col-12">
                 <table class="table">
