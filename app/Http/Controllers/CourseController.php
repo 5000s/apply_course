@@ -8,26 +8,19 @@ use App\Models\Location;
 use App\Models\Member;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Input;
-use Illuminate\Support\Facades\Storage;
+
 
 
 class CourseController extends Controller
 {
     public function adminSearchMember(Request $request){
-
         if (!Auth::check()){
             return redirect("admin/login");
         }
 
         $members = Member::select("id as i","name as n","surname as s","phone_slug as p")->get();
-
-        $data = [];
-        $data['members'] = $members;
-
-        return view('admin.courser_admin_member', $data);
+        return view('admin.courser_admin_member', ['members' => $members]);
     }
 
     public function adminMemberCourse(Request $request){
