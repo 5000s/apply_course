@@ -19,6 +19,8 @@ use App\Http\Controllers\PagesController;
 use App\Http\Controllers\UserController;
 
 
+Auth::routes();
+
 Route::get('/', [PagesController::class, 'index'])->name('pages.index');
 
 Route::get('/login', [AuthController::class, 'index'])->name('pages.login');
@@ -50,3 +52,11 @@ Route::get('admin/logout', [UserController::class, 'logout'] );
 
 
 
+
+Auth::routes();
+
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
+Auth::routes();
+
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
