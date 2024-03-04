@@ -56,7 +56,17 @@ Route::get('admin/logout', [UserController::class, 'logout'] );
 Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::get('/profile', [App\Http\Controllers\HomeController::class, 'profile'])->name('profile');
 
-Auth::routes();
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+// Route to show form for creating a new member
+Route::get('/member/create', [MemberController::class, 'create'])->name('member.create');
+
+// Route to store a new member
+Route::post('/member', [MemberController::class, 'store'])->name('member.store');
+
+// Route to show form for editing an existing member
+Route::get('/member/{member}/edit', [MemberController::class, 'edit'])->name('member.edit');
+
+// Route to update an existing member
+Route::put('/member/{member}', [MemberController::class, 'update'])->name('member.update');
