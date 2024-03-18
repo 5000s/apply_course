@@ -42,11 +42,15 @@ Route::post('/course/apply/finish', [CourseController::class, 'courseApplyFinish
 Route::get('userform/{time}/{member_id}/{filename}', [CourseController::class, 'getApplication']);
 Route::get('profile/course', [CourseController::class, 'userCourse']);
 
+#### MEMBER ADMIN
+Route::get('admin/courses', [CourseController::class, 'courseList']);
+Route::get('admin/courses/applylist', [CourseController::class, 'courseApplyList']);
+
 
 Route::get('admin/member', [CourseController::class, 'adminSearchMember']);
 Route::get('admin/member/course', [CourseController::class, 'adminMemberCourse']);
 
-
+##### LOGIN DO BY SRA
 Route::get('admin/login', [UserController::class, 'login'] )->name("adminLogin");
 Route::post('admin/login', [UserController::class, 'login']);
 Route::get('admin/logout', [UserController::class, 'logout'] );
@@ -62,7 +66,6 @@ Route::middleware(['verified'])->group(function () {
     Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
     Route::get('/profile', [App\Http\Controllers\HomeController::class, 'profile'])->name('profile');
 
-
 // Route to show form for creating a new member
     Route::get('/member/create', [MemberController::class, 'create'])->name('member.create');
 
@@ -75,8 +78,10 @@ Route::middleware(['verified'])->group(function () {
 // Route to update an existing member
     Route::put('/member/{member}', [MemberController::class, 'update'])->name('member.update');
 
-
 });
 
 
 Route::get('/send-test-email', [EmailTestController::class, 'sendTestEmail'] );
+
+
+

@@ -14,10 +14,32 @@ use Illuminate\Support\Facades\Auth;
 
 class CourseController extends Controller
 {
+    public function courseList()
+    {
+        //TODO: LET HONG FINISH
+
+        $courses = Course::whereYear("date_start",">=","2024")->orderBy("id","desc")->get();
+        $data = [];
+        $data['courses'] = $courses;
+
+        return view('admin.course_list', $data);
+    }
+
+    public function courseApplyList()
+    {
+        //TODO: LET HONG FINISH
+
+        $apply  = Apply::where("course_id","501")->orderBy("created_at","asc")->with('member')->get();
+        $data = [];
+        $data['applies'] = $apply;
+
+        return view('admin.courser_apply', $data);
+    }
+
     public function adminSearchMember(Request $request){
-        if (!Auth::check()){
-            return redirect("admin/login");
-        }
+//        if (!Auth::check()){
+//            return redirect("admin/login");
+//        }
 
         $members = Member::select("id as i","name as n","surname as s","phone_slug as p")->get();
         return view('admin.courser_admin_member', ['members' => $members]);
@@ -25,9 +47,9 @@ class CourseController extends Controller
 
     public function adminMemberCourse(Request $request){
 
-        if (!Auth::check()){
-            return redirect("admin/login");
-        }
+//        if (!Auth::check()){
+//            return redirect("admin/login");
+//        }
 
         $member = $request->member;
 
