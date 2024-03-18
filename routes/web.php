@@ -17,6 +17,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MemberController;
 use App\Http\Controllers\PagesController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\EmailTestController;
 
 
 Auth::routes();
@@ -53,20 +54,29 @@ Route::get('admin/logout', [UserController::class, 'logout'] );
 
 
 
-Auth::routes();
+Auth::routes(['verify' => true]);
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
-Route::get('/profile', [App\Http\Controllers\HomeController::class, 'profile'])->name('profile');
+
+Route::middleware(['verified'])->group(function () {
+
+    Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+    Route::get('/profile', [App\Http\Controllers\HomeController::class, 'profile'])->name('profile');
 
 
 // Route to show form for creating a new member
-Route::get('/member/create', [MemberController::class, 'create'])->name('member.create');
+    Route::get('/member/create', [MemberController::class, 'create'])->name('member.create');
 
 // Route to store a new member
-Route::post('/member', [MemberController::class, 'store'])->name('member.store');
+    Route::post('/member', [MemberController::class, 'store'])->name('member.store');
 
 // Route to show form for editing an existing member
-Route::get('/member/{member}/edit', [MemberController::class, 'edit'])->name('member.edit');
+    Route::get('/member/{member}/edit', [MemberController::class, 'edit'])->name('member.edit');
 
 // Route to update an existing member
-Route::put('/member/{member}', [MemberController::class, 'update'])->name('member.update');
+    Route::put('/member/{member}', [MemberController::class, 'update'])->name('member.update');
+
+
+});
+
+
+Route::get('/send-test-email', [EmailTestController::class, 'sendTestEmail'] );
