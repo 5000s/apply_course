@@ -78,15 +78,36 @@ class CourseController extends Controller
     {
         //TODO: LET HONG FINISH
 
-        $apply = DB::table('Apply as a') // Use 'databaseName as a' to alias the table name
-            ->where('a.course_id', '=', '501') // Apply the condition where b equals '2023'
-            ->orderBy("created_at", "asc")
-            ->with('member')
+        // $apply = DB::table('Apply as a') // Use 'databaseName as a' to alias the table name
+        //     ->where('a.course_id', '=', '501') // Apply the condition where b equals '2023'
+        //     ->orderBy("created_at", "asc")
+        //     ->with('member')
+        //     ->get();
+
+        $course_id = '149'; // Example value, replace with the actual course_id you want to query
+
+
+        $members = DB::table('members as m')
+            ->select(
+                DB::raw("DATE_FORMAT(a.created_at, '%Y-%m-%d %H:%i:%s') as apply_date"),
+                'm.name',
+                'm.surname',
+                'm.phone',
+                'm.email',
+                'm.age',
+                'm.gender',
+                'm.buddhism',
+                'a.state',
+                'm.updated_by'
+            )
+            ->join('applies as a', 'a.member_id', '=', 'm.id')
+            ->join('courses as c', 'c.id', '=', 'a.course_id')
+            ->where('a.course_id', $course_id)
+            ->orderByRaw("DATE_FORMAT(a.created_at, '%Y-%m-%d %H:%i:%s')")
             ->get();
 
-        // $apply = Apply::where("course_id", "501")->orderBy("created_at", "asc")->with('member')->get();
         $data = [];
-        $data['applies'] = $apply;
+        $data['members'] = $members;
 
         return view('admin.courser_apply', $data);
     }

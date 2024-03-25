@@ -67,9 +67,8 @@
 
 
 <div class="container" id='hidden'>
-
-<div class="top-layer">
-    <div class="headerBar py-3" >
+    <div class="top-layer">
+        <div class="headerBar py-3" >
             <div>
                 <h4>สถานที่<h4/>
                 <select class="select select-bordered max-w-xs" name="location" id="location">
@@ -119,35 +118,35 @@
         </div>
     </div>
     <div class="tableContainer">
-    <table id="myTable" class="table table-striped">
-        <thead>
-        <tr>
-            <td class="text-center w-[20%]">ชื่อคอร์ส</td>
-            <td class="text-center w-[20%]">วันที่เริ่ม</td>
-            <td class="text-center w-[20%]">วันที่จบ</td>
-            <td class="text-center w-[20%]">จำนวนผู้สมัคร</td>
-            <td class="text-center w-[20%]">จำนวนผู้สมัครที่ confirm</td>
-            <td class="text-center w-[20%]">จำนวนผู้สมัครที่ผ่านการอบรม</td>
-            <td class="text-center w-[20%]">ดูผู้สมัคร</td>
-            <td class="text-center w-[20%]">Download excel</td>
-        </tr>
-        </thead>
-      
-        <tbody>
-            @foreach ($courses as $course)
-                <tr>
-                    <td class="text-center">{{ $course->category }}</td>
-                    <td class="text-center">{{ $course->date_start}}</td>
-                    <td class="text-center">{{ $course->date_end }}</td>
-                    <td class="text-center">{{ $course->apply_count }}</td>
-                    <td class="text-center">{{ $course->confirm_count }}</td>
-                    <td class="text-center">{{ $course->pass_count }}</td>
-                    <td><button class="btn btn-sm btn-active">Choose</button></td>
-                    <td><button class="btn btn-sm btn-active">Download</button></td>
-                </tr>
-            @endforeach
-        </tbody>
-    </table>
+        <table id="myTable" class="table table-striped">
+            <thead>
+            <tr>
+                <td class="text-center w-[20%]">ชื่อคอร์ส</td>
+                <td class="text-center w-[20%]">วันที่เริ่ม</td>
+                <td class="text-center w-[20%]">วันที่จบ</td>
+                <td class="text-center w-[20%]">จำนวนผู้สมัคร</td>
+                <td class="text-center w-[20%]">จำนวนผู้สมัครที่ confirm</td>
+                <td class="text-center w-[20%]">จำนวนผู้สมัครที่ผ่านการอบรม</td>
+                <td class="text-center w-[20%]">ดูผู้สมัคร</td>
+                <td class="text-center w-[20%]">Download excel</td>
+            </tr>
+            </thead>
+        
+            <tbody>
+                @foreach ($courses as $course)
+                    <tr>
+                        <td class="text-center">{{ $course->category }}</td>
+                        <td class="text-center">{{ $course->date_start}}</td>
+                        <td class="text-center">{{ $course->date_end }}</td>
+                        <td class="text-center">{{ $course->apply_count }}</td>
+                        <td class="text-center">{{ $course->confirm_count }}</td>
+                        <td class="text-center">{{ $course->pass_count }}</td>
+                        <td><button class="btn btn-sm btn-active">Choose</button></td>
+                        <td><button class="btn btn-sm btn-active">Download</button></td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
     </div> 
 
 </div>
