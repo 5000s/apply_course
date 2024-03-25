@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\DB;
 
 class CourseController extends Controller
 {
-    public function courseList()
+    public function courseList(Request $request)
     {
 
         //TODO: LET HONG FINISH
@@ -23,12 +23,18 @@ class CourseController extends Controller
         // $data = [];
         // $data['courses'] = $courses;
         $data = [];
+        $locationChoose = "";
+
+        if ($request->isMethod('post')) {
+            // Logic specific to POST requests
+            $locationChoose = $request->input('location');
+            error_log($locationChoose);
+        }
 
         //initial
-        $location_id = 1;
+        $location_id = 1; //1,3
         $category_id = 6;
-        $date_start = '2017-01-01';
-        $date_end = '2022-01-01';
+        $year = '2020';
 
         $courses = DB::table('courses as c')
             ->select(
@@ -43,7 +49,10 @@ class CourseController extends Controller
             ->join('applies as a', 'c.id', '=', 'a.course_id')
             ->where('c.location_id', $location_id)
             ->where('c.category_id', $category_id)
-            ->whereBetween('c.date_start', [$date_start, $date_end])
+            ->where(function ($query) use ($year) {
+                $query->whereYear('c.date_start', $year)
+                    ->orWhereYear('c.date_end', $year);
+            })
             ->groupBy('c.location', 'c.id', 'c.category', 'c.date_start', 'c.date_end')
             ->get();
 
@@ -64,7 +73,6 @@ class CourseController extends Controller
             ->where('a.state', 'ผ่านการอบรม')
             ->count();
     }
-
 
     public function courseApplyList()
     {

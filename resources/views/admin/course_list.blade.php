@@ -7,6 +7,7 @@
 
 <link href="https://cdn.jsdelivr.net/npm/daisyui@4.7.3/dist/full.min.css" rel="stylesheet" type="text/css" />
 <script src="https://cdn.tailwindcss.com"></script>
+<meta name="csrf-token" content="{{ csrf_token() }}">
 
 <style>
     .btn-center {
@@ -45,9 +46,8 @@
     }
     .headerBar {
         display: flex;
-        justify-content: space-between;
-    
-        /* space-betwe */
+        justify-content: flex-start;
+        gap: 100px ; 
     }
     .container {
         /* justify-content: space-between; */
@@ -70,54 +70,52 @@
 
 <div class="top-layer">
     <div class="headerBar py-3" >
-            
             <div>
                 <h4>สถานที่<h4/>
-                <select class="select select-bordered max-w-xs">
-                    <option value="location1">แก่งคอย</option>
-                    <option value="location2">ลานหิน</option>
-                    <option value="location3">หาดใหญ่</option>
-                    <option value="location4">มูลนิธิ อ่อนนุช</option>
+                <select class="select select-bordered max-w-xs" name="location" id="location">
+                    <option value="1">แก่งคอย</option>
+                    <option value="2">ลานหิน</option>
+                    <option value="3">หาดใหญ่</option>
+                    <option value="4">มูลนิธิ อ่อนนุช</option>
                 </select>  
             </div>   
 
             <div>
                 <h4>คอร์ส<h4/>
-                <select class="select select-bordered max-w-xs">
-                    <option value="courseType1">คอร์สอานาปานสติ</option>
-                    <option value="courseType2">คอร์สเตโชวิปัสสนา</option>
-                    <option value="courseType3">คอร์สเตโชฯ (ศิษย์เก่า)</option>
-                    <option value="courseType4">คอร์สศิษย์เก่า (๓ วัน)</option>
-
-                    <option value="courseType5">คอร์สวิถีอาสวะ</option>
-                    <option value="courseType6">คอร์สฤาษี (๑๔ วัน)</option>
-                    <option value="courseType7">ธรรมะแคมป์</option>
-                    <option value="courseType8">คอร์สอานาปานสติ ๑ วัน</option>
-                    <option value="courseType9">คอร์สเตโชฯ (อาวุโส)</option>
+                <select class="select select-bordered max-w-xs" name="category", id="category">
+                    <option value="5">คอร์สอานาปานสติ</option>
+                    <option value="1">คอร์สเตโชวิปัสสนา</option>
+                    <option value="3">คอร์สเตโชฯ (ศิษย์เก่า)</option>
+                    <option value="6">คอร์สศิษย์เก่า (๓ วัน)</option>
+                    <option value="4">คอร์สวิถีอาสวะ</option>
+                    <option value="2">คอร์สฤาษี (๑๔ วัน)</option>
+                    <option value="7">ธรรมะแคมป์</option>
+                    <option value="8">คอร์สอานาปานสติ ๑ วัน</option>
+                    <option value="9">คอร์สเตโชฯ (อาวุโส)</option>
                     
                 </select> 
             </div>   
 
             <div>
-                <h4>วันที่ค้นหา<h4/>
-                <select class="select select-bordered max-w-xs">
-                    <option value="1">2018-11-16</option>
-                    <!-- <option value="2">?</option> -->
-                    <!-- <option value="3">?</option> -->
-                    <!-- <option value="4">?</option> -->
+                <h4>ปีที่ต้องการค้นหา<h4/>
+                <select class="select select-bordered max-w-xs" name="year" id="year">
+                    <option value="2011">2011</option>
+                    <option value="2012">2012</option>
+                    <option value="2013">2013</option>
+                    <option value="2014">2014</option>
+                    <option value="2015">2015</option>
+                    <option value="2016">2016</option>
+                    <option value="2017">2017</option>
+                    <option value="2018">2018</option>
+                    <option value="2019">2019</option>
+                    <option value="2020">2020</option>
+                    <option value="2021">2021</option>
+                    <option value="2022">2022</option>
+                    <option value="2023">2023</option>
+                    <option value="2024">2024</option>
                 </select>  
             </div>   
-
-            <div>
-                <h4>ถึงวันที่<h4/>
-                <select class="select select-bordered max-w-xs">
-                    <option value="1">2018-11-16</option>
-                    <!-- <option value="2">?</option>
-                    <option value="3">?</option>
-                    <option value="4">?</option> -->
-                </select>  
-            </div>   
-            
+        
         </div>
     </div>
     <div class="tableContainer">
@@ -179,6 +177,33 @@
         $('#hidden').fadeTo(300,1);
         $('#myTable').DataTable().columns.adjust().draw();
     });
+
+    // document.getElementById('locationSelect').addEventListener('change', function() {
+    // const location = this.value;
+    //     fetch('/admin/courses', { 
+    //         method: 'POST',
+    //         headers: {
+    //             'Content-Type': 'application/json',
+    //             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') // Ensure CSRF token is correctly retrieved
+    //         },
+    //         body: JSON.stringify({
+    //             location: location
+    //         })
+    //     })
+    //     .then(response => {
+    //         if (!response.ok) {
+    //             throw new Error('Network response was not ok');
+    //         }
+    //         return response.json();
+    //     })
+    //     .then(data => {
+    //         console.log(data); 
+    //     })
+    //     .catch((error) => {
+    //         console.error('Error:', error);
+    //     });
+    // });
+
 </script>
 
 
