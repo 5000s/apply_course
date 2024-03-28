@@ -13,14 +13,21 @@
             display: block;
             text-align: center
         }
+        .btn-in-table {
+            margin: 3px; 
+            /* font-size: 90%; */
+            text-align: center;
+            white-space: nowrap;
+        }
     </style>
+
 <div class="container" id='hidden'>
     <div class="tableContainer">
             <table id="myTable" class="table table-striped">
                 <thead>
                 <tr>
                     <td class="text-center w-[5%]">ลำดับ</td>
-                    <td class="text-center w-[10%]">สมัครเมื่อ</td>
+                    <td class="text-center w-[20%]">สมัครเมื่อ</td>
                     <td class="text-center w-[15%]">ชื่อ</td>
                     <td class="text-center w-[15%]">นามสกุล</td>
                     <td class="text-center w-[20%]">เบอร์</td>
@@ -46,11 +53,27 @@
                             <td class="text-center">{{ $member->age }}</td>
                             <td class="text-center">{{ $member->gender }}</td>
                             <td class="text-center">{{ $member->buddhism }}</td>
-
-                            <td><button class="btn btn-sm btn-active">ใบสมัคร</button></td>
-                            <td><button class="btn btn-sm btn-active">ยื่นใบสมัคร</button></td>
+                            
+                            <td>
+                                <button class="btn btn-sm btn-active btn-in-table">ใบสมัคร</button>
+                                <button class="btn btn-sm btn-active btn-in-table">ดูข้อมูล</button>
+                            </td>
+                            
+                            <td>
+                                <div class="dropdown dropdown-hover">
+                                    <div tabindex="0" role="button" class="btn btn-sm btn-active">Click</div>
+                                    <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
+                                        <li><a>ยื่นใบสมัคร</a></li>
+                                        <li><a>โทร confirm แล้ว</a></li>
+                                        <li><a>ผ่านการอบรม</a></li>
+                                        <li><a>ยุติกลางคัน</a></li>
+                                    </ul>
+                                </div>
+                                
+                            </td>
 
                             <td class="text-center">{{ $member->updated_by }}</td>
+
                         </tr>
                     @endforeach
                 </tbody>
@@ -59,18 +82,20 @@
     </div>
     <script type="text/javascript">
         $(document).ready(function() {
+
                 // Initialize the data table
                 $("#myTable").DataTable({
                     // "searching": false,
-                    "order": [[ 0, "desc" ]], //or asc
-                    "columnDefs" : [{"targets":0, "type":"date-en"}],
+                    "order": [[ 1, "asc" ]], //or asc
+                    // "columnDefs" : [{"targets":0, "type":"date-en"}],
                 });
 
                 $('#myTable thead').css({
                 'background-color': '#414C50',
                 'color': 'white',
                 'text-align': 'center'
-            });
+                });
+       
 
                 $('#hidden').fadeTo(300,1);
                 $('#myTable').DataTable().columns.adjust().draw();
