@@ -139,7 +139,7 @@
                         <td class="text-center">{{ $course->apply_count }}</td>
                         <td class="text-center">{{ $course->confirm_count }}</td>
                         <td class="text-center">{{ $course->pass_count }}</td>
-                        <td><button class="btn btn-sm btn-active">Choose</button></td>
+                        <td><a href="{{url("admin/courses/applylist") . "/$course->id"}}" class="btn btn-sm btn-active">Choose</a></td>
                         <td><button class="btn btn-sm btn-active">Download</button></td>
                     </tr>
                 @endforeach

@@ -69,18 +69,8 @@ class CourseController extends Controller
             ->count();
     }
 
-    public function courseApplyList()
+    public function courseApplyList(Request $request, $course_id)
     {
-        //TODO: LET HONG FINISH
-
-        // $apply = DB::table('Apply as a') // Use 'databaseName as a' to alias the table name
-        //     ->where('a.course_id', '=', '501') // Apply the condition where b equals '2023'
-        //     ->orderBy("created_at", "asc")
-        //     ->with('member')
-        //     ->get();
-
-        $course_id = '149'; // Example value, replace with the actual course_id you want to query
-
 
         $members = DB::table('members as m')
             ->select(
