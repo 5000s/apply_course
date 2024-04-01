@@ -43,7 +43,7 @@ Route::get('userform/{time}/{member_id}/{filename}', [CourseController::class, '
 Route::get('profile/course', [CourseController::class, 'userCourse']);
 
 #### MEMBER ADMIN
-Route::get('admin/courses', [CourseController::class, 'courseList']);
+Route::get('admin/courses', [CourseController::class, 'courseList'])->name("admin.courses");
 Route::get('admin/courses/applylist', [CourseController::class, 'courseApplyList']);
 // Route::post('admin/courses', [CourseController::class, 'courseList']);
 

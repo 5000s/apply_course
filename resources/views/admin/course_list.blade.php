@@ -47,7 +47,7 @@
     .headerBar {
         display: flex;
         justify-content: flex-start;
-        gap: 100px ; 
+        gap: 100px ;
     }
     .container {
         /* justify-content: space-between; */
@@ -59,7 +59,7 @@
         overflow: auto;
     }
     .location-top-bar {
-        background-color: blue;  
+        background-color: blue;
         color: white;
         padding: 4px;
     }
@@ -67,6 +67,7 @@
 
 
 <div class="container" id='hidden'>
+    <form action="{{route("admin.courses")}}" method="get">
     <div class="top-layer">
         <div class="headerBar py-3" >
             <div>
@@ -76,12 +77,12 @@
                     <option value="2">ลานหิน</option>
                     <option value="3">หาดใหญ่</option>
                     <option value="4">มูลนิธิ อ่อนนุช</option>
-                </select>  
-            </div>   
+                </select>
+            </div>
 
             <div>
                 <h4>คอร์ส<h4/>
-                <select class="select select-bordered max-w-xs" name="category", id="category">
+                <select class="form select select-bordered max-w-xs" name="category", id="category">
                     <option value="5">คอร์สอานาปานสติ</option>
                     <option value="1">คอร์สเตโชวิปัสสนา</option>
                     <option value="3">คอร์สเตโชฯ (ศิษย์เก่า)</option>
@@ -91,9 +92,9 @@
                     <option value="7">ธรรมะแคมป์</option>
                     <option value="8">คอร์สอานาปานสติ ๑ วัน</option>
                     <option value="9">คอร์สเตโชฯ (อาวุโส)</option>
-                    
-                </select> 
-            </div>   
+
+                </select>
+            </div>
 
             <div>
                 <h4>ปีที่ต้องการค้นหา<h4/>
@@ -112,11 +113,17 @@
                     <option value="2022">2022</option>
                     <option value="2023">2023</option>
                     <option value="2024">2024</option>
-                </select>  
-            </div>   
-        
+                </select>
+            </div>
+            <div>
+                <h4><br><h4/>
+                <button type="submit" class="btn btn-active"> ค้นหา</button>
+            </div>
+
         </div>
     </div>
+
+    </form>
     <div class="tableContainer">
         <table id="myTable" class="table table-striped">
             <thead>
@@ -131,7 +138,7 @@
                 <td class="text-center w-[20%]">Download excel</td>
             </tr>
             </thead>
-        
+
             <tbody>
                 @foreach ($courses as $course)
                     <tr>
@@ -147,7 +154,7 @@
                 @endforeach
             </tbody>
         </table>
-    </div> 
+    </div>
 
 </div>
 
@@ -179,7 +186,7 @@
 
     // document.getElementById('locationSelect').addEventListener('change', function() {
     // const location = this.value;
-    //     fetch('/admin/courses', { 
+    //     fetch('/admin/courses', {
     //         method: 'POST',
     //         headers: {
     //             'Content-Type': 'application/json',
@@ -196,7 +203,7 @@
     //         return response.json();
     //     })
     //     .then(data => {
-    //         console.log(data); 
+    //         console.log(data);
     //     })
     //     .catch((error) => {
     //         console.error('Error:', error);

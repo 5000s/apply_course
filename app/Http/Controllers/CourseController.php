@@ -25,16 +25,11 @@ class CourseController extends Controller
         $data = [];
         $locationChoose = "";
 
-        if ($request->isMethod('post')) {
-            // Logic specific to POST requests
-            $locationChoose = $request->input('location');
-            error_log($locationChoose);
-        }
-
         //initial
-        $location_id = 1; //1,3
-        $category_id = 6;
-        $year = '2020';
+        $location_id = $request->input('location', 1);
+        $category_id = $request->input('category', 6);
+        $now_year = Carbon::now()->year;
+        $year = $request->input('year', $now_year);
 
         $courses = DB::table('courses as c')
             ->select(
