@@ -73,46 +73,37 @@
             <div>
                 <h4>สถานที่<h4/>
                 <select class="select select-bordered max-w-xs" name="location" id="location">
-                    <option value="1">แก่งคอย</option>
-                    <option value="2">ลานหิน</option>
-                    <option value="3">หาดใหญ่</option>
-                    <option value="4">มูลนิธิ อ่อนนุช</option>
+                    @php $location = request()->query('location') @endphp
+                    <option @if($location==1) selected @endif value="1">แก่งคอย</option>
+                    <option @if($location==2) selected @endif value="2">ลานหิน</option>
+                    <option @if($location==3) selected @endif value="3">หาดใหญ่</option>
+                    <option @if($location==4) selected @endif value="4">มูลนิธิ อ่อนนุช</option>
                 </select>
             </div>
 
             <div>
                 <h4>คอร์ส<h4/>
                 <select class="form select select-bordered max-w-xs" name="category", id="category">
-                    <option value="5">คอร์สอานาปานสติ</option>
-                    <option value="1">คอร์สเตโชวิปัสสนา</option>
-                    <option value="3">คอร์สเตโชฯ (ศิษย์เก่า)</option>
-                    <option value="6">คอร์สศิษย์เก่า (๓ วัน)</option>
-                    <option value="4">คอร์สวิถีอาสวะ</option>
-                    <option value="2">คอร์สฤาษี (๑๔ วัน)</option>
-                    <option value="7">ธรรมะแคมป์</option>
-                    <option value="8">คอร์สอานาปานสติ ๑ วัน</option>
-                    <option value="9">คอร์สเตโชฯ (อาวุโส)</option>
-
+                    @php $category = request()->query('category') @endphp
+                    <option @if($category==5) selected @endif value="5">คอร์สอานาปานสติ</option>
+                    <option @if($category==1) selected @endif value="1">คอร์สเตโชวิปัสสนา</option>
+                    <option @if($category==3) selected @endif value="3">คอร์สเตโชฯ (ศิษย์เก่า)</option>
+                    <option @if($category==6) selected @endif value="6">คอร์สศิษย์เก่า (๓ วัน)</option>
+                    <option @if($category==4) selected @endif value="4">คอร์สวิถีอาสวะ</option>
+                    <option @if($category==2) selected @endif value="2">คอร์สฤาษี (๑๔ วัน)</option>
+                    <option @if($category==7) selected @endif value="7">ธรรมะแคมป์</option>
+                    <option @if($category==8) selected @endif value="8">คอร์สอานาปานสติ ๑ วัน</option>
+                    <option @if($category==9) selected @endif value="9">คอร์สเตโชฯ (อาวุโส)</option>
                 </select>
             </div>
 
             <div>
                 <h4>ปีที่ต้องการค้นหา<h4/>
                 <select class="select select-bordered max-w-xs" name="year" id="year">
-                    <option value="2011">2011</option>
-                    <option value="2012">2012</option>
-                    <option value="2013">2013</option>
-                    <option value="2014">2014</option>
-                    <option value="2015">2015</option>
-                    <option value="2016">2016</option>
-                    <option value="2017">2017</option>
-                    <option value="2018">2018</option>
-                    <option value="2019">2019</option>
-                    <option value="2020">2020</option>
-                    <option value="2021">2021</option>
-                    <option value="2022">2022</option>
-                    <option value="2023">2023</option>
-                    <option value="2024">2024</option>
+                    @for($year = \Carbon\Carbon::now()->year; $year >= 2011 ; $year--)
+                        @php $year_s = request()->query('year') @endphp
+                        <option @if($year_s==$year) selected @endif value="{{$year}}">{{$year}}</option>
+                    @endfor
                 </select>
             </div>
             <div>
