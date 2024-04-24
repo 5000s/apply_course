@@ -11,6 +11,7 @@
 |
 */
 
+use App\Http\Controllers\ApplyController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\HomeController;
@@ -18,6 +19,7 @@ use App\Http\Controllers\MemberController;
 use App\Http\Controllers\PagesController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\EmailTestController;
+use Illuminate\Support\Facades\Auth;
 
 
 Auth::routes();
@@ -77,7 +79,13 @@ Route::middleware(['verified'])->group(function () {
     Route::get('/member/{member}/edit', [MemberController::class, 'edit'])->name('member.edit');
 
 // Route to update an existing member
-    Route::put('/member/{member}', [MemberController::class, 'update'])->name('member.update');
+    Route::put('/member/update', [MemberController::class, 'update'])->name('member.update');
+
+    Route::get('apply/{member_id}/courses', [ApplyController::class, 'index'])->name('courses.index');
+    Route::get('apply/{member_id}/courses/{course_id}', [ApplyController::class, 'show'])->name('courses.show');
+    Route::post('apply/{member_id}/courses', [ApplyController::class, 'save'] )->name('courses.save');
+    Route::get('apply/{member_id}/courses/edit/{course_id}', [ApplyController::class, 'edit'] )->name('courses.edit');
+    Route::post('apply/{member_id}/courses/cancel/{course_id}', [ApplyController::class, 'cancel'] )->name('courses.cancel');
 
 });
 

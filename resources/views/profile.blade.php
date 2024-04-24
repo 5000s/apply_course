@@ -10,6 +10,7 @@
                 <th>Name</th>
                 <th>Surname</th>
                 <th>Actions</th>
+                <th>Apply Course</th>
             </tr>
             </thead>
             <tbody>
@@ -19,6 +20,10 @@
                     <td>{{ $member->surname }}</td>
                     <td>
                         <a href="{{ route('member.edit', $member->id) }}" class="btn btn-secondary">Edit</a>
+                    </td>
+                    <td>
+                        <a href="{{ route('courses.index', $member->id) }}" class="btn btn-secondary">Apply</a>
+
                     </td>
                 </tr>
             @endforeach

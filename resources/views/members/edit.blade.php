@@ -2,18 +2,32 @@
 
 @section('content')
     <div class="container">
-        <h1 class="text-center my-4">ฟอร์มเพิ่มข้อมูลผู้สมัคร</h1>
-        <form method="POST" action="{{ route('member.store') }}" class="border p-4 shadow rounded">
+        <h1 class="text-center my-4">แก้ไขข้อมูลผู้สมัคร</h1>
+
+        @if(session('success'))
+            <div class="alert alert-success">
+                {{ session('success') }}
+            </div>
+        @endif
+        @if ($errors->any())
+            <div class="alert alert-danger">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
+
+        <form method="POST" action="{{ route('member.update') }}" class="border p-4 shadow rounded">
             @csrf
             @method('PUT')
             <h4>ข้อมูลผู้สมัคร</h4>
             <div class="row">
+                <input type="hidden" id="member_id" name="member_id" value="{{$member->id}}">
                 <div class="col-md-6">
                     <!-- Left Column -->
-                    <div class="mb-3">
-                        <label for="name" class="form-label">รหัสผู้สมัคร</label>
-                        <span type="text" class="form-control" id="member_id"> {{$member->id}} </span>
-                    </div>
                     <div class="mb-3">
                         <label for="name" class="form-label">ชื่อ</label>
                         <input type="text" class="form-control" id="name" name="name" value="{{ $member->name }}"  required>
@@ -33,15 +47,24 @@
                     <!-- More fields from the left column -->
                     <div class="mb-3">
                         <label for="birthdate" class="form-label">วันเกิด</label>
-                        <input type="date" class="form-control" id="birthdate" name="birthdate" value="{{ $member->birthdate }}">
+                        <input type="date" class="form-control" id="birthdate" name="birthdate" value="{{ $member->birthdate->format('Y-m-d') }}">
                     </div>
                     <div class="mb-3">
                         <label for="nationality" class="form-label">สัญชาติ</label>
-                        <input type="text" class="form-control" id="nationality" name="nationality" value="{{ $member->nationality }}">
+                        <select class="form-control" id="nationality" name="nationality">
+                            @foreach($nations as $nation)
+                                <option  @if($member->nationality == $nation) selected @endif  value="{{$nation}}"> {{$nation}}</option>
+                            @endforeach
+                        </select>
+
                     </div>
                     <div class="mb-3">
-                        <label for="province" class="form-label">จังหวัด</label>
-                        <input type="text" class="form-control" id="province" name="province" value="{{ $member->province }}">
+                        <label for="province" class="form-label">จังหวัดที่อยู่ในไทย</label>
+                        <select class="form-control" id="control" name="province">
+                            @foreach($provinces as $province)
+                                <option @if($member->province == $province['name_th']) selected @endif value="{{$province['name_th']}}"> {{$province['name_th']}}</option>
+                            @endforeach
+                        </select>
                     </div>
                     <!-- Continue with other fields similarly -->
                 </div>
@@ -64,6 +87,24 @@
                         <label for="facebook" class="form-label">เฟซบุ๊ก</label>
                         <input type="text" class="form-control" id="facebook" name="facebook" value="{{ $member->facebook }}">
                     </div>
+                    <!-- Continue with other fields similarly -->
+                </div>
+            </div>
+            <h4>การศึกษา และ อาชีพ</h4>
+            <div class="row">
+                <div class="col-md-6">
+                    <!-- Left Column -->
+                    <div class="mb-3">
+                        <label for="degree" class="form-label">ระดับการศึกษา</label>
+                        <input type="text" class="form-control" id="degree" name="degree" value="{{ $member->degree }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="career" class="form-label">อาชีพ</label>
+                        <input type="text" class="form-control" id="career" name="career" value="{{ $member->career }}">
+                    </div>
+                    <!-- Continue with other fields similarly -->
+                </div>
+                <div class="col-md-6">
                     <div class="mb-3">
                         <label for="organization" class="form-label">องค์กรที่ทำงาน</label>
                         <input type="text" class="form-control" id="organization" name="organization" value="{{ $member->organization }}">
@@ -77,24 +118,24 @@
             </div>
             <!-- Fields that don't fit into the two-column layout -->
             <!-- Dharma Experience -->
-            <h4>ประสบการณ์เข้าคอร์สปฏิบัติธรรมของผู้สมัคร</h4>
-            <div class="mb-3">
-                <label for="know_source" class="form-label">ที่มาของการรู้จักคอร์สปฏิบัติธรรมนี้</label>
-                <input type="text" class="form-control" id="know_source" name="know_source" value="{{ $member->know_source }}">
-            </div>
+{{--            <h4>ประสบการณ์เข้าคอร์สปฏิบัติธรรมของผู้สมัคร</h4>--}}
+{{--            <div class="mb-3">--}}
+{{--                <label for="know_source" class="form-label">ที่มาของการรู้จักคอร์สปฏิบัติธรรมนี้</label>--}}
+{{--                <input type="text" class="form-control" id="know_source" name="know_source" value="{{ $member->know_source }}">--}}
+{{--            </div>--}}
 
-            <div class="mb-3">
-                <label for="dharma_ex" class="form-label">เคยมีประสบการณ์เข้าคอร์สปฏิบัติธรรมหรือไม่</label>
-                <select class="form-control" id="dharma_ex" name="dharma_ex" >
-                    <option value="ไม่เคย">ไม่เคย</option>
-                    <option value="เคย">เคย</option>
-                </select>
-            </div>
+{{--            <div class="mb-3">--}}
+{{--                <label for="dharma_ex" class="form-label">เคยมีประสบการณ์เข้าคอร์สปฏิบัติธรรมหรือไม่</label>--}}
+{{--                <select class="form-control" id="dharma_ex" name="dharma_ex" >--}}
+{{--                    <option value="ไม่เคย">ไม่เคย</option>--}}
+{{--                    <option value="เคย">เคย</option>--}}
+{{--                </select>--}}
+{{--            </div>--}}
 
-            <div class="mb-3">
-                <label for="dharma_ex_desc" class="form-label">รายละเอียดประสบการณ์ปฏิบัติธรรม</label>
-                <textarea class="form-control" id="dharma_ex_desc" name="dharma_ex_desc">{{ old('dharma_ex_desc') }}</textarea>
-            </div>
+{{--            <div class="mb-3">--}}
+{{--                <label for="dharma_ex_desc" class="form-label">รายละเอียดประสบการณ์ปฏิบัติธรรม</label>--}}
+{{--                <textarea class="form-control" id="dharma_ex_desc" name="dharma_ex_desc">{{ $member->dharma_ex_desc }}</textarea>--}}
+{{--            </div>--}}
 
 
 
@@ -102,28 +143,30 @@
             <h4>ผู้ติดต่อฉุกเฉิน</h4>
             <div class="mb-3">
                 <label for="name_emergency" class="form-label">ชื่อจริง ผู้ติดต่อฉุกเฉิน</label>
-                <input type="text" class="form-control" id="name_emergency" name="name_emergency" value="{{ old('name_emergency') }}">
+                <input type="text" class="form-control" id="name_emergency" name="name_emergency" value="{{ $member->name_emergency }}">
             </div>
 
             <div class="mb-3">
                 <label for="surname_emergency" class="form-label">นามสกุล ผู้ติดต่อฉุกเฉิน</label>
-                <input type="text" class="form-control" id="surname_emergency" name="surname_emergency" value="{{ old('surname_emergency') }}">
+                <input type="text" class="form-control" id="surname_emergency" name="surname_emergency" value="{{ $member->surname_emergency }}">
             </div>
 
             <div class="mb-3">
                 <label for="phone_emergency" class="form-label">โทรศัพท์ ผู้ติดต่อฉุกเฉิน</label>
-                <input type="text" class="form-control" id="phone_emergency" name="phone_emergency" value="{{ old('phone_emergency') }}">
+                <input type="text" class="form-control" id="phone_emergency" name="phone_emergency" value="{{ $member->phone_emergency }}">
             </div>
 
             <div class="mb-3">
                 <label for="relation_emergency" class="form-label">ความสัมพันธ์กับผู้ติดต่อฉุกเฉิน</label>
-                <input type="text" class="form-control" id="relation_emergency" name="relation_emergency" value="{{ old('relation_emergency') }}">
+                <input type="text" class="form-control" id="relation_emergency" name="relation_emergency" value="{{ $member->relation_emergency }}">
             </div>
 
 
             <div class="text-center">
                 <button type="submit" class="btn btn-primary">บันทึกข้อมูล</button>
             </div>
+
+            <input type="hidden" id="rechecking_id" name="rechecking_id" value="{{$member->id}}">
         </form>
     </div>
 @endsection
