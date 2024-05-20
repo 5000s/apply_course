@@ -28,10 +28,10 @@
 
                     @if($apply->application == "")
                         <div class="mb-3">
-                            <label for="registration_form" class="form-label">Upload Registration Form (PDF or Image)</label>
+                            <label for="registration_form" class="form-label">Upload Registration Form (Image)</label>
                             <input type="file" class="form-control"
                                    name="registration_form" required onchange="previewFile()"
-                                   accept="application/pdf,image/png,image/jpeg">
+                                   accept="image/png,image/jpeg">
                         </div>
                     @else
                         <div class="mb-3">
