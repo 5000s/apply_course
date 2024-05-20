@@ -66,12 +66,6 @@
                             @endif
                         @endif
                     </div>
-                    @if($apply->application != "")
-
-                        <button id="submit_button" type="submit" class="btn btn-primary" >ยกเลิกการสมัคร</button>
-                    @else
-                        <button id="submit_button" type="submit" class="btn btn-primary" disabled>ส่งใบสมัคร</button>
-                    @endif
                 </form>
             </div>
         </div>
