@@ -21,15 +21,14 @@
             <div class="card-body">
                 <p>{{ $course->date_start->format('d/m/Y') . "-".$course->date_end->format('d/m/Y') }}</p>
 
-                <p style="text-align: right">
-                    @if($apply->application != "")
-                        <button id="submit_button" type="submit" class="btn btn-primary" >ยกเลิกการสมัคร</button>
-                    @else
-                        <button id="submit_button" type="submit" class="btn btn-primary" disabled>ส่งใบสมัคร</button>
-                    @endif
-                </p>
-
                 <form action="{{ route('courses.save', $member_id) }}" method="POST" enctype="multipart/form-data">
+                    <p style="text-align: right">
+                        @if($apply->application != "")
+                            <button id="submit_button" type="submit" class="btn btn-primary" >ยกเลิกการสมัคร</button>
+                        @else
+                            <button id="submit_button" type="submit" class="btn btn-primary" disabled>ส่งใบสมัคร</button>
+                        @endif
+                    </p>
                     @csrf
                     <input type="hidden" name="course_id" value="{{ $course->id }}">
 
