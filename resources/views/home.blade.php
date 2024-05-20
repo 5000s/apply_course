@@ -5,7 +5,7 @@
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card">
-                <div class="card-header">ระบบสมัครคอร์สเตโชวิปัสสนา</div>
+                <div class="card-header">ระบบสมัครคอร์สเตโชวิปัสสนา 2567</div>
 
                 <div class="card-body">
                     @if (session('status'))
