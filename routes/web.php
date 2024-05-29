@@ -45,18 +45,21 @@ Route::get('userform/{time}/{member_id}/{filename}', [CourseController::class, '
 Route::get('profile/course', [CourseController::class, 'userCourse']);
 
 #### MEMBER ADMIN
-Route::get('admin/courses', [CourseController::class, 'courseList'])->name("admin.courses");
-Route::get('admin/courses/applylist/{course_id}', [CourseController::class, 'courseApplyList']);
-// Route::post('admin/courses', [CourseController::class, 'courseList']);
+
+Route::prefix('admin')->middleware('auth', 'admin')->group(function () {
+    Route::get('courses', [CourseController::class, 'courseList'])->name("admin.courses");
+    Route::get('courses/applylist/{course_id}', [CourseController::class, 'courseApplyList']);
 
 
-Route::get('admin/member', [CourseController::class, 'adminSearchMember']);
-Route::get('admin/member/course', [CourseController::class, 'adminMemberCourse']);
+    Route::get('member', [CourseController::class, 'adminSearchMember']);
+    Route::get('member/course', [CourseController::class, 'adminMemberCourse']);
 
 ##### LOGIN DO BY SRA
-Route::get('admin/login', [UserController::class, 'login'] )->name("adminLogin");
-Route::post('admin/login', [UserController::class, 'login']);
-Route::get('admin/logout', [UserController::class, 'logout'] );
+    Route::get('login', [UserController::class, 'login'] )->name("adminLogin");
+    Route::post('login', [UserController::class, 'login']);
+    Route::get('logout', [UserController::class, 'logout'] );
+});
+
 
 
 

@@ -1,6 +1,24 @@
 @extends('layouts.app')
 
 @section('content')
+    <script>
+        function goBack() {
+            // Get the current URL
+            var currentUrl = window.location.href;
+
+            // Split the URL by '/' to get parts
+            var urlParts = currentUrl.split('/');
+
+            // Remove the last part (519) to go back to the parent (courses)
+            urlParts.pop();
+
+            // Join the remaining parts to form the new URL
+            var newUrl = urlParts.join('/');
+
+            // Redirect to the new URL
+            window.location.href = newUrl;
+        }
+    </script>
     <div class="container">
         <h1 class="text-center my-4">{{ $course->category }}, {{ $course->location }}</h1>
         @if(session('success'))
@@ -24,7 +42,7 @@
                 <form action="{{ route('courses.save', $member_id) }}" method="POST" enctype="multipart/form-data">
                     <p style="text-align: right">
                         @if($apply->application != "")
-                            <button id="submit_button" type="submit" class="btn btn-primary" >ยกเลิกการสมัคร</button>
+                            <button id="back_button" type="button" class="btn btn-info" onclick="goBack()" >ย้อนกลับ</button>
                         @else
                             <button id="submit_button" type="submit" class="btn btn-primary" disabled>ส่งใบสมัคร</button>
                         @endif
@@ -65,6 +83,10 @@
                             @endif
                         @endif
                     </div>
+
+                    @if($apply->application != "")
+                        <button id="submit_button" type="submit" class="btn btn-primary" >ยกเลิกการสมัคร</button>
+                    @endif
                 </form>
             </div>
         </div>

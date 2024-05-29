@@ -43,6 +43,7 @@ class CourseController extends Controller
             )
             ->join('applies as a', 'c.id', '=', 'a.course_id')
             ->where('c.location_id', $location_id)
+            ->whereNull('a.cancel')
             ->where('c.category_id', $category_id)
             ->where(function ($query) use ($year) {
                 $query->whereYear('c.date_start', $year)
