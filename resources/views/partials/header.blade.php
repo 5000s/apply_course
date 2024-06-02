@@ -8,7 +8,7 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="{{ route('pages.index') }}">คอร์สปฎิบัติ</a>
+                        <a class="nav-link active" aria-current="page" href="{{ route('admin.courses') }}">จัดการคอร์ส</a>
                     </li>
 
                     @if(\Illuminate\Support\Facades\Auth::check())

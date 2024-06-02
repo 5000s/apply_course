@@ -21,6 +21,8 @@
     </script>
     <div class="container">
         <h1 class="text-center my-4">{{ $course->category }}, {{ $course->location }}</h1>
+        <h4 class="text-center my-4">{{ $course->coursename }}</h4>
+
         @if(session('success'))
             <div class="alert alert-success">
                 {{ session('success') }}
@@ -37,7 +39,7 @@
         @endif
         <div class="card">
             <div class="card-body">
-                <p>{{ $course->date_start->format('d/m/Y') . "-".$course->date_end->format('d/m/Y') }}</p>
+
 
                 <form action="{{ route('courses.save', $member_id) }}" method="POST" enctype="multipart/form-data">
                     <p style="text-align: right">

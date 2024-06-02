@@ -64,7 +64,7 @@
                 <td class="text-center w-[20%]">วันที่เริ่ม</td>
                 <td class="text-center w-[20%]">วันที่จบ</td>
                 <td class="text-center w-[20%]">สถานะ</td>
-                <td class="text-center w-[20%]">สมัคร</td>
+                <td class="text-center w-[20%]">การสมัคร</td>
             </tr>
             </thead>
             <tbody>
@@ -76,7 +76,11 @@
                     <td class="text-center">{{ $course->state }}</td>
                     <td>
                         @if($course->state === 'เปิดรับสมัคร')
-                            <a href="{{ route('courses.show', [$member_id, $course->id]) }}" class="btn btn-primary">สมัคร</a>
+                            @if(is_null($course->apply_id))
+                                <a href="{{ route('courses.show', [$member_id, $course->id]) }}" class="btn btn-primary">สมัคร</a>
+                            @else
+                                <a href="{{ route('courses.show', [$member_id, $course->id]) }}" class="btn btn-secondary">แก้ไข</a>
+                            @endif
                         @else
                             ปิดรับสมัคร
                         @endif

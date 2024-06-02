@@ -48,7 +48,15 @@ Route::get('profile/course', [CourseController::class, 'userCourse']);
 
 Route::prefix('admin')->middleware('auth', 'admin')->group(function () {
     Route::get('courses', [CourseController::class, 'courseList'])->name("admin.courses");
-    Route::get('courses/applylist/{course_id}', [CourseController::class, 'courseApplyList']);
+    Route::get('courses/applylist/{course_id}', [CourseController::class, 'courseApplyList'])->name("admin.courseList");
+    Route::get('courses/applylist/{course_id}/download', [CourseController::class, 'courseApplyListDownload'])->name('admin.applylist.download');
+    Route::get('courses/applylist/{course_id}/pdf', [CourseController::class, 'courseApplyListPdfDownload'])->name('admin.applylist.totalform.pdf');
+    Route::get('courses/applylist/{course_id}/zip', [CourseController::class, 'courseApplyListZipDownload'])->name('admin.applylist.totalform.zip');
+
+
+    Route::get('courses/applylist/{course_id}/{apply_id}/form', [CourseController::class, 'viewForm'])->name("admin.courseApplyForm");
+
+    Route::get('courses/applylist/{course_id}/{apply_id}/update/{status}', [CourseController::class, 'updateApplyStatus'])->name("admin.courseApplyStatus");
 
 
     Route::get('member', [CourseController::class, 'adminSearchMember']);

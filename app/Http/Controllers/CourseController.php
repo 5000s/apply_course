@@ -2,14 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\CourseApplyExport;
 use App\Models\Apply;
 use App\Models\Course;
 use App\Models\Location;
 use App\Models\Member;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
+use PA\ProvinceTh\Factory;
+use Madnest\Madzipper\Facades\Madzipper;
+use Illuminate\Support\Facades\Storage;
 
 
 
@@ -17,20 +23,16 @@ class CourseController extends Controller
 {
     public function courseList(Request $request)
     {
-
-        //TODO: LET HONG FINISH
-        // $courses = Course::whereYear("date_start", ">=", "2024")->orderBy("id", "desc")->get();
-        // $data = [];
-        // $data['courses'] = $courses;
         $data = [];
         $locationChoose = "";
 
-        //initial
+        // Initial
         $location_id = $request->input('location', 1);
         $category_id = $request->input('category', 6);
         $now_year = Carbon::now()->year;
         $year = $request->input('year', $now_year);
 
+        // Query builder with Eloquent
         $courses = DB::table('courses as c')
             ->select(
                 'c.location',
@@ -38,37 +40,37 @@ class CourseController extends Controller
                 'c.category',
                 'c.date_start',
                 'c.date_end',
-                DB::raw('COUNT(*) AS apply_count'),
-                DB::raw('COUNT(*) as confirm_count')
+                DB::raw('SUM(CASE WHEN a.cancel = 0 THEN 1 ELSE 0 END) as apply_count'),
+                DB::raw('SUM(CASE WHEN a.confirmed = "yes" THEN 1 ELSE 0 END) as confirm_count'),
+                DB::raw('SUM(CASE WHEN a.state = "ผ่านการอบรม" THEN 1 ELSE 0 END) as pass_count')
             )
-            ->join('applies as a', 'c.id', '=', 'a.course_id')
-            ->where('c.location_id', $location_id)
-            ->whereNull('a.cancel')
-            ->where('c.category_id', $category_id)
-            ->where(function ($query) use ($year) {
-                $query->whereYear('c.date_start', $year)
-                    ->orWhereYear('c.date_end', $year);
-            })
-            ->groupBy('c.location', 'c.id', 'c.category', 'c.date_start', 'c.date_end')
-            ->get();
+            ->leftJoin('applies as a', 'c.id', '=', 'a.course_id');
 
-        foreach ($courses as $course) {
-            $course->pass_count = $this->countPassedApplies($course->id);
+        // Apply filters
+        if ($location_id != "0") {
+            $courses = $courses->where('c.location_id', $location_id);
         }
 
+        if ($category_id != "0") {
+            $courses = $courses->where('c.category_id', $category_id);
+        }
+
+        // Year filter
+        $courses = $courses->where(function ($query) use ($year) {
+            $query->whereYear('c.date_start', $year)
+                ->orWhereYear('c.date_end', $year);
+        });
+
+        // Group by and get results
+        $courses = $courses->groupBy('c.location', 'c.id', 'c.category', 'c.date_start', 'c.date_end')
+            ->get();
+
+        // Pass data to view
         $data['courses'] = $courses;
 
         return view('admin.course_list', $data);
     }
 
-    private function countPassedApplies($course_id)
-    {
-        return DB::table('applies as a')
-            ->join('courses as c', 'c.id', '=', 'a.course_id')
-            ->where('c.id', $course_id)
-            ->where('a.state', 'ผ่านการอบรม')
-            ->count();
-    }
 
     public function courseApplyList(Request $request, $course_id)
     {
@@ -76,6 +78,8 @@ class CourseController extends Controller
         $members = DB::table('members as m')
             ->select(
                 DB::raw("DATE_FORMAT(a.created_at, '%Y-%m-%d %H:%i:%s') as apply_date"),
+                'a.id as apply_id',
+                'c.id as course_id',
                 'm.name',
                 'm.surname',
                 'm.phone',
@@ -84,11 +88,12 @@ class CourseController extends Controller
                 'm.gender',
                 'm.buddhism',
                 'a.state',
-                'm.updated_by'
+                'a.updated_by'
             )
             ->join('applies as a', 'a.member_id', '=', 'm.id')
             ->join('courses as c', 'c.id', '=', 'a.course_id')
             ->where('a.course_id', $course_id)
+            ->where('a.cancel', 0)
             ->orderByRaw("DATE_FORMAT(a.created_at, '%Y-%m-%d %H:%i:%s')")
             ->get();
 
@@ -96,6 +101,122 @@ class CourseController extends Controller
         $data['members'] = $members;
 
         return view('admin.courser_apply', $data);
+    }
+
+    public function courseApplyListDownload(Request $request, $course_id)
+    {
+        return Excel::download(new CourseApplyExport($course_id), 'course_apply_list.xlsx');
+    }
+
+    public function courseApplyListPdfDownload(Request $request, $course_id)
+    {
+        $applications = DB::table('members as m')
+            ->select(
+                DB::raw("DATE_FORMAT(a.created_at, '%Y-%m-%d %H:%i:%s') as apply_date"),
+                'a.id as apply_id',
+                'c.coursename as coursename',
+                'm.name',
+                'm.surname',
+                'm.phone',
+                'm.email',
+                'm.age',
+                'm.gender',
+                'm.buddhism',
+                'a.state',
+                'a.updated_by',
+                'a.application'
+            )
+            ->join('applies as a', 'a.member_id', '=', 'm.id')
+            ->join('courses as c', 'c.id', '=', 'a.course_id')
+            ->where('a.course_id', $course_id)
+            ->where('a.cancel', 0)
+            ->orderByRaw("DATE_FORMAT(a.created_at, '%Y-%m-%d %H:%i:%s')")
+            ->get();
+
+        $pdf = PDF::loadView('pdf.course_apply_list', compact('applications'));
+
+        return $pdf->download('course_apply_list.pdf');
+    }
+
+    public function courseApplyListZipDownload(Request $request, $course_id)
+    {
+        $applications = DB::table('members as m')
+            ->select(
+                'm.name as first_name',
+                'm.surname as last_name',
+                'a.id as apply_id',
+                'a.application',
+                'c.id as course_id'
+            )
+            ->join('applies as a', 'a.member_id', '=', 'm.id')
+            ->join('courses as c', 'c.id', '=', 'a.course_id')
+            ->where('a.course_id', $course_id)
+            ->where('a.cancel', 0)
+            ->get();
+
+        // Create a temporary file to store the zip
+        $zipFileName = 'course_applications_' . $course_id . '.zip';
+        $zipFilePath = storage_path('app/' . $zipFileName);
+
+        // Create a new zip file
+        $zipper = Madzipper::make($zipFilePath);
+
+        foreach ($applications as $application) {
+            // Get the path to the application file
+            $filePath = storage_path('app/public/' . $application->application);
+
+            if (file_exists($filePath)) {
+                // Create a new file name
+                $newFileName = $application->first_name . '_' . $application->last_name . '_course_' . $application->course_id . '.' . pathinfo($filePath, PATHINFO_EXTENSION);
+
+                // Add file to the zip with the new file name
+                $zipper->addString($newFileName, file_get_contents($filePath));
+            }
+        }
+
+        // Close the zip file
+        $zipper->close();
+
+        // Return the zip file as a download
+        return response()->download($zipFilePath)->deleteFileAfterSend(true);
+    }
+
+    public function viewForm(Request $request, $course_id, $apply_id)
+    {
+
+        $apply = Apply::where("id", $apply_id)->first();
+        $member = Member::where("id", $apply->member_id)->first();
+        $course = Course::where("id", $apply->course_id)->first();
+
+        $data = [];
+        $data['apply'] = $apply;
+        $data['member'] = $member;
+        $data['course'] = $course;
+
+        $provinces = Factory::province();
+        $provinceArray = $provinces->toArray();
+        usort($provinceArray, array($this, 'compareByNameTh'));
+
+        $data["nations"] = MemberController::$nationals;
+        $data["provinces"] = $provinceArray;
+
+        return view('admin.courser_apply_member', $data);
+    }
+
+    public function updateApplyStatus($course_id, $apply_id, $status)
+    {
+       $admin = Auth::user();
+
+        $apply = Apply::where("id", $apply_id)->first();
+        $apply->state = $status;
+        $apply->updated_by = $admin->name;
+        $apply->save();
+
+        return redirect()->route('admin.courseList', ['course_id' => $course_id]);
+    }
+
+    public function compareByNameTh($a, $b) {
+        return strcmp($a['name_th'], $b['name_th']);
     }
 
     public function adminSearchMember(Request $request)

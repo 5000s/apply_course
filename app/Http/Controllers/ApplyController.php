@@ -17,13 +17,12 @@ class ApplyController extends Controller
 {
     public function index(Request $request, $member_id)
     {
-
-
         $location_id = $request->input('location', 1);
         $category_id = $request->input('category', 0);
         $now_year = Carbon::now()->year;
         $year = $request->input('year', $now_year);
 
+        // Query to get courses
         $courses = DB::table('courses as c')
             ->select(
                 'c.location',
@@ -32,21 +31,24 @@ class ApplyController extends Controller
                 'c.date_start',
                 'c.date_end',
                 'c.state',
-                DB::raw('COUNT(*) AS apply_count'),
-                DB::raw('COUNT(*) as confirm_count')
+                'a.id as apply_id',
+                'a.cancel'
             )
-            ->join('applies as a', 'c.id', '=', 'a.course_id')
+            ->leftJoin('applies as a', function($join) use ($member_id) {
+                $join->on('c.id', '=', 'a.course_id')
+                    ->where('a.member_id', '=', $member_id)
+                    ->where('a.cancel', '=', 0);
+            })
             ->where('c.location_id', $location_id)
-
             ->where(function ($query) use ($year) {
                 $query->whereYear('c.date_start', $year)
                     ->orWhereYear('c.date_end', $year);
             })
-            ->groupBy('c.location', 'c.id', 'c.category', 'c.date_start', 'c.date_end', 'c.state');
+            ->groupBy('c.location', 'c.id', 'c.category', 'c.date_start', 'c.date_end', 'c.state', 'a.id', 'a.cancel');
 
         if ($category_id != 0){
             $courses = $courses->where('c.category_id', $category_id)->get();
-        }else{
+        } else {
             $courses = $courses->get();
         }
 
@@ -93,6 +95,12 @@ class ApplyController extends Controller
 
     public function save(Request $request, $member_id)
     {
+        ini_set('upload_max_filesize', '10M');
+        ini_set('post_max_size', '12M');
+
+
+
+
         if ( !$this->checkUserAccessMember($member_id)){
             return redirect()->route('profile')->withErrors('The Member is not found.');
         }
@@ -100,11 +108,13 @@ class ApplyController extends Controller
         $course_id = $request->input("course_id");
         $cancel= $request->input("cancel");
 
+
         if ($cancel == "cancel") {
             $applys = Apply::where("course_id",$course_id)->where("member_id",$member_id)->get();
             foreach ($applys as $apply){
                 $apply->cancel = 1;
                 $apply->cancel_at = Carbon::now();
+                $apply->updated_by = "USER";
                 $apply->save();
             }
 
@@ -112,19 +122,23 @@ class ApplyController extends Controller
 
         }else if ($request->hasFile('registration_form')) {
 
-
             $request->validate([
                 'course_id' => 'required|exists:courses,id',
-                'registration_form' => 'required|file|mimes:pdf,jpg,jpeg,png|max:4096', // 4MB Max
+                'registration_form' => 'required|file|mimes:pdf,jpg,jpeg,png|max:8192', // 4MB Max
             ]);
 
             $apply = new Apply();
+
             $apply->member_id = $member_id;
             $apply->course_id = $course_id;
             $apply->cancel = 0;
+            $apply->state = "ยื่นใบสมัคร";
+
+            $apply->created_by = "USER";
 
 
             $file = $request->file('registration_form');
+
             $extension = $file->getClientOriginalExtension();
             $filename = $this->generateFileName($member_id,$course_id,$extension);
             $storagePath = 'uploads/courses/' . $course_id;
@@ -135,9 +149,14 @@ class ApplyController extends Controller
             $apply->save();
             // Save course application with file path (adjust according to your database structure)
             // Application::create([...]);
+
+
+
              return redirect()->route('courses.show', ['member_id' => $member_id, 'course_id' => $course_id]);
 
 //            return redirect()->route('courses.index',['member_id' => $member_id])->with('status', 'Applied successfully');
+        }else{
+            dd($request->file('registration_form'));
         }
     }
 
