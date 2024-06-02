@@ -14,7 +14,7 @@
             text-align: center
         }
         .btn-in-table {
-            margin: 3px; 
+            margin: 3px;
             /* font-size: 90%; */
             text-align: center;
             white-space: nowrap;
@@ -26,21 +26,22 @@
             <table id="myTable" class="table table-striped">
                 <thead>
                 <tr>
-                    <td class="text-center w-[5%]">ลำดับ</td>
-                    <td class="text-center w-[20%]">สมัครเมื่อ</td>
-                    <td class="text-center w-[15%]">ชื่อ</td>
-                    <td class="text-center w-[15%]">นามสกุล</td>
-                    <td class="text-center w-[20%]">เบอร์</td>
-                    <td class="text-center w-[20%]">email</td>
-                    <td class="text-center w-[5%]">อายุ</td>
-                    <td class="text-center w-[20%]">เพศ</td>
-                    <td class="text-center w-[20%]">buddhism</td>
-                    <td class="text-center w-[20%]">ข้อมูล</td>
-                    <td class="text-center w-[20%]">status</td>
-                    <td class="text-center w-[20%]">แก้ไขโดย</td>
+                    <td class="text-center ">ลำดับ</td>
+                    <td class="text-center ">สมัครเมื่อ</td>
+                    <td class="text-center ">ชื่อ</td>
+                    <td class="text-center ">นามสกุล</td>
+                    <td class="text-center ">เบอร์</td>
+                    <td class="text-center ">email</td>
+                    <td class="text-center ">อายุ</td>
+                    <td class="text-center ">เพศ</td>
+                    <td class="text-center ">buddhism</td>
+                    <td class="text-center ">สถานะ</td>
+                    <td class="text-center ">ข้อมูล</td>
+                    <td class="text-center ">status</td>
+                    <td class="text-center ">แก้ไขโดย</td>
                 </tr>
                 </thead>
-            
+
                 <tbody>
                     @foreach ($members as $index => $member)
                         <tr>
@@ -53,23 +54,23 @@
                             <td class="text-center">{{ $member->age }}</td>
                             <td class="text-center">{{ $member->gender }}</td>
                             <td class="text-center">{{ $member->buddhism }}</td>
-                            
+                            <td class="text-center">{{ $member->state }}</td>
+
                             <td>
-                                <button class="btn btn-sm btn-active btn-in-table">ใบสมัคร</button>
-                                <button class="btn btn-sm btn-active btn-in-table">ดูข้อมูล</button>
+                                <a href="{{ route('admin.courseApplyForm', ['course_id' => $member->course_id, 'apply_id' => $member->apply_id]) }}" target="_blank"> <button class="btn btn-sm btn-active btn-in-table">ดูข้อมูล</button></a>
                             </td>
-                            
+
                             <td>
                                 <div class="dropdown dropdown-hover">
-                                    <div tabindex="0" role="button" class="btn btn-sm btn-active">Click</div>
+                                    <div tabindex="0" role="button" class="btn btn-sm btn-active">แก้ไข</div>
                                     <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
-                                        <li><a>ยื่นใบสมัคร</a></li>
-                                        <li><a>โทร confirm แล้ว</a></li>
-                                        <li><a>ผ่านการอบรม</a></li>
-                                        <li><a>ยุติกลางคัน</a></li>
+                                        <li><a href="{{ route('admin.courseApplyStatus', ['course_id' => $member->course_id, 'apply_id' => $member->apply_id, 'status' => "ยื่นใบสมัคร"]) }}" target="self">ยื่นใบสมัคร</a></li>
+                                        <li><a href="{{ route('admin.courseApplyStatus', ['course_id' => $member->course_id, 'apply_id' => $member->apply_id, 'status' => "ยืนยันแล้ว"]) }}" target="self">ยืนยันแล้ว</a></li>
+                                        <li><a href="{{ route('admin.courseApplyStatus', ['course_id' => $member->course_id, 'apply_id' => $member->apply_id, 'status' => "ผ่านการอบรม"]) }}" target="self">ผ่านการอบรม</a></li>
+                                        <li><a href="{{ route('admin.courseApplyStatus', ['course_id' => $member->course_id, 'apply_id' => $member->apply_id, 'status' => "ยุติกลางคัน"]) }}" target="self">ยุติกลางคัน</a></li>
                                     </ul>
                                 </div>
-                                
+
                             </td>
 
                             <td class="text-center">{{ $member->updated_by }}</td>
@@ -78,7 +79,7 @@
                     @endforeach
                 </tbody>
             </table>
-        </div> 
+        </div>
     </div>
     <script type="text/javascript">
         $(document).ready(function() {
@@ -95,7 +96,7 @@
                 'color': 'white',
                 'text-align': 'center'
                 });
-       
+
 
                 $('#hidden').fadeTo(300,1);
                 $('#myTable').DataTable().columns.adjust().draw();

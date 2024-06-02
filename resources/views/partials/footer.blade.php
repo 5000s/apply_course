@@ -2,5 +2,5 @@
     Copyrights &copy; {{ date('Y') }} All Rights Reserved <br>
     ภาพและเนื้อหาในเว็บไซต์นี้เป็นงานมีลิขสิทธิ์ ห้ามทำซ้ำหรือดัดแปลง <br>
     <hr>
-    <a href="{{url("admin/member")}}" style="color: gray;"> ระบบค้นหาสำหรับเจ้าหน้าที่</a>
+{{--    <a href="{{url("admin/member")}}" style="color: gray;"> ระบบค้นหาสำหรับเจ้าหน้าที่</a>--}}
 </footer>

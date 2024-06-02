@@ -74,6 +74,7 @@
                 <h4>สถานที่<h4/>
                 <select class="select select-bordered max-w-xs" name="location" id="location">
                     @php $location = request()->query('location') @endphp
+                    <option @if($location==0) selected @endif value="0">ทั้งหมด</option>
                     <option @if($location==1) selected @endif value="1">แก่งคอย</option>
                     <option @if($location==2) selected @endif value="2">ลานหิน</option>
                     <option @if($location==3) selected @endif value="3">หาดใหญ่</option>
@@ -85,6 +86,7 @@
                 <h4>คอร์ส<h4/>
                 <select class="form select select-bordered max-w-xs" name="category", id="category">
                     @php $category = request()->query('category') @endphp
+                    <option @if($category==0) selected @endif value="0">ทั้งหมด</option>
                     <option @if($category==5) selected @endif value="5">คอร์สอานาปานสติ</option>
                     <option @if($category==1) selected @endif value="1">คอร์สเตโชวิปัสสนา</option>
                     <option @if($category==3) selected @endif value="3">คอร์สเตโชฯ (ศิษย์เก่า)</option>
@@ -119,6 +121,7 @@
         <table id="myTable" class="table table-striped">
             <thead>
             <tr>
+                <td class="text-center w-[20%]">สถานที่</td>
                 <td class="text-center w-[20%]">ชื่อคอร์ส</td>
                 <td class="text-center w-[20%]">วันที่เริ่ม</td>
                 <td class="text-center w-[20%]">วันที่จบ</td>
@@ -126,21 +129,24 @@
                 <td class="text-center w-[20%]">จำนวนผู้สมัครที่ confirm</td>
                 <td class="text-center w-[20%]">จำนวนผู้สมัครที่ผ่านการอบรม</td>
                 <td class="text-center w-[20%]">ดูผู้สมัคร</td>
-                <td class="text-center w-[20%]">Download excel</td>
+                <td class="text-center w-[20%]">รายการผู้สมัคร</td>
+                <td class="text-center w-[20%]">ใบสมัครทั้งหมด</td>
             </tr>
             </thead>
 
             <tbody>
                 @foreach ($courses as $course)
                     <tr>
+                        <td class="text-center">{{ $course->location }}</td>
                         <td class="text-center">{{ $course->category }}</td>
                         <td class="text-center">{{ $course->date_start}}</td>
                         <td class="text-center">{{ $course->date_end }}</td>
                         <td class="text-center">{{ $course->apply_count }}</td>
                         <td class="text-center">{{ $course->confirm_count }}</td>
                         <td class="text-center">{{ $course->pass_count }}</td>
-                        <td><a href="{{url("admin/courses/applylist") . "/$course->id"}}" class="btn btn-sm btn-active">Choose</a></td>
-                        <td><button class="btn btn-sm btn-active">Download</button></td>
+                        <td><a href="{{url("admin/courses/applylist") . "/$course->id"}}" class="btn btn-sm btn-active">เปิดดู</a></td>
+                        <td><a href="{{route("admin.applylist.download", $course->id )}}" class="btn btn-sm btn-active">Download</a></td>
+                        <td><a href="{{route("admin.applylist.totalform.zip", $course->id )}}" class="btn btn-sm btn-active">Download</a></td>
                     </tr>
                 @endforeach
             </tbody>
@@ -161,6 +167,7 @@
         // Initialize the data table
         $("#myTable").DataTable({
             // "searching": false,
+            pageLength: 20,
             "order": [[ 0, "desc" ]], //or asc
             "columnDefs" : [{"targets":0, "type":"date-en"}],
         });
@@ -172,34 +179,9 @@
     });
 
         $('#hidden').fadeTo(300,1);
-        $('#myTable').DataTable().columns.adjust().draw();
+
     });
 
-    // document.getElementById('locationSelect').addEventListener('change', function() {
-    // const location = this.value;
-    //     fetch('/admin/courses', {
-    //         method: 'POST',
-    //         headers: {
-    //             'Content-Type': 'application/json',
-    //             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') // Ensure CSRF token is correctly retrieved
-    //         },
-    //         body: JSON.stringify({
-    //             location: location
-    //         })
-    //     })
-    //     .then(response => {
-    //         if (!response.ok) {
-    //             throw new Error('Network response was not ok');
-    //         }
-    //         return response.json();
-    //     })
-    //     .then(data => {
-    //         console.log(data);
-    //     })
-    //     .catch((error) => {
-    //         console.error('Error:', error);
-    //     });
-    // });
 
 </script>
 
