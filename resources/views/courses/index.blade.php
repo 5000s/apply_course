@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="container">
-        <h1 class="text-center my-4">Course List</h1>
+        <h1 class="text-center my-4">รายการคอร์ส</h1>
         <div class="row">
             <div class="col" style="text-align: center; justify-content: center;">
                 <form action="{{route("courses.index", $member_id)}}" method="get">

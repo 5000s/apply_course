@@ -55,6 +55,34 @@ class ApplyController extends Controller
         return view('courses.index', compact('courses', 'member_id')); // Return the view with the courses list
     }
 
+    public function memberApplyHistory(Request $request, $member_id)
+    {
+
+        if ( !$this->checkUserAccessMember($member_id)){
+            return redirect()->route('profile')->withErrors('The Member is not found.');
+        }
+
+        $apples = DB::table('applies as a')
+            ->select(
+                'a.id as apply_id',
+                'a.created_at as apply_date',
+                'a.state as state',
+                'c.id as course_id',
+                'c.coursename',
+                'c.category',
+                'c.location',
+                'c.date_start',
+                'c.date_end',
+                DB::raw('DATEDIFF(c.date_start, NOW()) as days_until_start')
+            )
+            ->join('courses as c', 'c.id', '=', 'a.course_id')
+            ->where('a.member_id', $member_id)
+            ->orderBy('a.created_at', 'desc')
+            ->get();
+
+        return view('members.history', compact('apples', 'member_id'));
+    }
+
     public function checkUserAccessMember($member_id): bool
     {
         $user_id = Auth::user()->id;

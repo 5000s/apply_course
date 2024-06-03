@@ -28,7 +28,7 @@
                         <a href="{{ route('courses.index', $member->id) }}" class="btn btn-secondary">สมัคร</a>
                     </td>
                     <td>
-                        <a href="{{ route('courses.index', $member->id) }}" class="btn btn-secondary">ประวัติ</a>
+                        <a href="{{ route('courses.history', $member->id) }}" class="btn btn-secondary">ประวัติ</a>
                     </td>
                 </tr>
             @endforeach

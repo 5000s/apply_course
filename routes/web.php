@@ -93,6 +93,10 @@ Route::middleware(['verified'])->group(function () {
     Route::put('/member/update', [MemberController::class, 'update'])->name('member.update');
 
     Route::get('apply/{member_id}/courses', [ApplyController::class, 'index'])->name('courses.index');
+
+    Route::get('apply/{member_id}/courses/history', [ApplyController::class, 'memberApplyHistory'])->name('courses.history');
+
+
     Route::get('apply/{member_id}/courses/{course_id}', [ApplyController::class, 'show'])->name('courses.show');
     Route::post('apply/{member_id}/courses', [ApplyController::class, 'save'] )->name('courses.save');
     Route::get('apply/{member_id}/courses/edit/{course_id}', [ApplyController::class, 'edit'] )->name('courses.edit');
