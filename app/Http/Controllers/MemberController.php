@@ -251,7 +251,7 @@ class MemberController extends Controller
             'phone_2' => 'nullable|max:20',
             'blacklist' => 'nullable|in:yes,no',
             'line' => 'nullable|max:100',
-            'email' => 'required|email|max:256',
+            'email' => 'nullable|email|max:256',
             'province' => 'nullable|max:64',
             'country' => 'nullable|max:64',
             'facebook' => 'nullable|max:256',
