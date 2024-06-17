@@ -279,6 +279,7 @@ class MemberController extends Controller
         ]);
         $validatedData['email'] = Auth::user()->email; // Link member to user by email
         $validatedData['created_by'] = Auth::user()->id; // Link member to user by email
+        $validatedData['updated_by'] = Auth::user()->id; // Link member to user by email
 
         Member::create($validatedData);
 
