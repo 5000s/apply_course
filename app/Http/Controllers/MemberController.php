@@ -278,6 +278,7 @@ class MemberController extends Controller
             'nationality' => 'nullable|max:255'
         ]);
         $validatedData['email'] = Auth::user()->email; // Link member to user by email
+        $validatedData['created_by'] = Auth::user()->id; // Link member to user by email
 
         Member::create($validatedData);
 
