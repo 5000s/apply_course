@@ -94,4 +94,7 @@ return [
 
     'course_history' => 'ประวัติการเข้าคอร์ส',
     'apply_date' => 'วันที่สมัคร',
+
+    'course_application_system' => 'ระบบสมัครคอร์สเตโชวิปัสสนา',
+    'please_sign_in' => 'โปรดลงชื่อเข้าใช้งาน',
 ];

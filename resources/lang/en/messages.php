@@ -94,4 +94,7 @@ return [
     'course_history' => 'Course History',
     'apply_date' => 'Apply Date',
 
+    'course_application_system' => 'Techo Vipassana Course Application System',
+    'please_sign_in' => 'Please sign in',
+
 ];
