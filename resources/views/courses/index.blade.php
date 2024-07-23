@@ -2,15 +2,21 @@
 
 @section('content')
     <div class="container">
-        <h1 class="text-center my-4">รายการคอร์ส</h1>
+
+
+        <div class="d-flex justify-content-between align-items-center my-4">
+            <h1 class="text-center my-4">{{ __('messages.course_list') }}</h1>
+            <a href="{{ route('profile') }}" class="btn btn-secondary">{{ __('messages.back') }}</a>
+        </div>
+
         <div class="row">
             <div class="col" style="text-align: center; justify-content: center;">
-                <form action="{{route("courses.index", $member_id)}}" method="get">
+                <form action="{{route('courses.index', $member_id)}}" method="get">
                     <table>
                         <tr>
-                            <td>สถานที่</td>
-                            <td>คอร์ส</td>
-                            <td>ปีที่ต้องการค้นหา</td>
+                            <td>{{ __('messages.location') }}</td>
+                            <td>{{ __('messages.course') }}</td>
+                            <td>{{ __('messages.year') }}</td>
                             <td></td>
                         </tr>
                         <tr>
@@ -24,7 +30,7 @@
                                 </select>
                             </td>
                             <td>
-                                <select class="form select select-bordered max-w-xs" name="category", id="category">
+                                <select class="form select select-bordered max-w-xs" name="category" id="category">
                                     @php $category = request()->query('category') @endphp
                                     <option @if($category==0) selected @endif value="0">ทั้งหมด</option>
                                     <option @if($category==5) selected @endif value="5">คอร์สอานาปานสติ</option>
@@ -47,12 +53,10 @@
                                 </select>
                             </td>
                             <td>
-                                <button type="submit" class="btn btn-active"> ค้นหา</button>
+                                <button type="submit" class="btn btn-active">{{ __('messages.search') }}</button>
                             </td>
                         </tr>
                     </table>
-
-
                 </form>
             </div>
         </div>
@@ -60,29 +64,29 @@
         <table class="table">
             <thead>
             <tr>
-                <td class="text-center w-[20%]">ชื่อคอร์ส</td>
-                <td class="text-center w-[20%]">วันที่เริ่ม</td>
-                <td class="text-center w-[20%]">วันที่จบ</td>
-                <td class="text-center w-[20%]">สถานะ</td>
-                <td class="text-center w-[20%]">การสมัคร</td>
+                <td class="text-center w-[20%]">{{ __('messages.course_name') }}</td>
+                <td class="text-center w-[20%]">{{ __('messages.start_date') }}</td>
+                <td class="text-center w-[20%]">{{ __('messages.end_date') }}</td>
+                <td class="text-center w-[20%]">{{ __('messages.status') }}</td>
+                <td class="text-center w-[20%]">{{ __('messages.application') }}</td>
             </tr>
             </thead>
             <tbody>
             @foreach($courses as $course)
                 <tr>
                     <td class="text-center">{{ $course->category }}</td>
-                    <td class="text-center">{{ $course->date_start}}</td>
+                    <td class="text-center">{{ $course->date_start }}</td>
                     <td class="text-center">{{ $course->date_end }}</td>
                     <td class="text-center">{{ $course->state }}</td>
                     <td>
                         @if($course->state === 'เปิดรับสมัคร')
                             @if(is_null($course->apply_id))
-                                <a href="{{ route('courses.show', [$member_id, $course->id]) }}" class="btn btn-primary">สมัคร</a>
+                                <a href="{{ route('courses.show', [$member_id, $course->id]) }}" class="btn btn-primary">{{ __('messages.register') }}</a>
                             @else
-                                <a href="{{ route('courses.show', [$member_id, $course->id]) }}" class="btn btn-secondary">แก้ไข</a>
+                                <a href="{{ route('courses.show', [$member_id, $course->id]) }}" class="btn btn-secondary">{{ __('messages.edit') }}</a>
                             @endif
                         @else
-                            ปิดรับสมัคร
+                            {{ __('messages.closed') }}
                         @endif
                     </td>
                 </tr>

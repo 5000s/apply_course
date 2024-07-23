@@ -62,7 +62,7 @@ class ApplyController extends Controller
             return redirect()->route('profile')->withErrors('The Member is not found.');
         }
 
-        $apples = DB::table('applies as a')
+        $applies  = DB::table('applies as a')
             ->select(
                 'a.id as apply_id',
                 'a.created_at as apply_date',
@@ -80,7 +80,7 @@ class ApplyController extends Controller
             ->orderBy('a.created_at', 'desc')
             ->get();
 
-        return view('members.history', compact('apples', 'member_id'));
+        return view('members.history', compact('applies', 'member_id'));
     }
 
     public function checkUserAccessMember($member_id): bool

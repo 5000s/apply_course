@@ -3,17 +3,17 @@
 @section('content')
     <div class="container">
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h1>รายการผู้สมัคร</h1>
-            <a href="{{ route('member.create') }}" class="btn btn-primary">เพิ่มผู้สมัคร</a>
+            <h1>{{ __('messages.applicant_list') }}</h1>
+            <a href="{{ route('member.create') }}" class="btn btn-primary">{{ __('messages.add_applicant') }}</a>
         </div>
         <table class="table">
             <thead>
             <tr>
-                <th>ชื่อจริง</th>
-                <th>นามสกุล</th>
-                <th width="15%">แก้ไขข้อมูล</th>
-                <th width="15%">สมัครเข้าคอร์ส</th>
-                <th width="15%">ประวัติ</th>
+                <th>{{ __('messages.first_name') }}</th>
+                <th>{{ __('messages.surname') }}</th>
+                <th width="15%">{{ __('messages.edit_info') }}</th>
+                <th width="15%">{{ __('messages.register_course') }}</th>
+                <th width="15%">{{ __('messages.history') }}</th>
             </tr>
             </thead>
             <tbody>
@@ -22,13 +22,13 @@
                     <td>{{ $member->name }}</td>
                     <td>{{ $member->surname }}</td>
                     <td>
-                        <a href="{{ route('member.edit', $member->id) }}" class="btn btn-secondary">แก้ไข</a>
+                        <a href="{{ route('member.edit', $member->id) }}" class="btn btn-secondary">{{ __('messages.edit') }}</a>
                     </td>
                     <td>
-                        <a href="{{ route('courses.index', $member->id) }}" class="btn btn-secondary">สมัคร</a>
+                        <a href="{{ route('courses.index', $member->id) }}" class="btn btn-secondary">{{ __('messages.register') }}</a>
                     </td>
                     <td>
-                        <a href="{{ route('courses.history', $member->id) }}" class="btn btn-secondary">ประวัติ</a>
+                        <a href="{{ route('courses.history', $member->id) }}" class="btn btn-secondary">{{ __('messages.history') }}</a>
                     </td>
                 </tr>
             @endforeach

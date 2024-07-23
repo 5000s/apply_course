@@ -19,7 +19,10 @@ use App\Http\Controllers\MemberController;
 use App\Http\Controllers\PagesController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\EmailTestController;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Session;
 
 
 Auth::routes();
@@ -27,10 +30,22 @@ Auth::routes();
 Route::get('/', [PagesController::class, 'index'])->name('pages.index');
 
 Route::get('/login', [AuthController::class, 'index'])->name('pages.login');
+
+Route::get('/preregister', [AuthController::class, 'preregister'])->name('preregister');
+
+Route::get('/request-access', [AuthController::class, 'formPreregister'])->name('request-access');
+
+Route::post('/check-email', [AuthController::class, 'checkEmail'])->name('check-email');
+Route::post('/request-password-reset', [AuthController::class, 'requestPasswordReset'])->name('request-password-reset');
+Route::get('/request-password-reset', [AuthController::class, 'requestPasswordReset'])->name('request-password-reset');
+
 Route::post('/post-login', [AuthController::class, 'login'])->name('pages.postlogin');
+
 Route::get('/updatePhone', [AuthController::class, 'updatePhone']);
 
 Route::get('/about', [PagesController::class, 'about'])->name('pages.about');
+
+
 
 // Course
 
@@ -77,8 +92,8 @@ Auth::routes(['verify' => true]);
 
 Route::middleware(['verified'])->group(function () {
 
-    Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
-    Route::get('/profile', [App\Http\Controllers\HomeController::class, 'profile'])->name('profile');
+    Route::get('/home', [HomeController::class, 'index'])->name('home');
+    Route::get('/profile', [HomeController::class, 'profile'])->name('profile');
 
 // Route to show form for creating a new member
     Route::get('/member/create', [MemberController::class, 'create'])->name('member.create');
@@ -106,6 +121,16 @@ Route::middleware(['verified'])->group(function () {
 
 
 Route::get('/send-test-email', [EmailTestController::class, 'sendTestEmail'] );
+
+
+
+Route::get('lang/{locale}', function ($locale) {
+    if (in_array($locale, ['en', 'th'])) {
+        Session::put('locale', $locale);
+        App::setLocale($locale);
+    }
+    return redirect()->back();
+})->name('lang.switch');
 
 
 

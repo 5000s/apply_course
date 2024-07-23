@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="container">
-        <h1 class="text-center my-4">ฟอร์มเพิ่มข้อมูลผู้สมัคร</h1>
+        <h1 class="text-center my-4">{{ __('messages.applicant_form') }}</h1>
         @if(session('success'))
             <div class="alert alert-success">
                 {{ session('success') }}
@@ -20,147 +20,110 @@
 
         <form method="POST" action="{{ route('member.store') }}" class="border p-4 shadow rounded">
             @csrf
-            <h4>ข้อมูลผู้สมัคร</h4>
+            <h4>{{ __('messages.applicant') }}</h4>
             <div class="row">
                 <div class="col-md-6">
                     <!-- Left Column -->
                     <div class="mb-3">
-                        <label for="name" class="form-label">ชื่อ</label>
+                        <label for="name" class="form-label">{{ __('messages.name') }} <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" id="name" name="name" required>
                     </div>
                     <div class="mb-3">
-                        <label for="surname" class="form-label">นามสกุล</label>
+                        <label for="surname" class="form-label">{{ __('messages.surname') }} <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" id="surname" name="surname" required>
                     </div>
-
                     <div class="mb-3">
-                        <label for="gender" class="form-label">เพศ</label>
-                        <select class="form-select form-control" id="gender" name="gender">
-                            <option value="หญิง">หญิง</option>
-                            <option value="ชาย">ชาย</option>
+                        <label for="gender" class="form-label">{{ __('messages.gender') }} <span class="text-danger">*</span></label>
+                        <select class="form-select form-control" id="gender" name="gender" required>
+                            <option value="หญิง">{{ __('messages.female') }}</option>
+                            <option value="ชาย">{{ __('messages.male') }}</option>
                         </select>
                     </div>
-                    <!-- More fields from the left column -->
                     <div class="mb-3">
-                        <label for="birthdate" class="form-label">วันเกิด</label>
-                        <input type="date" class="form-control" id="birthdate" name="birthdate">
+                        <label for="birthdate" class="form-label">{{ __('messages.birthdate') }} <span class="text-danger">*</span></label>
+                        <input type="date" class="form-control" id="birthdate" name="birthdate" required>
                     </div>
                     <div class="mb-3">
-                        <label for="nationality" class="form-label">สัญชาติ</label>
-                        <select class="form-control" id="nationality" name="nationality">
+                        <label for="nationality" class="form-label">{{ __('messages.nationality') }} <span class="text-danger">*</span></label>
+                        <select class="form-control" id="nationality" name="nationality" required>
                             @foreach($nations as $nation)
-                                <option value="{{$nation}}"> {{$nation}}</option>
+                                <option value="{{$nation}}">{{$nation}}</option>
                             @endforeach
                         </select>
-
                     </div>
                     <div class="mb-3">
-                        <label for="province" class="form-label">จังหวัดที่อยู่ในไทย</label>
-                        <select class="form-control" id="control" name="province">
+                        <label for="province" class="form-label">{{ __('messages.province') }} <span class="text-danger">*</span></label>
+                        <select class="form-control" id="province" name="province" required>
                             @foreach($provinces as $province)
-                                <option value="{{$province['name_th']}}"> {{$province['name_th']}}</option>
+                                <option value="{{$province['name_th']}}">{{$province['name_th']}}</option>
                             @endforeach
                         </select>
                     </div>
-                    <!-- Continue with other fields similarly -->
                 </div>
                 <div class="col-md-6">
                     <!-- Right Column -->
                     <div class="mb-3">
-                        <label for="phone" class="form-label">โทรศัพท์</label>
-                        <input type="text" class="form-control" id="phone" name="phone">
+                        <label for="phone" class="form-label">{{ __('messages.phone') }} <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="phone" name="phone" required>
                     </div>
                     <div class="mb-3">
-                        <label for="phone2" class="form-label">โทรศัพท์ที่ 2</label>
+                        <label for="phone2" class="form-label">{{ __('messages.phone2') }}</label>
                         <input type="text" class="form-control" id="phone2" name="phone2">
                     </div>
                     <div class="mb-3">
-                        <label for="line" class="form-label">ไลน์</label>
+                        <label for="line" class="form-label">{{ __('messages.line') }}</label>
                         <input type="text" class="form-control" id="line" name="line">
                     </div>
-                    <!-- More fields from the right column -->
                     <div class="mb-3">
-                        <label for="facebook" class="form-label">เฟซบุ๊ก</label>
+                        <label for="facebook" class="form-label">{{ __('messages.facebook') }}</label>
                         <input type="text" class="form-control" id="facebook" name="facebook">
                     </div>
-                    <!-- Continue with other fields similarly -->
                 </div>
             </div>
-            <h4>การศึกษา และ อาชีพ</h4>
+            <h4>{{ __('messages.education') }}</h4>
             <div class="row">
                 <div class="col-md-6">
                     <!-- Left Column -->
                     <div class="mb-3">
-                        <label for="degree" class="form-label">ระดับการศึกษา</label>
+                        <label for="degree" class="form-label">{{ __('messages.degree') }} <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" id="degree" name="degree" required>
                     </div>
                     <div class="mb-3">
-                        <label for="career" class="form-label">อาชีพ</label>
+                        <label for="career" class="form-label">{{ __('messages.career') }} <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" id="career" name="career" required>
                     </div>
-                    <!-- Continue with other fields similarly -->
                 </div>
                 <div class="col-md-6">
                     <!-- Right Column -->
                     <div class="mb-3">
-                        <label for="organization" class="form-label">องค์กร</label>
+                        <label for="organization" class="form-label">{{ __('messages.organization') }}</label>
                         <input type="text" class="form-control" id="organization" name="organization">
                     </div>
                     <div class="mb-3">
-                        <label for="expertise" class="form-label">ความเชี่ยวชาญ</label>
+                        <label for="expertise" class="form-label">{{ __('messages.expertise') }}</label>
                         <input type="text" class="form-control" id="expertise" name="expertise">
                     </div>
-                    <!-- Continue with other fields similarly -->
                 </div>
             </div>
-            <!-- Fields that don't fit into the two-column layout -->
-            <!-- Dharma Experience -->
-{{--            <h4>ประสบการณ์เข้าคอร์สปฏิบัติธรรมของผู้สมัคร</h4>--}}
-{{--            <div class="mb-3">--}}
-{{--                <label for="know_source" class="form-label">ที่มาของการรู้จักคอร์สปฏิบัติธรรมนี้</label>--}}
-{{--                <input type="text" class="form-control" id="know_source" name="know_source" value="{{ old('know_source') }}">--}}
-{{--            </div>--}}
-
-{{--            <div class="mb-3">--}}
-{{--                <label for="dharma_ex" class="form-label">เคยมีประสบการณ์เข้าคอร์สปฏิบัติธรรมหรือไม่</label>--}}
-{{--                <select class="form-control" id="dharma_ex" name="dharma_ex">--}}
-{{--                    <option value="ไม่เคย">ไม่เคย</option>--}}
-{{--                    <option value="เคย">เคย</option>--}}
-{{--                </select>--}}
-{{--            </div>--}}
-
-{{--            <div class="mb-3">--}}
-{{--                <label for="dharma_ex_desc" class="form-label">รายละเอียดประสบการณ์ปฏิบัติธรรม</label>--}}
-{{--                <textarea class="form-control" id="dharma_ex_desc" name="dharma_ex_desc">{{ old('dharma_ex_desc') }}</textarea>--}}
-{{--            </div>--}}
-
-
-
-            <!-- Emergency Contact -->
-            <h4>ผู้ติดต่อฉุกเฉิน</h4>
+            <h4>{{ __('messages.emergency_contact') }}</h4>
             <div class="mb-3">
-                <label for="name_emergency" class="form-label">ชื่อจริง ผู้ติดต่อฉุกเฉิน</label>
-                <input type="text" class="form-control" id="name_emergency" name="name_emergency" value="{{ old('name_emergency') }}">
+                <label for="name_emergency" class="form-label">{{ __('messages.emergency_name') }} <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="name_emergency" name="name_emergency" value="{{ old('name_emergency') }}" required>
             </div>
-
             <div class="mb-3">
-                <label for="surname_emergency" class="form-label">นามสกุล ผู้ติดต่อฉุกเฉิน</label>
-                <input type="text" class="form-control" id="surname_emergency" name="surname_emergency" value="{{ old('surname_emergency') }}">
+                <label for="surname_emergency" class="form-label">{{ __('messages.emergency_surname') }} <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="surname_emergency" name="surname_emergency" value="{{ old('surname_emergency') }}" required>
             </div>
-
             <div class="mb-3">
-                <label for="phone_emergency" class="form-label">โทรศัพท์ ผู้ติดต่อฉุกเฉิน</label>
-                <input type="text" class="form-control" id="phone_emergency" name="phone_emergency" value="{{ old('phone_emergency') }}">
+                <label for="phone_emergency" class="form-label">{{ __('messages.emergency_phone') }} <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="phone_emergency" name="phone_emergency" value="{{ old('phone_emergency') }}" required>
             </div>
-
             <div class="mb-3">
-                <label for="relation_emergency" class="form-label">ความสัมพันธ์กับผู้ติดต่อฉุกเฉิน</label>
-                <input type="text" class="form-control" id="relation_emergency" name="relation_emergency" value="{{ old('relation_emergency') }}">
+                <label for="relation_emergency" class="form-label">{{ __('messages.emergency_relation') }} <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="relation_emergency" name="relation_emergency" value="{{ old('relation_emergency') }}" required>
             </div>
-
-
             <div class="text-center">
-                <button type="submit" class="btn btn-primary">บันทึกข้อมูล</button>
+                <button type="submit" class="btn btn-primary">{{ __('messages.save') }}</button>
             </div>
         </form>
     </div>
