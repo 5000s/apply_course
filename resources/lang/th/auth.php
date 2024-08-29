@@ -7,4 +7,12 @@ return [
     'If you did not receive the email' => 'หากคุณไม่ได้รับอีเมล',
     'click here to request another' => 'คลิกที่นี่เพื่อขอลิงก์ใหม่',
     'Please check your junk folder as well if you do not find the email in your inbox.' => 'โปรดตรวจสอบโฟลเดอร์ขยะของคุณด้วย หากคุณไม่พบอีเมลในกล่องขาเข้า',
+    'Send Password Reset Link' => 'ส่งลิงก์รีเซ็ตรหัสผ่าน',
+    'Reset Password' => 'รีเซ็ตรหัสผ่าน',
+
+    'Login' => 'เข้าสู่ระบบ',
+    'Email Address' => 'ที่อยู่อีเมล',
+    'Password' => 'รหัสผ่าน',
+    'Remember Me' => 'จดจำฉัน',
+    'Forgot Your Password?' => 'ลืมรหัสผ่าน?',
 ];

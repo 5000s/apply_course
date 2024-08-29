@@ -16,7 +16,14 @@ return [
     'failed' => 'These credentials do not match our records.',
     'password' => 'The provided password is incorrect.',
     'throttle' => 'Too many login attempts. Please try again in :seconds seconds.',
+    'Send Password Reset Link' => 'Send Password Reset Link',
+    'Reset Password' => 'Reset Password',
 
+    'Login' => 'Login',
+    'Email Address' => 'Email Address',
+    'Password' => 'Password',
+    'Remember Me' => 'Remember Me',
+    'Forgot Your Password?' => 'Forgot Your Password?',
 
 
 ];

@@ -49,6 +49,7 @@ class ApplyController extends Controller
         if ($category_id != 0){
             $courses = $courses->where('c.category_id', $category_id)->get();
         } else {
+            $courses = $courses->whereIn('c.category_id', [1,3,5,6,8]);
             $courses = $courses->get();
         }
 
@@ -127,8 +128,6 @@ class ApplyController extends Controller
         ini_set('post_max_size', '12M');
 
 
-
-
         if ( !$this->checkUserAccessMember($member_id)){
             return redirect()->route('profile')->withErrors('The Member is not found.');
         }
@@ -137,12 +136,15 @@ class ApplyController extends Controller
         $cancel= $request->input("cancel");
 
 
+        $course = Course::where("id",$course_id)->first();
+
         if ($cancel == "cancel") {
             $applys = Apply::where("course_id",$course_id)->where("member_id",$member_id)->get();
             foreach ($applys as $apply){
                 $apply->cancel = 1;
                 $apply->cancel_at = Carbon::now();
                 $apply->updated_by = "USER";
+                $apply->application = null;
                 $apply->save();
             }
 
@@ -167,6 +169,8 @@ class ApplyController extends Controller
 
             $file = $request->file('registration_form');
 
+            logger()->info('File size being uploaded: ' . $file->getSize());
+
             $extension = $file->getClientOriginalExtension();
             $filename = $this->generateFileName($member_id,$course_id,$extension);
             $storagePath = 'uploads/courses/' . $course_id;
@@ -183,6 +187,24 @@ class ApplyController extends Controller
              return redirect()->route('courses.show', ['member_id' => $member_id, 'course_id' => $course_id]);
 
 //            return redirect()->route('courses.index',['member_id' => $member_id])->with('status', 'Applied successfully');
+        }else if($course->category_id == 8){
+            // อานาปา 1 วัน
+
+            $regstration_name = $request->input("regstration_name");
+
+            $apply = new Apply();
+
+            $apply->member_id = $member_id;
+            $apply->course_id = $course_id;
+            $apply->cancel = 0;
+            $apply->state = "ยื่นใบสมัคร";
+
+            $apply->created_by = "USER";
+            $apply->application = $regstration_name;
+            $apply->save();
+
+            return redirect()->route('courses.show', ['member_id' => $member_id, 'course_id' => $course_id]);
+
         }else{
             dd($request->file('registration_form'));
         }

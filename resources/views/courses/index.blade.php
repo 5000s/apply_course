@@ -33,15 +33,15 @@
                                 <select class="form select select-bordered max-w-xs" name="category" id="category">
                                     @php $category = request()->query('category') @endphp
                                     <option @if($category==0) selected @endif value="0">ทั้งหมด</option>
-                                    <option @if($category==5) selected @endif value="5">คอร์สอานาปานสติ</option>
-                                    <option @if($category==1) selected @endif value="1">คอร์สเตโชวิปัสสนา</option>
-                                    <option @if($category==3) selected @endif value="3">คอร์สเตโชฯ (ศิษย์เก่า)</option>
-                                    <option @if($category==6) selected @endif value="6">คอร์สศิษย์เก่า (๓ วัน)</option>
-                                    <option @if($category==4) selected @endif value="4">คอร์สวิถีอาสวะ</option>
-                                    <option @if($category==2) selected @endif value="2">คอร์สฤาษี (๑๔ วัน)</option>
-                                    <option @if($category==7) selected @endif value="7">ธรรมะแคมป์</option>
-                                    <option @if($category==8) selected @endif value="8">คอร์สอานาปานสติ ๑ วัน</option>
-                                    <option @if($category==9) selected @endif value="9">คอร์สเตโชฯ (อาวุโส)</option>
+{{--                                    <option @if($category==7) selected @endif value="7">ธรรมะแคมป์</option>--}}
+                                    <option @if($category==8) selected @endif value="8">คอร์สอานาปานสติ 1 วัน</option>
+                                    <option @if($category==5) selected @endif value="5">คอร์สอานาปานสติ 4 วัน</option>
+                                    <option @if($category==1) selected @endif value="1">คอร์สวิปัสสนา 7 วัน</option>
+                                    <option @if($category==3) selected @endif value="3">คอร์สวิปัสสนา 7 วัน (ศิษย์เก่า)</option>
+                                    <option @if($category==6) selected @endif value="6">คอร์สวิปัสสนา 3 วัน (ศิษย์เก่า)</option>
+{{--                                    <option @if($category==4) selected @endif value="4">คอร์สวิถีอาสวะ</option>--}}
+{{--                                    <option @if($category==2) selected @endif value="2">คอร์สฤาษี (๑๔ วัน)</option>--}}
+{{--                                    <option @if($category==9) selected @endif value="9">คอร์สเตโชฯ (อาวุโส)</option>--}}
                                 </select>
                             </td>
                             <td>
