@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use App\Notifications\ResetPassword;
+
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -37,6 +39,11 @@ class User extends Authenticatable implements MustVerifyEmail
         'email_verified_at' => 'datetime',
     ];
 
+
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new ResetPassword($token));
+    }
 
 
 }
