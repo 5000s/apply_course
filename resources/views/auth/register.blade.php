@@ -4,7 +4,7 @@
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-8">
-            <div class="card">
+            <div class="card" style="font-size: 18px;">
                 <div class="card-header">{{ __('messages.Register') }}</div>
 
                 <div class="card-body">
@@ -96,6 +96,16 @@
                             </div>
                         </div>
                     </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8 " style="padding-top: 10px">
+            <div class="card">
+                <div class="card-body" style="font-size: 18px;">
+                    <strong>หมายเหตุ:</strong> หากท่านเป็นศิษย์เก่า หรือเคยมีประวัติการเข้าคอร์สมาก่อน หากท่าน
+                    สมัครสมาชิกใหม่ในหน้านี้ ชื่อนามสกุลท่านอาจซ้ำ ทำให้การสมัครไม่สำเร็จ หรือหาก
+                    สำเร็จ อาจทำให้ข้อมูลการเข้าคอร์สของท่านสูญหายได้
+
                 </div>
             </div>
         </div>

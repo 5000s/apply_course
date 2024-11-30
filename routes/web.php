@@ -46,6 +46,9 @@ Route::get('/updatePhone', [AuthController::class, 'updatePhone']);
 Route::get('/about', [PagesController::class, 'about'])->name('pages.about');
 
 
+//student
+Route::get('/course/list', [ApplyController::class, 'showCourseForStudent'])->name('showCourseForStudent');
+
 
 // Course
 

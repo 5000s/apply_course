@@ -1,0 +1,52 @@
+.option_course {
+    height: 100px;
+    display: flex; /* Enable Flexbox */
+    justify-content: center; /* Horizontally center */
+    align-items: center; /* Vertically center */
+    font-weight: bold;
+    text-align: center;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    text-wrap: pretty;
+    font-size: 16px;
+}
+
+
+    /* Add the CSS here */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+    font-family: Arial, sans-serif;
+    margin: 20px 0;
+    font-size: 16px;
+}
+
+th, td{
+    border: 1px solid black;
+    padding: 10px;
+}
+
+th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+td{
+    font-size: 18px;
+}
+
+
+
+
+tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+caption {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    text-align: center;
+}

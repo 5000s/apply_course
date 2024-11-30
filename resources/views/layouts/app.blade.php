@@ -69,11 +69,11 @@
                                 </li>
                             @endif
 
-                            @if (Route::has('register'))
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('preregister') }}">{{ __('messages.Register') }}</a>
-                                </li>
-                            @endif
+{{--                            @if (Route::has('register'))--}}
+{{--                                <li class="nav-item">--}}
+{{--                                    <a class="nav-link" href="{{ route('preregister') }}">{{ __('messages.Register') }}</a>--}}
+{{--                                </li>--}}
+{{--                            @endif--}}
                         @else
                             <li class="nav-item">
                                 <a class="nav-link" href="{{ route('profile') }}"> {{ __('messages.profile') }}  </a>

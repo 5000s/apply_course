@@ -7,43 +7,59 @@
                 {{ session('error') }}
             </div>
         @endif
-        <div class="row mb-4">
-            <div class="col-md-6 offset-md-3 text-center">
-                <h2>{{ __('messages.enter_details') }}</h2>
-                <p>{{ __('messages.enter_name_surname') }}</p>
-                <form id="request-access-form" method="POST" action="{{ route('check-email') }}">
-                    @csrf
-                    <div class="form-group">
-                        <input type="text" name="first_name" id="first_name" class="form-control" placeholder="{{ __('messages.first_name') }}" required>
+        <div class="row mb-12">
+            <div class="col-md-6 offset-md-3 ">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="text-center">
+                            <h2>{{ __('messages.enter_details') }}</h2>
+                            <p>{{ __('messages.enter_name_surname') }}</p>
+                            <form id="request-access-form" method="POST" action="{{ route('check-email') }}">
+                                @csrf
+                                <div class="form-group">
+                                    <input type="text" name="first_name" id="first_name" class="form-control" placeholder="{{ __('messages.first_name') }}" required>
+                                </div>
+                                <div class="form-group">
+                                    <input type="text" name="last_name" id="last_name" class="form-control" placeholder="{{ __('messages.last_name') }}" required>
+                                </div>
+                                <div class="form-group">
+                                    <select name="birth_year" id="birth_year" class="form-control" required>
+                                        <option value="">{{ __('messages.select_birth_year') }}</option>
+                                        @php
+                                            $currentYear = date('Y');
+                                            $startYear = $currentYear - 90;
+                                        @endphp
+                                        @for ($year = ($currentYear-6); $year >= $startYear ; $year--)
+                                            <option value="{{ $year }}">{{ $year+543 }} ({{$year}})</option>
+                                        @endfor
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <select name="gender" id="gender" class="form-control" required>
+                                        <option value="">{{ __('messages.gender') }}</option>
+                                        <option value="ชาย">{{ __('messages.male') }}</option>
+                                        <option value="หญิง">{{ __('messages.female') }}</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-lg w-100 mt-3 shadow">
+                                    <i class="fas fa-envelope"></i> {{ __('messages.check_email') }}
+                                </button>
+                            </form>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <input type="text" name="last_name" id="last_name" class="form-control" placeholder="{{ __('messages.last_name') }}" required>
-                    </div>
-                    <div class="form-group">
-                        <select name="birth_year" id="birth_year" class="form-control" required>
-                            <option value="">{{ __('messages.select_birth_year') }}</option>
-                            @php
-                                $currentYear = date('Y');
-                                $startYear = $currentYear - 90;
-                            @endphp
-                            @for ($year = ($currentYear-6); $year >= $startYear ; $year--)
-                                <option value="{{ $year }}">{{ $year+543 }} ({{$year}})</option>
-                            @endfor
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <select name="gender" id="gender" class="form-control" required>
-                            <option value="">{{ __('messages.gender') }}</option>
-                            <option value="ชาย">{{ __('messages.male') }}</option>
-                            <option value="หญิง">{{ __('messages.female') }}</option>
-                        </select>
-                    </div>
-                    <button type="submit" class="btn btn-primary btn-lg w-100 mt-3">
-                        <i class="fas fa-envelope"></i> {{ __('messages.check_email') }}
-                    </button>
-                </form>
+                </div>
             </div>
+
+            <div class="col-md-6 offset-md-3 " style="padding-top: 10px">
+{{--                <div class="card">--}}
+{{--                    <div class="card-body" style="font-size: 18px;">--}}
+{{--                        <strong>หมายเหตุ:</strong> หากท่านไม่ทราบอีเมลหรือต้องการเปลี่ยนอีเมลใหม่<br>กรุณาคลิกขอเปลี่ยนแปลงข้อมูลในระบบสมาชิก--}}
+{{--                        <a href="#" class="btn shadow w-100" style="font-size: 18px; background-color: #ff6365; color: #111111;">ขอเปลี่ยนแปลงข้อมูลในระบบสมาชิก</a>--}}
+{{--                    </div>--}}
+{{--                </div>--}}
+{{--            </div>--}}
         </div>
+
     </div>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

@@ -11,6 +11,8 @@ class PagesController extends Controller
     {
         if(Auth::check()){
             return redirect()->route('profile');
+        }else{
+            return redirect()->route('login');
         }
 
         return view('home');
@@ -20,4 +22,6 @@ class PagesController extends Controller
     {
         return view('about');
     }
+
+
 }

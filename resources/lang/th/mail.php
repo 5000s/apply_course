@@ -7,5 +7,5 @@ return [
     'reset_password_line_2' => 'ลิงก์รีเซ็ตรหัสผ่านนี้จะหมดอายุใน :count นาที.',
     'reset_password_line_3' => 'หากคุณไม่ได้ขอรีเซ็ตรหัสผ่าน ไม่จำเป็นต้องดำเนินการเพิ่มเติม.',
     'reset_password_regards' => 'ขอแสดงความนับถือ,',
-    'reset_password_footer' => 'ระบบสมัครคอร์สสายธรรมวิปัสสนา',
+    'reset_password_footer' => 'ระบบสมัครคอร์สวิปัสสนา',
 ];

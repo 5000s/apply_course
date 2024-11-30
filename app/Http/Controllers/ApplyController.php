@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Apply;
+use App\Models\Location;
 use App\Models\Member;
 use Carbon\Carbon;
 use Google\Service\AdMob\App;
@@ -15,45 +16,144 @@ use Illuminate\Support\Facades\DB;
 
 class ApplyController extends Controller
 {
-    public function index(Request $request, $member_id)
-    {
-        $location_id = $request->input('location', 1);
-        $category_id = $request->input('category', 0);
-        $now_year = Carbon::now()->year;
-        $year = $request->input('year', $now_year);
+
+    public function showCourseForStudent(){
+
+        $now = Carbon::now()->subMonth(6);
 
         // Query to get courses
-        $courses = DB::table('courses as c')
+        $courses_saraburi = self::getCourses(1,$now);
+        $courses_surin = self::getCourses(2,$now);
+        $courses_hadyai = self::getCourses(3,$now);
+        $courses_bangkok = self::getCourses(4,$now);
+        $courses_phuket = self::getCourses(5,$now);
+
+        $data = [];
+
+        $data['courses_saraburi'] = $courses_saraburi;
+        $data['location_saraburi'] = Location::where("id",1)->first();
+
+        $data['courses_surin'] = $courses_surin;
+        $data['location_surin'] = Location::where("id",2)->first();
+
+        $data['courses_hadyai'] = $courses_hadyai;
+        $data['location_hadyai'] = Location::where("id",3)->first();
+
+        $data['courses_bangkok'] = $courses_bangkok;
+        $data['location_bangkok'] = Location::where("id",4)->first();
+
+        $data['courses_phuket'] = $courses_phuket;
+        $data['location_phuket'] = Location::where("id",5)->first();
+
+
+
+
+        return view('courses.list',$data); // Return the view with the courses list
+    }
+
+    public static function getCourses($location_id, $dateStart)
+    {
+        return DB::table('courses as c')
+            ->join('course_categories as cc', 'c.category_id', '=', 'cc.id') // Join with course_categories table
             ->select(
-                'c.location',
                 'c.id',
-                'c.category',
                 'c.date_start',
+                'cc.show_name as name', // Get course category name
                 'c.date_end',
-                'c.state',
-                'a.id as apply_id',
-                'a.cancel'
+                'c.category',
+                'c.state'
             )
-            ->leftJoin('applies as a', function($join) use ($member_id) {
+            ->whereDate('c.date_start', '>', $dateStart)
+            ->whereIn('c.category_id', [1, 3, 5, 6, 8])
+            ->where('c.location_id', $location_id)
+            ->get()
+            ->map(function ($course) {
+                // Parse the start and end dates
+                $startDate = Carbon::parse($course->date_start)->locale('th');
+                $endDate = Carbon::parse($course->date_end)->locale('th');
+
+                // Add 543 years to convert Gregorian year to Thai Buddhist year
+                $thaiYear = $endDate->year + 543;
+
+                // Format the date range with Thai Buddhist year
+                if ($startDate->isSameDay($endDate)) {
+                    $course->date_range = "{$startDate->translatedFormat('j F')} $thaiYear";
+                } else {
+                    $course->date_range = "{$startDate->translatedFormat('j')}–{$endDate->translatedFormat('j F')} $thaiYear";
+                }
+
+                $course->month_year = "{$endDate->translatedFormat('F')} $thaiYear";
+
+                return $course;
+            });
+    }
+
+    public static function getCourseWithMember($location_id, $member_id, $dateStart)
+    {
+        return DB::table('courses as c')
+            ->join('course_categories as cc', 'c.category_id', '=', 'cc.id') // Join with course_categories table
+            ->leftJoin('applies as a', function ($join) use ($member_id) {
                 $join->on('c.id', '=', 'a.course_id')
                     ->where('a.member_id', '=', $member_id)
                     ->where('a.cancel', '=', 0);
-            })
-            ->where('c.location_id', $location_id)
-            ->where(function ($query) use ($year) {
-                $query->whereYear('c.date_start', $year)
-                    ->orWhereYear('c.date_end', $year);
-            })
-            ->groupBy('c.location', 'c.id', 'c.category', 'c.date_start', 'c.date_end', 'c.state', 'a.id', 'a.cancel');
+            }) // Join with applies table for member-specific data
+            ->select(
+                'c.id',
+                'c.date_start',
+                'cc.show_name as name', // Get course category name
+                'c.date_end',
+                'c.category',
+                'c.state',
+                'a.id as apply_id', // Member's application ID
+                'a.cancel'
+            )
+            ->whereDate('c.date_start', '>', $dateStart) // Filter courses starting after $dateStart
+            ->whereIn('c.category_id', [1, 3, 5, 6, 8]) // Filter specific categories
+            ->where('c.location_id', $location_id) // Filter by location
+            ->get()
+            ->map(function ($course) {
+                // Parse the start and end dates
+                $startDate = Carbon::parse($course->date_start)->locale('th');
+                $endDate = Carbon::parse($course->date_end)->locale('th');
 
-        if ($category_id != 0){
-            $courses = $courses->where('c.category_id', $category_id)->get();
-        } else {
-            $courses = $courses->whereIn('c.category_id', [1,3,5,6,8]);
-            $courses = $courses->get();
-        }
+                // Add 543 years to convert Gregorian year to Thai Buddhist year
+                $thaiYear = $endDate->year + 543;
 
-        return view('courses.index', compact('courses', 'member_id')); // Return the view with the courses list
+                // Format the date range with Thai Buddhist year
+                if ($startDate->isSameDay($endDate)) {
+                    $course->date_range = "{$startDate->translatedFormat('j F')} $thaiYear";
+                } else {
+                    $course->date_range = "{$startDate->translatedFormat('j')}–{$endDate->translatedFormat('j F')} $thaiYear";
+                }
+
+                $course->month_year = "{$endDate->translatedFormat('F')} $thaiYear";
+
+                return $course;
+            });
+    }
+
+
+
+    public function index(Request $request, $member_id)
+    {
+        $location_id = $request->input('location', 1);
+        $now = Carbon::now()->subMonth(6);
+
+        // Query to get courses
+        $courses = self::getCourseWithMember($location_id,$member_id,$now);
+        $location = Location::where("id",$location_id)->first();
+
+
+        $locations = Location::where("id","!=",2)->get();
+
+        $data = [];
+        $data['courses'] = $courses;
+        $data['course_location'] = $location;
+        $data['course_locations'] = $locations;
+        $data['selected_location_id'] = $location_id;
+        $data['member_id'] = $member_id;
+
+        return view('courses.index', $data); // Return the view with the courses list
     }
 
     public function memberApplyHistory(Request $request, $member_id)
