@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Exports\CourseApplyExport;
 use App\Models\Apply;
 use App\Models\Course;
+use App\Models\CourseCategory;
 use App\Models\Location;
 use App\Models\Member;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -21,7 +22,47 @@ use Illuminate\Support\Facades\Storage;
 
 class CourseController extends Controller
 {
-    public function courseList(Request $request)
+
+    public function courseCreate(Request $request)
+    {
+        $locations = Location::all();
+        $categories = CourseCategory::all();
+        return view('admin.course_create', compact('locations', 'categories'));
+    }
+
+    public function courseEdit(Request $request,$course_id)
+    {
+
+        $course = Course::where("id",$course_id)->first();
+        $locations = Location::all();
+        $categories = CourseCategory::all();
+
+        return view('admin.course_create', compact('course', 'locations', 'categories'));
+    }
+
+
+    public function courseSave(Request $request)
+    {
+
+        $locations = Location::all();
+        $categories = CourseCategory::all();
+
+        return "SAVE";
+
+    }
+
+    public function courseUpdate(Request $request)
+    {
+
+        $locations = Location::all();
+        $categories = CourseCategory::all();
+
+        return "UPDATE";
+    }
+
+
+
+        public function courseList(Request $request)
     {
         $data = [];
         $locationChoose = "";
@@ -34,9 +75,13 @@ class CourseController extends Controller
 
         // Query builder with Eloquent
         $courses = DB::table('courses as c')
+            ->join('course_categories as cc', 'c.category_id', '=', 'cc.id') // Join course categories
+
             ->select(
                 'c.location',
                 'c.id',
+                'c.state',
+                'cc.show_name as name', // Course category name
                 'c.category',
                 'c.date_start',
                 'c.date_end',
@@ -62,8 +107,26 @@ class CourseController extends Controller
         });
 
         // Group by and get results
-        $courses = $courses->groupBy('c.location', 'c.id', 'c.category', 'c.date_start', 'c.date_end')
-            ->get();
+        $courses = $courses->groupBy( 'c.state', 'c.location', 'c.id', 'c.category', 'c.date_start', 'c.date_end', 'cc.show_name')
+            ->get()->map(function ($course) {
+                // Parse the start and end dates
+                $startDate = Carbon::parse($course->date_start)->locale('th');
+                $endDate = Carbon::parse($course->date_end)->locale('th');
+
+                // Add 543 years to convert Gregorian year to Thai Buddhist year
+                $thaiYear = $endDate->year + 543;
+
+                // Format the date range with Thai Buddhist year
+                if ($startDate->isSameDay($endDate)) {
+                    $course->date_range = "{$startDate->translatedFormat('j F')} $thaiYear";
+                } else {
+                    $course->date_range = "{$startDate->translatedFormat('j')}–{$endDate->translatedFormat('j F')} $thaiYear";
+                }
+
+                $course->month_year = "{$endDate->translatedFormat('F')} $thaiYear";
+
+                return $course;
+            });
 
         // Pass data to view
         $data['courses'] = $courses;
