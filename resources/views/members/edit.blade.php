@@ -1,12 +1,25 @@
 @extends('layouts.app')
 
 @section('content')
+    @php
+        $pattern = '/admin\/courses\/applylist\/\d+\/\d+\/form/';
+       $isMatchingUrl = preg_match($pattern, $previous_url) ? true : false;
+
+    @endphp
+
     <div class="container">
         <div class="d-flex justify-content-between align-items-center my-4">
             <h1 class="text-center">{{ __('messages.applicant_edit_form') }}</h1>
 
             @if($user->admin == 1)
-                <a href="{{ route('admin.members') }}" class="btn btn-secondary">{{ __('messages.back') }}</a>
+
+                @if($isMatchingUrl )
+                    <a href="javascript:history.back()"  class="btn btn-secondary">{{ __('messages.back') }}</a>
+                    @else
+                    <a href="{{ route('admin.members') }}" class="btn btn-secondary">{{ __('messages.back') }}</a>
+                @endif
+
+
                     @else
                 <a href="{{ route('profile') }}" class="btn btn-secondary">{{ __('messages.back') }}</a>
            @endif

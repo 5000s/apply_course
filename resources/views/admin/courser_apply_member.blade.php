@@ -3,8 +3,15 @@
 @section('content')
 
     <div class="container">
+
         <h1 class="text-center my-4">{{ $course->category }}, {{ $course->location }}</h1>
         <h3 class="text-center my-4">{{ $course->date_start->format('d/m/Y') . "-". $course->date_end->format('d/m/Y') }}</h3>
+        <div class=" my-4" style="text-align: right">
+            <a href="{{ route('member.edit', $member->id) }}" class="btn btn-secondary">แก้ไขข้อมูลผู้สมัคร</a>
+            <a href="{{ route('courses.history', $member->id) }}" class="btn btn-secondary">ดูประวัติการสมัคร</a>
+        </div>
+
+
         @if(session('success'))
             <div class="alert alert-success">
                 {{ session('success') }}

@@ -39,13 +39,13 @@
                     <td style="display: none"> {{ str_replace(' ', '', $member->phone) }} </td>
 
                     <td style="text-align: center">
-                        <a href="{{ route('member.edit', $member->id) }}" class="btn btn-secondary">{{ __('messages.edit') }}</a>
+                        <a target="_blank" href="{{ route('member.edit', $member->id) }}" class="btn btn-secondary">{{ __('messages.edit') }}</a>
                     </td>
                     <td style="text-align: center">
-                        <a href="{{ route('courses.index', $member->id) }}" class="btn btn-secondary">{{ __('messages.register') }}</a>
+                        <a target="_blank" href="{{ route('courses.index', $member->id) }}" class="btn btn-secondary">{{ __('messages.register') }}</a>
                     </td>
                     <td style="text-align: center">
-                        <a href="{{ route('courses.history', $member->id) }}" class="btn btn-secondary">{{ __('messages.history') }}</a>
+                        <a target="_blank" href="{{ route('courses.history', $member->id) }}" class="btn btn-secondary">{{ __('messages.history') }}</a>
                     </td>
                 </tr>
             @endforeach

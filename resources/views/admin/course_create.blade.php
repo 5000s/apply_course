@@ -35,7 +35,7 @@
 
                             <!-- Start Date -->
                             <div class="mb-3">
-                                <label for="date_start" class="form-label">Start Date</label>
+                                <label for="date_start" class="form-label">วันที่เริ่ม</label>
                                 <input type="date"
                                        name="date_start"
                                        id="date_start"
@@ -46,7 +46,7 @@
 
                             <!-- End Date -->
                             <div class="mb-3">
-                                <label for="date_end" class="form-label">End Date</label>
+                                <label for="date_end" class="form-label">วันที่จบ</label>
                                 <input type="date"
                                        name="date_end"
                                        id="date_end"
@@ -57,7 +57,7 @@
 
                             <!-- Location -->
                             <div class="mb-3">
-                                <label for="location_id" class="form-label">Location</label>
+                                <label for="location_id" class="form-label">สถานที่</label>
                                 <select name="location_id" id="location_id" class="form-control" required>
                                     <option value="" disabled selected>Select Location</option>
                                     @foreach ($locations as $location)
@@ -71,7 +71,7 @@
 
                             <!-- Category -->
                             <div class="mb-3">
-                                <label for="category_id" class="form-label">Category</label>
+                                <label for="category_id" class="form-label">ประเภทคอร์ส</label>
                                 <select name="category_id" id="category_id" class="form-control" required>
                                     <option value="" disabled selected>Select Category</option>
                                     @foreach ($categories as $category)
@@ -85,7 +85,7 @@
 
                             <!-- State -->
                             <div class="mb-3">
-                                <label for="state" class="form-label">State</label>
+                                <label for="state" class="form-label">สถานะ</label>
                                 <select name="state" id="state" class="form-control" required>
                                     <option value="เปิดรับสมัคร"
                                         {{ old('state', $course->state ?? '') == 'เปิดรับสมัคร' ? 'selected' : '' }}>เปิดรับสมัคร</option>

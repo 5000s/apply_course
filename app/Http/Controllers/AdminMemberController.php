@@ -11,6 +11,7 @@ class AdminMemberController extends Controller
     public function profile()
     {
 
+
         // Retrieve all members related to this user by email
         $members = Member::where("surname", "!=", "")->get();
 

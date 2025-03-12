@@ -30,7 +30,7 @@ class CourseApplyExport implements FromCollection, WithHeadings
                 'm.surname',
                 'm.phone',
                 'm.email',
-                'm.age',
+                DB::raw("TIMESTAMPDIFF(YEAR, m.birthdate, CURDATE()) as age"),
                 'm.gender',
                 'm.buddhism',
                 'a.state',
@@ -39,7 +39,10 @@ class CourseApplyExport implements FromCollection, WithHeadings
             ->join('applies as a', 'a.member_id', '=', 'm.id')
             ->join('courses as c', 'c.id', '=', 'a.course_id')
             ->where('a.course_id', $this->course_id)
-            ->where('a.cancel', 0)
+            ->where(function ($query) {
+                $query->where('a.cancel', 0)
+                    ->orWhereNull('a.cancel');
+            })
             ->orderByRaw("DATE_FORMAT(a.created_at, '%Y-%m-%d %H:%i:%s')")
             ->get();
     }

@@ -294,10 +294,16 @@ class MemberController extends Controller
      * Store a newly created member in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function storeAdmin(Request $request)
     {
+        $user = Auth::user();
+        if( $user->admin != 1 || $user->editor != 1){
+            return back()->withErrors(['error' => 'You have no permission to create/edit']);
+        }
+
+
         $validatedData = $request->validate([
             'gender' => 'required|in:ชาย,หญิง',
             'name' => 'required|max:32',
@@ -366,6 +372,7 @@ class MemberController extends Controller
         $data["provinces"] = $provinceArray;
         $data["member"] = $member;
         $data["user"] = $user;
+        $data["previous_url"] = url()->previous();
 
 
         return view('members.edit', $data); // Assumes you have a view at resources/views/members/edit.blade.php
@@ -443,6 +450,12 @@ class MemberController extends Controller
 
     public function updateAdmin(Request $request)
     {
+
+        $user = Auth::user();
+        if( $user->admin != 1 || $user->editor != 1){
+            return back()->withErrors(['error' => 'You have no permission to create/edit']);
+        }
+
         $validatedData = $request->validate([
             'gender' => 'required|in:ชาย,หญิง',
             'name' => 'required|max:32',

@@ -158,6 +158,7 @@ class ApplyController extends Controller
 
     public function memberApplyHistory(Request $request, $member_id)
     {
+        $user= Auth::user();
 
         if ( !$this->checkUserAccessMember($member_id)){
             return redirect()->route('profile')->withErrors('The Member is not found.');
@@ -181,7 +182,7 @@ class ApplyController extends Controller
             ->orderBy('a.created_at', 'desc')
             ->get();
 
-        return view('members.history', compact('applies', 'member_id'));
+        return view('members.history', compact('applies', 'member_id', 'user'));
     }
 
     public function checkUserAccessMember($member_id): bool

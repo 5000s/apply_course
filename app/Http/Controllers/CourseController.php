@@ -46,6 +46,11 @@ class CourseController extends Controller
      */
     public function courseSave(Request $request)
     {
+        $user = Auth::user();
+        if( $user->admin != 1 || $user->editor != 1){
+            return back()->withErrors(['error' => 'You have no permission to create/edit']);
+        }
+
         // Validate the incoming request
         $request->validate([
             'date_start'  => 'required|date',
@@ -74,6 +79,12 @@ class CourseController extends Controller
      */
     public function courseUpdate(Request $request, $id)
     {
+
+        $user = Auth::user();
+        if( $user->admin != 1 || $user->editor != 1){
+            return back()->withErrors(['error' => 'You have no permission to create/edit']);
+        }
+
         // Validate the incoming request
         $request->validate([
             'date_start'  => 'required|date',
@@ -203,6 +214,7 @@ class CourseController extends Controller
             ->orderByRaw("DATE_FORMAT(a.created_at, '%Y-%m-%d %H:%i:%s')")
             ->get();
 
+
         $data = [];
         $data['members'] = $members;
 
@@ -239,7 +251,10 @@ class CourseController extends Controller
             ->join('applies as a', 'a.member_id', '=', 'm.id')
             ->join('courses as c', 'c.id', '=', 'a.course_id')
             ->where('a.course_id', $course_id)
-            ->where('a.cancel', 0)
+            ->where(function ($query) {
+                $query->where('a.cancel', 0)
+                    ->orWhereNull('a.cancel');
+            })
             ->orderByRaw("DATE_FORMAT(a.created_at, '%Y-%m-%d %H:%i:%s')")
             ->get();
 
@@ -261,7 +276,10 @@ class CourseController extends Controller
             ->join('applies as a', 'a.member_id', '=', 'm.id')
             ->join('courses as c', 'c.id', '=', 'a.course_id')
             ->where('a.course_id', $course_id)
-            ->where('a.cancel', 0)
+            ->where(function ($query) {
+                $query->where('a.cancel', 0)
+                    ->orWhereNull('a.cancel');
+            })
             ->get();
 
         // Create a temporary file to store the zip
