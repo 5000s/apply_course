@@ -137,7 +137,7 @@ class ApplyController extends Controller
     public function index(Request $request, $member_id)
     {
         $location_id = $request->input('location', 1);
-        $now = Carbon::now()->subMonth(6);
+        $now = Carbon::now();
 
         // Query to get courses
         $courses = self::getCourseWithMember($location_id,$member_id,$now);
