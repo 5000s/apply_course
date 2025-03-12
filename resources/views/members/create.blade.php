@@ -147,14 +147,14 @@
 
                     <div class="mb-3">
                         <label for="email" class="form-label">Email <span class="text-danger"></span></label>
-                        <input type="text" class="form-control" id="email" name="email" value="{{ $member->email }}">
+                        <input type="text" class="form-control" id="email" name="email">
                     </div>
 
                     <div class="mb-3">
                         <label for="buddhism" class="form-label">Buddhism <span class="text-danger"></span></label>
                         <select class="form-control" id="buddhism" name="buddhism">
                             @foreach(\App\Models\Member::getEnumValues('buddhism') as $value)
-                                <option value="{{ $value }}" {{ $member->buddhism == $value ? 'selected' : '' }}>
+                                <option value="{{ $value }}">
                                     {{ ucfirst($value) }}
                                 </option>
                             @endforeach
@@ -165,7 +165,7 @@
                         <label for="status" class="form-label">Status <span class="text-danger"></span></label>
                         <select class="form-control" id="status" name="status">
                             @foreach(\App\Models\Member::getEnumValues('status') as $value)
-                                <option value="{{ $value }}" {{ $member->status == $value ? 'selected' : '' }}>
+                                <option value="{{ $value }}" >
                                     {{ ucfirst($value) }}
                                 </option>
                             @endforeach
@@ -176,7 +176,7 @@
                         <label for="blacklist" class="form-label">Blacklist <span class="text-danger"></span></label>
                         <select class="form-control" id="blacklist" name="blacklist">
                             @foreach(\App\Models\Member::getEnumValues('blacklist') as $value)
-                                <option value="{{ $value }}" {{ $member->blacklist == $value ? 'selected' : '' }}>
+                                <option value="{{ $value }}" >
                                     {{ ucfirst($value) }}
                                 </option>
                             @endforeach
@@ -185,12 +185,12 @@
 
                     <div class="mb-3">
                         <label for="blacklist_release" class="form-label">Blacklist End <span class="text-danger"></span></label>
-                        <input type="date" class="form-control" id="blacklist_release" name="blacklist_release" value="{{ $member->blacklist_release }}">
+                        <input type="date" class="form-control" id="blacklist_release" name="blacklist_release" >
                     </div>
 
                     <div class="mb-3">
                         <label for="pseudo" class="form-label">Pseudo <span class="text-danger"></span></label>
-                        <input type="text" class="form-control" id="pseudo" name="pseudo" value="{{ $member->pseudo }}">
+                        <input type="text" class="form-control" id="pseudo" name="pseudo"">
                     </div>
                 @endif
 
