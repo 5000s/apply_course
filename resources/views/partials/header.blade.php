@@ -12,8 +12,10 @@
                     </li>
 
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="{{ route('admin.courses.create') }}">สร้างคอร์ส</a>
+                        <a class="nav-link active" aria-current="page" href="{{ route('admin.members') }}">จัดการสมาชิก</a>
                     </li>
+
+
 
                     @if(\Illuminate\Support\Facades\Auth::check())
 

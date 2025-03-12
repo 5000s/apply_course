@@ -186,7 +186,15 @@ class ApplyController extends Controller
 
     public function checkUserAccessMember($member_id): bool
     {
-        $user_id = Auth::user()->id;
+        $user= Auth::user();
+
+        if ($user->admin == 1){
+            return true;
+        }
+
+        $user_id = $user->id;
+
+
         $email = Auth::user()->email;
 
         $members = Member::where("email",$email)->where("id",$member_id)->first();

@@ -67,12 +67,18 @@
 
 
     <div class="container" id='hidden'>
-        <form action="{{route("admin.courses")}}" method="get">
+
+
+        <form action="{{ route('admin.courses') }}" method="get">
             <div class="top-layer">
-                <div class="headerBar py-3" >
-                    <div>
-                        <h4>สถานที่<h4/>
-                            <select class="select select-bordered max-w-xs" name="location" id="location">
+                <div class="headerBar py-3 d-flex justify-content-between align-items-center">
+
+                    <!-- ส่วนซ้าย: ฟิลด์ค้นหาต่างๆ -->
+                    <div class="d-flex gap-3">
+                        <!-- สถานที่ -->
+                        <div>
+                            <h4>สถานที่</h4>
+                            <select class="form-select" name="location" id="location">
                                 @php $location = request()->query('location') @endphp
                                 <option @if($location==0) selected @endif value="0">ทั้งหมด</option>
                                 <option @if($location==1) selected @endif value="1">แก่งคอย</option>
@@ -80,11 +86,12 @@
                                 <option @if($location==3) selected @endif value="3">หาดใหญ่</option>
                                 <option @if($location==4) selected @endif value="4">มูลนิธิ อ่อนนุช</option>
                             </select>
-                    </div>
+                        </div>
 
-                    <div>
-                        <h4>คอร์ส<h4/>
-                            <select class="form select select-bordered max-w-xs" name="category", id="category">
+                        <!-- คอร์ส -->
+                        <div>
+                            <h4>คอร์ส</h4>
+                            <select class="form-select" name="category" id="category">
                                 @php $category = request()->query('category') @endphp
                                 <option @if($category==0) selected @endif value="0">ทั้งหมด</option>
                                 <option @if($category==5) selected @endif value="5">คอร์สอานาปานสติ</option>
@@ -97,24 +104,35 @@
                                 <option @if($category==8) selected @endif value="8">คอร์สอานาปานสติ ๑ วัน</option>
                                 <option @if($category==9) selected @endif value="9">คอร์สเตโชฯ (อาวุโส)</option>
                             </select>
-                    </div>
+                        </div>
 
-                    <div>
-                        <h4>ปีที่ต้องการค้นหา<h4/>
-                            <select class="select select-bordered max-w-xs" name="year" id="year">
-                                @for($year = \Carbon\Carbon::now()->year; $year >= 2011 ; $year--)
+                        <!-- ปีที่ต้องการค้นหา -->
+                        <div>
+                            <h4>ปีที่ต้องการค้นหา</h4>
+                            <select class="form-select" name="year" id="year">
+                                @for($y = \Carbon\Carbon::now()->year; $y >= 2011 ; $y--)
                                     @php $year_s = request()->query('year') @endphp
-                                    <option @if($year_s==$year) selected @endif value="{{$year}}">{{$year+543}}</option>
+                                    <option @if($year_s==$y) selected @endif value="{{$y}}">{{$y+543}}</option>
                                 @endfor
                             </select>
+                        </div>
+
+                        <!-- ปุ่ม ค้นหา -->
+                        <div class="d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary">ค้นหา</button>
+                        </div>
                     </div>
+
+                    <!-- ส่วนขวา: ปุ่ม สร้างคอร์ส -->
                     <div>
-                        <h4><br><h4/>
-                            <button type="submit" class="btn btn-active"> ค้นหา</button>
+                        <a class="btn btn-success" href="{{ route('admin.courses.create') }}">
+                            สร้างคอร์ส
+                        </a>
                     </div>
                 </div>
             </div>
         </form>
+
         <div class="tableContainer">
             <table id="myTable" class="table table-striped">
                 <thead>
@@ -124,7 +142,6 @@
                     <td class="text-center w-[20%]">วันที่</td>
                     <td class="text-center w-[15%]">สถานที่</td>
                     <td class="text-center w-[25%]">ชื่อคอร์ส</td>
-
                     <td class="text-center w-[5%]">จำนวนผู้สมัคร<br/> ทั้งหมด</td>
                     <td class="text-center w-[5%]">จำนวนผู้สมัคร<br/> ที่ confirm</td>
                     <td class="text-center w-[5%]">จำนวนผู้สมัคร<br/> ที่ผ่านการอบรม</td>
@@ -148,7 +165,7 @@
                         <td class="text-left">{{ $course->location }}</td>
                         <td class="text-left">{{ $course->name }}</td>
 
-                        <td class="text-center">{{ $course->apply_count }}</td>
+                        <td class="text-center">{{ $course->apply_all_count }}</td>
                         <td class="text-center">{{ $course->confirm_count }}</td>
                         <td class="text-center">{{ $course->pass_count }}</td>
                         <td><a href="{{url("admin/courses/applylist") . "/$course->id"}}" class="btn btn-sm btn-active">เปิดดู</a></td>

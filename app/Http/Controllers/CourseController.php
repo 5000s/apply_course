@@ -41,23 +41,62 @@ class CourseController extends Controller
     }
 
 
+    /**
+     * Store a newly created course in storage.
+     */
     public function courseSave(Request $request)
     {
+        // Validate the incoming request
+        $request->validate([
+            'date_start'  => 'required|date',
+            'date_end'    => 'required|date',
+            'location_id' => 'required|integer|exists:locations,id',
+            'category_id' => 'required|integer|exists:course_categories,id',
+            'state'       => 'required|string',
+        ]);
 
-        $locations = Location::all();
-        $categories = CourseCategory::all();
+        // Create a new course instance
+        $course = new Course();
+        $course->date_start   = $request->input('date_start');
+        $course->date_end     = $request->input('date_end');
+        $course->location_id  = $request->input('location_id');
+        $course->category_id  = $request->input('category_id');
+        $course->state        = $request->input('state');
+        // Add any other relevant fields here if needed
 
-        return "SAVE";
+        $course->save();
 
+        return redirect()->back()->with('success', 'Course saved successfully!');
     }
 
-    public function courseUpdate(Request $request)
+    /**
+     * Update the specified course in storage.
+     */
+    public function courseUpdate(Request $request, $id)
     {
+        // Validate the incoming request
+        $request->validate([
+            'date_start'  => 'required|date',
+            'date_end'    => 'required|date',
+            'location_id' => 'required|integer|exists:locations,id',
+            'category_id' => 'required|integer|exists:course_categories,id',
+            'state'       => 'required|string',
+        ]);
 
-        $locations = Location::all();
-        $categories = CourseCategory::all();
+        // Fetch the existing course, or throw a 404 if not found
+        $course = Course::findOrFail($id);
 
-        return "UPDATE";
+        // Update course fields
+        $course->date_start   = $request->input('date_start');
+        $course->date_end     = $request->input('date_end');
+        $course->location_id  = $request->input('location_id');
+        $course->category_id  = $request->input('category_id');
+        $course->state        = $request->input('state');
+        // Update any other relevant fields here if needed
+
+        $course->save();
+
+        return redirect()->back()->with('success', 'Course updated successfully!');
     }
 
 
@@ -85,6 +124,7 @@ class CourseController extends Controller
                 'c.category',
                 'c.date_start',
                 'c.date_end',
+                DB::raw('COUNT(DISTINCT CASE WHEN a.cancel IS NULL OR a.cancel = 0 THEN a.member_id END) as apply_all_count'),
                 DB::raw('SUM(CASE WHEN a.cancel = 0 THEN 1 ELSE 0 END) as apply_count'),
                 DB::raw('SUM(CASE WHEN a.confirmed = "yes" THEN 1 ELSE 0 END) as confirm_count'),
                 DB::raw('SUM(CASE WHEN a.state = "ผ่านการอบรม" THEN 1 ELSE 0 END) as pass_count')
@@ -156,12 +196,19 @@ class CourseController extends Controller
             ->join('applies as a', 'a.member_id', '=', 'm.id')
             ->join('courses as c', 'c.id', '=', 'a.course_id')
             ->where('a.course_id', $course_id)
-            ->where('a.cancel', 0)
+            ->where(function ($query) {
+                $query->where('a.cancel', 0)
+                    ->orWhereNull('a.cancel');
+            })
             ->orderByRaw("DATE_FORMAT(a.created_at, '%Y-%m-%d %H:%i:%s')")
             ->get();
 
         $data = [];
         $data['members'] = $members;
+
+        $course = Course::where("id", $course_id)->first();
+
+        $data['course'] = $course;
 
         return view('admin.courser_apply', $data);
     }
@@ -609,6 +656,7 @@ class CourseController extends Controller
             $my_apply = new Apply();
             $my_apply->member_id = $member_id;
             $my_apply->course_id = $course_id;
+            $my_apply->role = "ผู้เข้าอบรม";
             $my_apply->role = "ผู้เข้าอบรม";
             $my_apply->shelter = "ทั้วไป";
             $my_apply->confirmed = "no";

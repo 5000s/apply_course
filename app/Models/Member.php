@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class Member extends Model
 {
@@ -53,6 +54,17 @@ class Member extends Model
     'know_source',
     ];
 
-
     protected $dates = ['birthdate'];
+
+    protected $casts = [
+        'birthdate' => 'date', // or 'datetime'
+    ];
+
+    public static function getEnumValues($column)
+    {
+        $type = DB::select("SHOW COLUMNS FROM members WHERE Field = ?", [$column])[0]->Type;
+        preg_match('/^enum\((.*)\)$/', $type, $matches);
+        $values = explode(',', $matches[1]);
+        return array_map(fn($value) => trim($value, "'"), $values);
+    }
 }

@@ -2,7 +2,18 @@
 
 @section('content')
     <div class="container">
-        <h1 class="text-center my-4">{{ __('messages.applicant_form') }}</h1>
+
+        <div class="d-flex justify-content-between align-items-center my-4">
+            <h1 class="text-center my-4">{{ __('messages.applicant_form') }}</h1>
+
+            @if($user->admin == 1)
+                <a href="{{ route('admin.members') }}" class="btn btn-secondary">{{ __('messages.back') }}</a>
+            @else
+                <a href="{{ route('profile') }}" class="btn btn-secondary">{{ __('messages.back') }}</a>
+            @endif
+
+        </div>
+
         @if(session('success'))
             <div class="alert alert-success">
                 {{ session('success') }}
@@ -18,7 +29,11 @@
             </div>
         @endif
 
-        <form method="POST" action="{{ route('member.store') }}" class="border p-4 shadow rounded">
+        @if($user->admin == 1)
+            <form method="POST" action="{{ route('member.store.admin') }}" class="border p-4 shadow rounded">
+        @else
+            <form method="POST" action="{{ route('member.store') }}" class="border p-4 shadow rounded">
+        @endif
             @csrf
             <h4>{{ __('messages.applicant') }}</h4>
             <div class="row">
@@ -125,6 +140,62 @@
             <div class="text-center">
                 <button type="submit" class="btn btn-primary">{{ __('messages.save') }}</button>
             </div>
-        </form>
+
+
+                @if( $user->admin == 1 )
+                    <h4> สำหรับ Admin เท่านั้นที่แก้ไขได้ </h4>
+
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email <span class="text-danger"></span></label>
+                        <input type="text" class="form-control" id="email" name="email" value="{{ $member->email }}">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="buddhism" class="form-label">Buddhism <span class="text-danger"></span></label>
+                        <select class="form-control" id="buddhism" name="buddhism">
+                            @foreach(\App\Models\Member::getEnumValues('buddhism') as $value)
+                                <option value="{{ $value }}" {{ $member->buddhism == $value ? 'selected' : '' }}>
+                                    {{ ucfirst($value) }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="status" class="form-label">Status <span class="text-danger"></span></label>
+                        <select class="form-control" id="status" name="status">
+                            @foreach(\App\Models\Member::getEnumValues('status') as $value)
+                                <option value="{{ $value }}" {{ $member->status == $value ? 'selected' : '' }}>
+                                    {{ ucfirst($value) }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="blacklist" class="form-label">Blacklist <span class="text-danger"></span></label>
+                        <select class="form-control" id="blacklist" name="blacklist">
+                            @foreach(\App\Models\Member::getEnumValues('blacklist') as $value)
+                                <option value="{{ $value }}" {{ $member->blacklist == $value ? 'selected' : '' }}>
+                                    {{ ucfirst($value) }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="blacklist_release" class="form-label">Blacklist End <span class="text-danger"></span></label>
+                        <input type="date" class="form-control" id="blacklist_release" name="blacklist_release" value="{{ $member->blacklist_release }}">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="pseudo" class="form-label">Pseudo <span class="text-danger"></span></label>
+                        <input type="text" class="form-control" id="pseudo" name="pseudo" value="{{ $member->pseudo }}">
+                    </div>
+                @endif
+
+
+
+            </form>
     </div>
 @endsection

@@ -78,11 +78,7 @@
                             <li class="nav-item">
                                 <a class="nav-link" href="{{ route('profile') }}"> {{ __('messages.profile') }}  </a>
                             </li>
-                            @if(Auth::user()->admin == 1)
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('admin.courses') }}">จัดการคอร์ส</a>
-                                </li>
-                            @endif
+
                             <li class="nav-item">
                                 <a class="nav-link" href="{{ route('logout') }}"
                                    onclick="event.preventDefault();
@@ -93,6 +89,13 @@
                                     @csrf
                                 </form>
                             </li>
+
+
+                            @if(Auth::user()->admin == 1)
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ route('admin.courses') }}">ระบบจัดการ</a>
+                                </li>
+                            @endif
                         @endguest
                     </ul>
                 </div>

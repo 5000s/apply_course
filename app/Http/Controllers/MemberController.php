@@ -216,6 +216,8 @@ class MemberController extends Controller
 
     public function create()
     {
+        $user = Auth::user();
+
         $provinces = Factory::province();
         $provinceArray = $provinces->toArray();
         usort($provinceArray, array($this, 'compareByNameTh'));
@@ -223,6 +225,7 @@ class MemberController extends Controller
         $data = [];
         $data["nations"] = MemberController::$nationals;
         $data["provinces"] = $provinceArray;
+        $data["user"] = $user;
 
         return view('members.create',$data); // Assumes you have a view at resources/views/members/create.blade.php
     }
@@ -286,6 +289,64 @@ class MemberController extends Controller
         return redirect()->route('profile')->with('success', 'Member created successfully.');
     }
 
+
+    /**
+     * Store a newly created member in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function storeAdmin(Request $request)
+    {
+        $validatedData = $request->validate([
+            'gender' => 'required|in:ชาย,หญิง',
+            'name' => 'required|max:32',
+            'surname' => 'required|max:128',
+            'nickname' => 'nullable|max:32',
+            'age' => 'nullable|integer|min:0',
+            'birthdate' => 'required|date',
+            'buddhism' => 'nullable|in:ภิกษุ,สามเณร,แม่ชี,ฆราวาส',
+            'status' => 'nullable|in:ผู้สมัครใหม่,ศิษย์อานาปานสติ,ศิษย์เตโชวิปัสสนา,ศิษย์อานาฯ ๑ วัน',
+            'phone_slug' => 'nullable|max:128',
+            'phone' => 'required|max:128',
+            'phone_2' => 'nullable|max:20',
+            'blacklist' => 'nullable|in:yes,no',
+            'line' => 'nullable|max:100',
+            'email' => 'nullable|email|max:256',
+            'province' => 'nullable|max:64',
+            'country' => 'nullable|max:64',
+            'facebook' => 'nullable|max:256',
+            'organization' => 'nullable',
+            'expertise' => 'nullable',
+            'degree' => 'nullable',
+            'career' => 'nullable',
+            'techo_year' => 'nullable|integer|min:0',
+            'techo_courses' => 'nullable|integer|min:0',
+            'blacklist_release' => 'nullable|date',
+            'blacklist_remark' => 'nullable',
+            'pseudo' => 'nullable|max:13',
+            'url_apply' => 'nullable|max:1024',
+            'url_history' => 'nullable|max:1024',
+            'url_image' => 'nullable|max:1024',
+            'dharma_ex_desc' => 'nullable',
+            'dharma_ex' => 'nullable|max:255',
+            'know_source' => 'nullable|max:255',
+            'name_emergency' => 'nullable|max:50',
+            'surname_emergency' => 'nullable|max:50',
+            'phone_emergency' => 'nullable|max:50',
+            'relation_emergency' => 'nullable|max:100',
+            'create_complete' => 'nullable|boolean',
+            'nationality' => 'nullable|max:255'
+        ]);
+
+        $validatedData['created_by'] = Auth::user()->id; // Link member to user by email
+        $validatedData['updated_by'] = Auth::user()->id; // Link member to user by email
+
+        Member::create($validatedData);
+
+        return redirect()->route('profile')->with('success', 'Member created successfully.');
+    }
+
     /**
      * Show the form for editing the specified member.
      *
@@ -294,6 +355,7 @@ class MemberController extends Controller
      */
     public function edit($id)
     {
+        $user = Auth::user();
         $member = Member::findOrFail($id); // Ensure the member exists
         $provinces = Factory::province();
         $provinceArray = $provinces->toArray();
@@ -303,6 +365,7 @@ class MemberController extends Controller
         $data["nations"] = MemberController::$nationals;
         $data["provinces"] = $provinceArray;
         $data["member"] = $member;
+        $data["user"] = $user;
 
 
         return view('members.edit', $data); // Assumes you have a view at resources/views/members/edit.blade.php
@@ -367,6 +430,62 @@ class MemberController extends Controller
 
         $member = Member::findOrFail($member_id);
 
+        if (!$member){
+            return redirect()->route('profile')->with('success', 'Member edit failed');
+        }
+
+        $member->update($request->input());
+
+        return back()->with('success',  'Member updated successfully.');
+
+    }
+
+
+    public function updateAdmin(Request $request)
+    {
+        $validatedData = $request->validate([
+            'gender' => 'required|in:ชาย,หญิง',
+            'name' => 'required|max:32',
+            'surname' => 'required|max:128',
+            'nickname' => 'nullable|max:32',
+            'age' => 'nullable|integer|min:0',
+            'birthdate' => 'required|date',
+            'buddhism' => 'nullable|in:ภิกษุ,สามเณร,แม่ชี,ฆราวาส',
+            'status' => 'nullable|in:ผู้สมัครใหม่,ศิษย์อานาปานสติ,ศิษย์เตโชวิปัสสนา,ศิษย์อานาฯ ๑ วัน',
+            'phone_slug' => 'nullable|max:128',
+            'phone' => 'required|max:128',
+            'phone_2' => 'nullable|max:20',
+            'blacklist' => 'nullable|in:yes,no',
+            'line' => 'nullable|max:100',
+            'email' => 'nullable|email|max:256',
+            'province' => 'nullable|max:64',
+            'country' => 'nullable|max:64',
+            'facebook' => 'nullable|max:256',
+            'organization' => 'nullable',
+            'expertise' => 'nullable',
+            'degree' => 'nullable',
+            'career' => 'nullable',
+            'techo_year' => 'nullable|integer|min:0',
+            'techo_courses' => 'nullable|integer|min:0',
+            'blacklist_release' => 'nullable|date',
+            'blacklist_remark' => 'nullable',
+            'pseudo' => 'nullable|max:13',
+            'url_apply' => 'nullable|max:1024',
+            'url_history' => 'nullable|max:1024',
+            'url_image' => 'nullable|max:1024',
+            'dharma_ex_desc' => 'nullable',
+            'dharma_ex' => 'nullable|max:255',
+            'know_source' => 'nullable|max:255',
+            'name_emergency' => 'nullable|max:50',
+            'surname_emergency' => 'nullable|max:50',
+            'phone_emergency' => 'nullable|max:50',
+            'relation_emergency' => 'nullable|max:100',
+            'create_complete' => 'nullable|boolean',
+            'nationality' => 'nullable|max:255'
+        ]);
+
+        $member_id = $request->member_id;
+        $member = Member::findOrFail($member_id);
         if (!$member){
             return redirect()->route('profile')->with('success', 'Member edit failed');
         }

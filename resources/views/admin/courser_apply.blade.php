@@ -20,6 +20,8 @@
             white-space: nowrap;
         }
     </style>
+    <h1 class="text-center my-4">{{ $course->category }}, {{ $course->location }}</h1>
+    <h3 class="text-center my-4">{{ $course->date_start->format('d/m/Y') . "-". $course->date_end->format('d/m/Y') }}</h3>
 
 <div class="container" id='hidden'>
     <div class="tableContainer">
@@ -87,6 +89,7 @@
                 // Initialize the data table
                 $("#myTable").DataTable({
                     // "searching": false,
+                    "pageLength": 100,
                     "order": [[ 1, "asc" ]], //or asc
                     // "columnDefs" : [{"targets":0, "type":"date-en"}],
                 });

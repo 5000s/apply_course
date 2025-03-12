@@ -11,6 +11,7 @@
 |
 */
 
+use App\Http\Controllers\AdminMemberController;
 use App\Http\Controllers\ApplyController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CourseController;
@@ -69,7 +70,8 @@ Route::prefix('admin')->middleware('auth', 'admin')->group(function () {
     Route::get('courses/create', [CourseController::class, 'courseCreate'])->name("admin.courses.create");
     Route::get('courses/edit/{course_id}', [CourseController::class, 'courseEdit'])->name("admin.courses.edit");
     Route::get('courses/save', [CourseController::class, 'courseSave'])->name("admin.courses.save");
-    Route::get('courses/update/{course_id}', [CourseController::class, 'courseUpdate'])->name("admin.courses.update");
+
+    Route::put('courses/update/{course_id}', [CourseController::class, 'courseUpdate'])->name("admin.courses.update");
 
     Route::get('courses/applylist/{course_id}', [CourseController::class, 'courseApplyList'])->name("admin.courseList");
     Route::get('courses/applylist/{course_id}/download', [CourseController::class, 'courseApplyListDownload'])->name('admin.applylist.download');
@@ -82,8 +84,10 @@ Route::prefix('admin')->middleware('auth', 'admin')->group(function () {
     Route::get('courses/applylist/{course_id}/{apply_id}/update/{status}', [CourseController::class, 'updateApplyStatus'])->name("admin.courseApplyStatus");
 
 
-    Route::get('member', [CourseController::class, 'adminSearchMember']);
-    Route::get('member/course', [CourseController::class, 'adminMemberCourse']);
+    Route::get('member', [AdminMemberController::class, 'profile'])->name("admin.members");
+    Route::get('member/course', [AdminMemberController::class, 'adminMemberCourse']);
+
+
 
 ##### LOGIN DO BY SRA
     Route::get('login', [UserController::class, 'login'] )->name("adminLogin");
@@ -108,12 +112,14 @@ Route::middleware(['verified'])->group(function () {
 
 // Route to store a new member
     Route::post('/member', [MemberController::class, 'store'])->name('member.store');
+    Route::post('/memberadmin', [MemberController::class, 'storeAdmin'])->name('member.store.admin');
 
 // Route to show form for editing an existing member
     Route::get('/member/{member}/edit', [MemberController::class, 'edit'])->name('member.edit');
 
 // Route to update an existing member
     Route::put('/member/update', [MemberController::class, 'update'])->name('member.update');
+    Route::put('/member/updateadmin', [MemberController::class, 'updateAdmin'])->name('member.update.admin');
 
     Route::get('apply/{member_id}/courses', [ApplyController::class, 'index'])->name('courses.index');
 

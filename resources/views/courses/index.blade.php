@@ -7,7 +7,7 @@
 
             <div class="d-flex justify-content-between align-items-center my-4">
                 <h1 class="text-center my-4">{{ __('messages.course_list') }}</h1>
-                <a href="{{ route('profile') }}" class="btn btn-secondary">{{ __('messages.back') }}</a>
+                <a href="javascript:history.back()" class="btn btn-secondary">{{ __('messages.back') }}</a>
             </div>
 
 

@@ -4,7 +4,13 @@
     <div class="container">
         <div class="d-flex justify-content-between align-items-center my-4">
             <h1 class="text-center">{{ __('messages.applicant_edit_form') }}</h1>
-            <a href="{{ route('profile') }}" class="btn btn-secondary">{{ __('messages.back') }}</a>
+
+            @if($user->admin == 1)
+                <a href="{{ route('admin.members') }}" class="btn btn-secondary">{{ __('messages.back') }}</a>
+                    @else
+                <a href="{{ route('profile') }}" class="btn btn-secondary">{{ __('messages.back') }}</a>
+           @endif
+
         </div>
 
         @if(session('success'))
@@ -22,7 +28,13 @@
             </div>
         @endif
 
-        <form method="POST" action="{{ route('member.update') }}" class="border p-4 shadow rounded">
+
+        @if($user->admin == 1)
+            <form method="POST" action="{{ route('member.update.admin') }}" class="border p-4 shadow rounded">
+        @else
+            <form method="POST" action="{{ route('member.update') }}" class="border p-4 shadow rounded">
+        @endif
+
             @csrf
             @method('PUT')
             <h4>{{ __('messages.applicant') }}</h4>
@@ -73,8 +85,11 @@
                     <!-- Right Column -->
                     <div class="mb-3">
                         <label for="phone" class="form-label">{{ __('messages.phone') }}</label>
-                        <input type="text" class="form-control" id="phone" name="phone" value="{{ $member->phone }}">
+                        <input type="text" class="form-control" id="phone" name="phone" value="{{ $member->phone }}" required>
                     </div>
+
+
+
                     <div class="mb-3">
                         <label for="phone2" class="form-label">{{ __('messages.phone2') }}</label>
                         <input type="text" class="form-control" id="phone2" name="phone2" value="{{ $member->phone2 }}">
@@ -145,6 +160,63 @@
             </div>
 
             <input type="hidden" id="rechecking_id" name="rechecking_id" value="{{ $member->id }}">
-        </form>
+
+
+                @if( $user->admin == 1 )
+                    <h4> สำหรับ Admin เท่านั้นที่แก้ไขได้ </h4>
+
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email <span class="text-danger"></span></label>
+                        <input type="text" class="form-control" id="email" name="email" value="{{ $member->email }}">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="buddhism" class="form-label">Buddhism <span class="text-danger"></span></label>
+                        <select class="form-control" id="buddhism" name="buddhism">
+                            @foreach(\App\Models\Member::getEnumValues('buddhism') as $value)
+                                <option value="{{ $value }}" {{ $member->buddhism == $value ? 'selected' : '' }}>
+                                    {{ ucfirst($value) }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="status" class="form-label">Status <span class="text-danger"></span></label>
+                        <select class="form-control" id="status" name="status">
+                            @foreach(\App\Models\Member::getEnumValues('status') as $value)
+                                <option value="{{ $value }}" {{ $member->status == $value ? 'selected' : '' }}>
+                                    {{ ucfirst($value) }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="blacklist" class="form-label">Blacklist <span class="text-danger"></span></label>
+                        <select class="form-control" id="blacklist" name="blacklist">
+                            @foreach(\App\Models\Member::getEnumValues('blacklist') as $value)
+                                <option value="{{ $value }}" {{ $member->blacklist == $value ? 'selected' : '' }}>
+                                    {{ ucfirst($value) }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="blacklist_release" class="form-label">Blacklist End <span class="text-danger"></span></label>
+                        <input type="date" class="form-control" id="blacklist_release" name="blacklist_release" value="{{ $member->blacklist_release }}">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="pseudo" class="form-label">Pseudo <span class="text-danger"></span></label>
+                        <input type="text" class="form-control" id="pseudo" name="pseudo" value="{{ $member->pseudo }}">
+                    </div>
+                @endif
+
+
+
+
+            </form>
     </div>
 @endsection
