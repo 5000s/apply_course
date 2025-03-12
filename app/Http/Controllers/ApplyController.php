@@ -19,7 +19,7 @@ class ApplyController extends Controller
 
     public function showCourseForStudent(){
 
-        $now = Carbon::now()->subMonth(6);
+        $now = Carbon::now();
 
         // Query to get courses
         $courses_saraburi = self::getCourses(1,$now);
@@ -64,7 +64,7 @@ class ApplyController extends Controller
                 'c.state'
             )
             ->whereDate('c.date_start', '>', $dateStart)
-            ->whereIn('c.category_id', [1, 3, 5, 6, 8])
+//            ->whereIn('c.category_id', [1, 3, 5, 6, 8])
             ->where('c.location_id', $location_id)
             ->get()
             ->map(function ($course) {
