@@ -333,6 +333,11 @@ class CourseController extends Controller
 
     public function updateApplyStatus($course_id, $apply_id, $status)
     {
+        $user = Auth::user();
+        if( $user->admin != 1 || $user->editor != 1){
+            return back()->withErrors(['error' => 'You have no permission to create/edit']);
+        }
+
        $admin = Auth::user();
 
         $apply = Apply::where("id", $apply_id)->first();
