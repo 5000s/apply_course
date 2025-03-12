@@ -108,7 +108,7 @@ class ApplyController extends Controller
                 'a.cancel'
             )
             ->whereDate('c.date_start', '>', $dateStart) // Filter courses starting after $dateStart
-            ->whereIn('c.category_id', [1, 3, 5, 6, 8]) // Filter specific categories
+//            ->whereIn('c.category_id', [1, 3, 5, 6, 8]) // Filter specific categories
             ->where('c.location_id', $location_id) // Filter by location
             ->get()
             ->map(function ($course) {
