@@ -190,7 +190,7 @@
 
                     <div class="mb-3">
                         <label for="pseudo" class="form-label">Pseudo <span class="text-danger"></span></label>
-                        <input type="text" class="form-control" id="pseudo" name="pseudo"">
+                        <input type="text" class="form-control" id="pseudo" name="pseudo">
                     </div>
                 @endif
 
