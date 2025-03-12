@@ -6,12 +6,21 @@
         <div class="d-flex justify-content-between align-items-center my-4">
             <h1 class="text-center my-4">{{ __('messages.course_history') }}</h1>
             @if($user->admin == 1)
-                <a href="javascript:history.back()" class="btn btn-secondary">{{ __('messages.back') }}</a>
+                <a href="javascript:history.back()" id="back-button" class="btn btn-secondary">{{ __('messages.back') }}</a>
             @else
                 <a href="{{ route('profile') }}" class="btn btn-secondary">{{ __('messages.back') }}</a>
             @endif
 
         </div>
+
+        <script>
+            // Hide the back button if there's no previous page
+            document.addEventListener("DOMContentLoaded", function() {
+                if (window.history.length <= 1) {
+                    document.getElementById("back-button").style.display = "none";
+                }
+            });
+        </script>
 
 
         <div class="row">
