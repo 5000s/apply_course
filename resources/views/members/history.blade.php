@@ -5,7 +5,12 @@
 
         <div class="d-flex justify-content-between align-items-center my-4">
             <h1 class="text-center my-4">{{ __('messages.course_history') }}</h1>
-            <a href="{{ route('profile') }}" class="btn btn-secondary">{{ __('messages.back') }}</a>
+            @if($user->admin == 1)
+                <a href="javascript:history.back()" class="btn btn-secondary">{{ __('messages.back') }}</a>
+            @else
+                <a href="{{ route('profile') }}" class="btn btn-secondary">{{ __('messages.back') }}</a>
+            @endif
+
         </div>
 
 

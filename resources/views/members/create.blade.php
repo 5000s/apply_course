@@ -185,7 +185,7 @@
 
                     <div class="mb-3">
                         <label for="blacklist_release" class="form-label">Blacklist End <span class="text-danger"></span></label>
-                        <input type="date" class="form-control" id="blacklist_release" name="blacklist_release" >
+                        <input type="date" class="form-control" id="blacklist_release" name="blacklist_release" value="1970-01-01" >
                     </div>
 
                     <div class="mb-3">
