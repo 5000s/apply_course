@@ -147,7 +147,7 @@
                     <td class="text-center w-[5%]">จำนวนผู้สมัคร<br/> ที่ผ่านการอบรม</td>
                     <td class="text-center w-[5%]">ดูผู้สมัคร</td>
                     <td class="text-center w-[5%]">รายการผู้สมัคร</td>
-                    <td class="text-center w-[5%]">ใบสมัครทั้งหมด</td>
+{{--                    <td class="text-center w-[5%]">ใบสมัครทั้งหมด</td>--}}
                 </tr>
                 </thead>
 
@@ -170,7 +170,7 @@
                         <td class="text-center">{{ $course->pass_count }}</td>
                         <td><a href="{{url("admin/courses/applylist") . "/$course->id"}}" class="btn btn-sm btn-active">เปิดดู</a></td>
                         <td><a href="{{route("admin.applylist.download", $course->id )}}" class="btn btn-sm btn-active">Download</a></td>
-                        <td><a href="{{route("admin.applylist.totalform.zip", $course->id )}}" class="btn btn-sm btn-active">Download</a></td>
+{{--                        <td><a href="{{route("admin.applylist.totalform.zip", $course->id )}}" class="btn btn-sm btn-active">Download</a></td>--}}
                     </tr>
                 @endforeach
                 </tbody>
