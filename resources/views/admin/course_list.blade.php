@@ -95,8 +95,8 @@
                             <select class="form-select" name="category" id="category">
                                 @php $category = request()->query('category') @endphp
                                 <option @if($category==0) selected @endif value="0">ทั้งหมด</option>
-                                <option @if($category==1) selected @endif value="1">คอร์สอานาปานสติ</option>
-                                <option @if($category==2) selected @endif value="2">คอร์สวปัสสนา</option>
+                                <option @if($category==1) selected @endif value="1">คอร์สวิปัสสนา</option>
+                                <option @if($category==2) selected @endif value="2">คอร์สอานาปานสติ</option>
 
 {{--                                <option @if($category==1) selected @endif value="1">คอร์สเตโชวิปัสสนา</option>--}}
 {{--                                <option @if($category==2) selected @endif value="2">คอร์สฤาษี (๑๔ วัน)</option>--}}
