@@ -119,9 +119,11 @@ class CourseController extends Controller
 
         // Initial
         $location_id = $request->input('location', 1);
-        $category_id = $request->input('category', 6);
+        $category_id = $request->input('category', 0);
+
         $now_year = Carbon::now()->year;
         $year = $request->input('year', $now_year);
+        $month = $request->input('month', 0);
 
         // Query builder with Eloquent
         $courses = DB::table('courses as c')
@@ -148,7 +150,19 @@ class CourseController extends Controller
         }
 
         if ($category_id != "0") {
-            $courses = $courses->where('c.category_id', $category_id);
+            if ($category_id == 1){
+                $courses = $courses->whereIn('c.category_id', [1,2,3,4,6,8,10,12]);
+            }else if ($category_id == 2){
+                $courses = $courses->whereIn('c.category_id', [5,7,9,11,13,14]);
+            }
+        }
+
+        if ($month != 0){
+
+            $courses = $courses->where(function ($query) use ($month) {
+                $query->whereMonth('c.date_start', $month)
+                    ->orWhereMonth('c.date_end', $month);
+            });
         }
 
         // Year filter
