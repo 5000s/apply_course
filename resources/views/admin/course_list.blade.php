@@ -81,11 +81,11 @@
                             <select class="form-select" name="location" id="location">
                                 @php $location = request()->query('location') @endphp
                                 <option @if($location==0) selected @endif value="0">ทั้งหมด</option>
-                                <option @if($location==1) selected @endif value="1">แก่งคอย</option>
-                                <option @if($location==2) selected @endif value="2">ลานหิน</option>
-                                <option @if($location==3) selected @endif value="3">หาดใหญ่</option>
-                                <option @if($location==4) selected @endif value="4">มูลนิธิ อ่อนนุช</option>
-                                <option @if($location==5) selected @endif value="5">ภูเก็ต</option>
+                                <option @if($location==1) selected @endif value="1">สระบุรี-โพธิธรรมญาณสถานเตชะชัยสิทธิ </option>
+                                <option @if($location==2) selected @endif value="2">สุรินทร์-ลานหินป่าโมกข์ </option>
+                                <option @if($location==3) selected @endif value="3">หาดใหญ่-แสงธรรมโพธิญาณ </option>
+                                <option @if($location==4) selected @endif value="4">อ่อนนุช-มูลนิธิโรงเรียนแห่งชีวิต </option>
+                                <option @if($location==5) selected @endif value="5">ภูเก็ต-โพธิธรรมญาณรีทรีต</option>
                             </select>
                         </div>
 
