@@ -150,9 +150,9 @@ class CourseController extends Controller
         }
 
         if ($category_id != "0") {
-            if ($category_id == 1){
+            if ($category_id == 1 || $category_id == "1"){
                 $courses = $courses->whereIn('c.category_id', [1,2,3,4,6,8,10,12]);
-            }else if ($category_id == 2){
+            }else if ($category_id == 2  || $category_id == "2"){
                 $courses = $courses->whereIn('c.category_id', [5,7,9,11,13,14]);
             }
         }
