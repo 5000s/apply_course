@@ -4,7 +4,9 @@
     <div class="container">
 
         <div class="d-flex justify-content-between align-items-center my-4">
-            <h1 class="text-center my-4">{{ __('messages.course_history') }}</h1>
+            <div class="text-left my-4">{{ __('messages.course_history') }}: {{$user->name}} {{$user->surname}}  </div>
+
+
             @if($user->admin == 1)
                 <a href="javascript:history.back()" id="back-button" class="btn btn-secondary">{{ __('messages.back') }}</a>
             @else
