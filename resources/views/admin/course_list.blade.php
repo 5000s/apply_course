@@ -85,7 +85,7 @@
                                 <option @if($location==2) selected @endif value="2">ลานหิน</option>
                                 <option @if($location==3) selected @endif value="3">หาดใหญ่</option>
                                 <option @if($location==4) selected @endif value="4">มูลนิธิ อ่อนนุช</option>
-                                <option @if($location==5) selected @endif value="4">ภูเก็ต</option>
+                                <option @if($location==5) selected @endif value="5">ภูเก็ต</option>
                             </select>
                         </div>
 
@@ -95,15 +95,20 @@
                             <select class="form-select" name="category" id="category">
                                 @php $category = request()->query('category') @endphp
                                 <option @if($category==0) selected @endif value="0">ทั้งหมด</option>
-                                <option @if($category==5) selected @endif value="5">คอร์สอานาปานสติ</option>
                                 <option @if($category==1) selected @endif value="1">คอร์สเตโชวิปัสสนา</option>
-                                <option @if($category==3) selected @endif value="3">คอร์สเตโชฯ (ศิษย์เก่า)</option>
-                                <option @if($category==6) selected @endif value="6">คอร์สศิษย์เก่า (๓ วัน)</option>
-                                <option @if($category==4) selected @endif value="4">คอร์สวิถีอาสวะ</option>
                                 <option @if($category==2) selected @endif value="2">คอร์สฤาษี (๑๔ วัน)</option>
+                                <option @if($category==3) selected @endif value="3">คอร์สเตโชฯ (ศิษย์เก่า)</option>
+                                <option @if($category==4) selected @endif value="4">คอร์สวิถีอาสวะ</option>
+                                <option @if($category==5) selected @endif value="5">คอร์สอานาปานสติ</option>
+                                <option @if($category==6) selected @endif value="6">คอร์สศิษย์เก่า (๓ วัน)</option>
                                 <option @if($category==7) selected @endif value="7">ธรรมะแคมป์</option>
                                 <option @if($category==8) selected @endif value="8">คอร์สอานาปานสติ ๑ วัน</option>
                                 <option @if($category==9) selected @endif value="9">คอร์สเตโชฯ (อาวุโส)</option>
+                                <option @if($category==10) selected @endif value="10">คอร์สวิปัสสานาสติปัฏฐานสี่ เผากิเลส 3 วัน 2 คืน (ศิษย์เก่า)</option>
+                                <option @if($category==11) selected @endif value="11">คอร์สสมาธิอานาปานสติ 1 วัน</option>
+                                <option @if($category==12) selected @endif value="12">คอร์สวิปัสสานาสติปัฏฐานสี่ เผากิเลส</option>
+                                <option @if($category==13) selected @endif value="13">คอร์สสมาธิอานาปานสติ 3 วัน 2 คืน</option>
+                                <option @if($category==14) selected @endif value="14">คอร์สสมาธิอานาปานสติ 4 วัน 3 คืน</option>
                             </select>
                         </div>
 
