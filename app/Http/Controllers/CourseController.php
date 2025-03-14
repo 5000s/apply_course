@@ -120,6 +120,7 @@ class CourseController extends Controller
         // Initial
         $location_id = $request->input('location', 1);
         $category_id = $request->input('category', 0);
+        $status = $request->input('status', 'เปิดรับสมัคร');
 
         $now_year = Carbon::now()->year;
         $year = $request->input('year', $now_year);
@@ -143,6 +144,10 @@ class CourseController extends Controller
                 DB::raw('SUM(CASE WHEN a.state = "ผ่านการอบรม" THEN 1 ELSE 0 END) as pass_count')
             )
             ->leftJoin('applies as a', 'c.id', '=', 'a.course_id');
+
+        if($status != "ทั้งหมด"){
+            $courses = $courses->where('c.state', $status);
+        }
 
         // Apply filters
         if ($location_id != "0") {

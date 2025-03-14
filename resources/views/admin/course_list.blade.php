@@ -76,7 +76,7 @@
                     <!-- ส่วนซ้าย: ฟิลด์ค้นหาต่างๆ -->
                     <div class="d-flex flex-wrap gap-3 w-100">
                         <!-- สถานที่ -->
-                        <div class="col-12 col-md-4">
+                        <div class="col-12 col-md-3">
                             <h4>สถานที่</h4>
                             <select class="form-select" name="location" id="location">
                                 @php $location = request()->query('location') @endphp
@@ -90,7 +90,7 @@
                         </div>
 
                         <!-- คอร์ส -->
-                        <div class="col-12 col-md-4">
+                        <div class="col-12 col-md-3">
                             <h4>คอร์ส</h4>
                             <select class="form-select" name="category" id="category">
                                 @php $category = request()->query('category') @endphp
@@ -112,6 +112,18 @@
 {{--                                <option @if($category==12) selected @endif value="12">คอร์สวิปัสสานาสติปัฏฐานสี่ เผากิเลส</option>--}}
 {{--                                <option @if($category==13) selected @endif value="13">คอร์สสมาธิอานาปานสติ 3 วัน 2 คืน</option>--}}
 {{--                                <option @if($category==14) selected @endif value="14">คอร์สสมาธิอานาปานสติ 4 วัน 3 คืน</option>--}}
+                            </select>
+                        </div>
+
+                        <!-- สถานะ -->
+                        <div class="col-12 col-md-2">
+                            <h4>สถานะ</h4>
+                            <select class="form-select" name="status" id="status">
+                                @php $status = request()->query('status', 'open') @endphp
+                                <option @if($status=='เปิดรับสมัคร') selected @endif value="เปิดรับสมัคร">เปิดรับสมัคร</option>
+                                <option @if($status=='ปิดรับสมัคร') selected @endif value="ปิดรับสมัคร">ปิดรับสมัคร</option>
+                                <option @if($status=='ยกเลิกคอร์ส') selected @endif value="ยกเลิกคอร์ส">ยกเลิกคอร์ส</option>
+                                <option @if($status=='ทั้งหมด') selected @endif value="ทั้งหมด">ทั้งหมด</option>
                             </select>
                         </div>
 
