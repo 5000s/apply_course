@@ -85,6 +85,7 @@
                                 <option @if($location==2) selected @endif value="2">ลานหิน</option>
                                 <option @if($location==3) selected @endif value="3">หาดใหญ่</option>
                                 <option @if($location==4) selected @endif value="4">มูลนิธิ อ่อนนุช</option>
+                                <option @if($location==5) selected @endif value="4">ภูเก็ต</option>
                             </select>
                         </div>
 
