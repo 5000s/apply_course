@@ -215,6 +215,7 @@ class CourseController extends Controller
                 'm.age',
                 'm.gender',
                 'm.buddhism',
+                'm.status',
                 'a.state',
                 'a.updated_by'
             )

@@ -32,11 +32,11 @@
                     <td class="text-center ">สมัครเมื่อ</td>
                     <td class="text-center ">ชื่อ</td>
                     <td class="text-center ">นามสกุล</td>
-                    <td class="text-center ">เบอร์</td>
-                    <td class="text-center ">email</td>
                     <td class="text-center ">อายุ</td>
                     <td class="text-center ">เพศ</td>
                     <td class="text-center ">buddhism</td>
+                    <td class="text-center ">ศิษย์</td>
+                    <td class="text-center ">ติดต่อ</td>
                     <td class="text-center ">สถานะ</td>
                     <td class="text-center ">ข้อมูล</td>
                     <td class="text-center ">status</td>
@@ -51,11 +51,16 @@
                             <td class="text-center">{{ $member->apply_date }}</td>
                             <td class="text-center">{{ $member->name }}</td>
                             <td class="text-center">{{ $member->surname }}</td>
-                            <td class="text-center">{{ $member->phone }}</td>
-                            <td class="text-center">{{ $member->email }}</td>
                             <td class="text-center">{{ $member->age }}</td>
                             <td class="text-center">{{ $member->gender }}</td>
                             <td class="text-center">{{ $member->buddhism }}</td>
+                            <td class="text-center">{{ $member->status }}</td>
+                            <td class="text-center">
+                                <div style="text-align: left">
+                                    P: {{ $member->phone }} <br>
+                                    E: {{ $member->email }}
+                                </div>
+                            </td>
                             <td class="text-center">{{ $member->state }}</td>
 
                             <td>

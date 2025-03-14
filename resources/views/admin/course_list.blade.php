@@ -187,7 +187,7 @@
                         <td class="text-center">{{ $course->apply_all_count }}</td>
                         <td class="text-center">{{ $course->confirm_count }}</td>
                         <td class="text-center">{{ $course->pass_count }}</td>
-                        <td><a href="{{url("admin/courses/applylist") . "/$course->id"}}" class="btn btn-sm btn-active">เปิดดู</a></td>
+                        <td><a target="_blank" href="{{url("admin/courses/applylist") . "/$course->id"}}" class="btn btn-sm btn-active">เปิดดู</a></td>
                         <td><a href="{{route("admin.applylist.download", $course->id )}}" class="btn btn-sm btn-active">Download</a></td>
 {{--                        <td><a href="{{route("admin.applylist.totalform.zip", $course->id )}}" class="btn btn-sm btn-active">Download</a></td>--}}
                     </tr>
