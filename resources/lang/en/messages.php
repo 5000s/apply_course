@@ -45,6 +45,7 @@ return [
     'applicant' => 'Applicant Information',
     'name' => 'First Name',
     'surname' => 'Surname',
+    'nickname' => 'Nickname',
     'birthdate' => 'Birthdate',
     'nationality' => 'Nationality',
     'province' => 'Province',

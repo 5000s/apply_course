@@ -2,63 +2,94 @@
 
 @section('content')
     <div class="container">
-
         <div class="d-flex justify-content-between align-items-center my-4">
-            <div class="text-left my-4">{{ __('messages.course_history') }}: {{$user->name}} {{$user->surname}}  </div>
-
+            <h4 class="text-left my-4">{{ __('messages.course_history') }}: {{$user->name}} {{$user->surname}}</h4>
 
             @if($user->admin == 1)
                 <a href="javascript:history.back()" id="back-button" class="btn btn-secondary">{{ __('messages.back') }}</a>
             @else
                 <a href="{{ route('profile') }}" class="btn btn-secondary">{{ __('messages.back') }}</a>
             @endif
-
         </div>
 
-        <script>
-            // Hide the back button if there's no previous page
-            document.addEventListener("DOMContentLoaded", function() {
-                if (window.history.length <= 1) {
-                    document.getElementById("back-button").style.display = "none";
+        <div class="card shadow-sm p-3">
+            <div class="table-responsive">
+                <table id="coursesTable" class="table table-striped table-hover">
+                    <thead class="table-dark">
+                    <tr>
+                        <th class="text-center">{{ __('messages.location') }}</th>
+                        <th class="text-center">{{ __('messages.course_name') }}</th>
+                        <th class="text-center">{{ __('messages.start_date') }}</th>
+                        <th class="text-center">{{ __('messages.end_date') }}</th>
+                        <th class="text-center">{{ __('messages.apply_date') }}</th>
+                        <th class="text-center">{{ __('messages.application') }}</th>
+                        <th class="text-center">{{ __('messages.status') }}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach($applies as $apply)
+                        <tr>
+                            <td class="text-center">{{ $apply->location }}</td>
+                            <td class="text-center">{{ $apply->category }}</td>
+                            <td class="text-center">{{ \Carbon\Carbon::parse($apply->date_start)->format('d/m/Y') }}</td>
+                            <td class="text-center">{{ \Carbon\Carbon::parse($apply->date_end)->format('d/m/Y') }}</td>
+                            <td class="text-center">{{ \Carbon\Carbon::parse($apply->apply_date)->format('d/m/Y') }}</td>
+                            <td class="text-center">
+                                    <span class="badge
+                                        @if($apply->state === 'ผ่านการอบรม') bg-success
+                                        @elseif($apply->state === 'ยื่นใบสมัคร') bg-info
+                                        @elseif($apply->state === 'ยุติกลางคัน') bg-danger
+                                        @else bg-secondary
+                                        @endif">
+                                        {{ $apply->state }}
+                                    </span>
+                            </td>
+                            <td class="text-center">
+                                @if($apply->state === 'เปิดรับสมัคร' && $apply->days_until_start > 0)
+                                    <a href="{{ route('courses.show', [$member_id, $apply->id]) }}" class="btn btn-primary btn-sm">
+                                        {{ __('messages.edit') }}
+                                    </a>
+                                @else
+                                    <span class="text-muted">{{ __('messages.closed') }}</span>
+                                @endif
+                            </td>
+                        </tr>
+                    @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    {{-- DataTables & Script --}}
+
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#coursesTable').DataTable({
+                "paging": true,
+                "ordering": true,
+                "info": true,
+                "language": {
+                    "search": "ค้นหา:",
+                    "lengthMenu": "แสดง _MENU_ รายการ",
+                    "zeroRecords": "ไม่พบข้อมูลที่ค้นหา",
+                    "info": "แสดง _START_ - _END_ จาก _TOTAL_ รายการ",
+                    "infoEmpty": "ไม่มีข้อมูล",
+                    "infoFiltered": "(กรองจากทั้งหมด _MAX_ รายการ)",
+                    "paginate": {
+                        "first": "หน้าแรก",
+                        "last": "หน้าสุดท้าย",
+                        "next": "ถัดไป",
+                        "previous": "ก่อนหน้า"
+                    }
                 }
             });
-        </script>
+        });
+    </script>
 
+    @push('styles')
+        <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+    @endpush
 
-        <div class="row">
-        </div>
-
-        <table class="table">
-            <thead>
-            <tr>
-                <td class="text-center w-[14%]">{{ __('messages.location') }}</td>
-                <td class="text-center w-[14%]">{{ __('messages.course_name') }}</td>
-                <td class="text-center w-[14%]">{{ __('messages.start_date') }}</td>
-                <td class="text-center w-[14%]">{{ __('messages.end_date') }}</td>
-                <td class="text-center w-[14%]">{{ __('messages.apply_date') }}</td>
-                <td class="text-center w-[14%]">{{ __('messages.status') }}</td>
-                <td class="text-center w-[16%]">{{ __('messages.application') }}</td>
-            </tr>
-            </thead>
-            <tbody>
-            @foreach($applies as $apply)
-                <tr>
-                    <td class="text-center">{{ $apply->location }}</td>
-                    <td class="text-center">{{ $apply->category }}</td>
-                    <td class="text-center">{{ $apply->date_start }}</td>
-                    <td class="text-center">{{ $apply->date_end }}</td>
-                    <td class="text-center">{{ $apply->apply_date }}</td>
-                    <td class="text-center">{{ $apply->state }}</td>
-                    <td>
-                        @if($apply->state === 'เปิดรับสมัคร' && $apply->days_until_start > 0)
-                            <a href="{{ route('courses.show', [$member_id, $apply->id]) }}" class="btn btn-secondary">{{ __('messages.edit') }}</a>
-                        @else
-                            {{ __('messages.closed') }}
-                        @endif
-                    </td>
-                </tr>
-            @endforeach
-            </tbody>
-        </table>
-    </div>
 @endsection

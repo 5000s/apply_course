@@ -108,8 +108,8 @@ class ApplyController extends Controller
                 'a.cancel'
             )
             ->whereDate('c.date_start', '>', $dateStart) // Filter courses starting after $dateStart
-//            ->whereIn('c.category_id', [1, 3, 5, 6, 8]) // Filter specific categories
             ->where('c.location_id', $location_id) // Filter by location
+            ->orderBy('c.date_start', 'asc') // ✅ Order by start date (earliest first)
             ->get()
             ->map(function ($course) {
                 // Parse the start and end dates
@@ -142,6 +142,7 @@ class ApplyController extends Controller
         // Query to get courses
         $courses = self::getCourseWithMember($location_id,$member_id,$now);
         $location = Location::where("id",$location_id)->first();
+        $member = Member::where("id",$member_id)->first();
 
 
         $locations = Location::where("id","!=",2)->get();
@@ -152,6 +153,7 @@ class ApplyController extends Controller
         $data['course_locations'] = $locations;
         $data['selected_location_id'] = $location_id;
         $data['member_id'] = $member_id;
+        $data['member'] = $member;
 
         return view('courses.index', $data); // Return the view with the courses list
     }
@@ -217,6 +219,7 @@ class ApplyController extends Controller
         $apply = Apply::where("course_id",$course_id)->where("member_id",$member_id)
             ->where("cancel",0)->orderBy("id","desc")->first();
 
+        $member = Member::where("id",$member_id)->first();
 
         if(!$apply){
             $apply = new Apply();
@@ -228,7 +231,7 @@ class ApplyController extends Controller
         if ($course->state != 'เปิดรับสมัคร') {
             return redirect()->route('courses.index', $member_id)->withErrors('Course is not open for application.');
         }
-        return view('courses.show', compact('course','member_id', 'apply' )); // Return the view with the course details
+        return view('courses.show', compact('course','member_id', 'apply' , 'member' )); // Return the view with the course details
     }
 
     public function save(Request $request, $member_id)

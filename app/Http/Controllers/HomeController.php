@@ -38,7 +38,7 @@ class HomeController extends Controller
         $user = Auth::user();
 
         // Retrieve all members related to this user by email
-        $members = Member::where('email', $user->email )->select('id', 'name', 'surname', 'email')->get();
+        $members = Member::where('email', $user->email )->select('id', 'name', 'surname', 'email', 'nickname')->get();
 
         // Pass the member data to the view
         return view('profile', ['members' => $members]);

@@ -46,6 +46,7 @@ return [
     'applicant' => 'ข้อมูลผู้สมัคร',
     'name' => 'ชื่อ',
     'surname' => 'นามสกุล',
+    'nickname' => 'ชื่อเล่น',
     'birthdate' => 'วันเกิด',
     'nationality' => 'สัญชาติ',
     'province' => 'จังหวัดที่อยู่ในไทย',
