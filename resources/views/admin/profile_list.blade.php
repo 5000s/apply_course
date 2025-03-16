@@ -32,8 +32,8 @@
                     <td>{{ $member->surname }}</td>
                     <td>{{ $member->nickname }}</td>
                     <td>{{ $member->gender }}</td>
-                    <td>{{ $member->techo_year }}</td>
                     <td>{{ $member->birthdate?->age ?? 'ไม่ทราบ' }}</td>
+                    <td>{{ $member->techo_year }}</td>
                     <td>{{ $member->phone }}</td>
                     <td>{{ $member->province }}</td>
                     <td style="display: none"> {{ str_replace(' ', '', $member->phone) }} </td>
