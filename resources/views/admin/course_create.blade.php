@@ -27,7 +27,7 @@
                     <div class="card-body">
                         <h1 class="text-center my-4">{{ isset($course) ? 'แก้ไข คอร์ส' : 'สร้างคอร์ส' }}</h1>
 
-                        <form action="{{ isset($course) ? route('admin.courses.update', $course->id) : route('admin.courses.create') }}" method="POST">
+                        <form action="{{ isset($course) ? route('admin.courses.update', $course->id) : route('admin.courses.save') }}" method="POST">
                             @csrf
                             @if (isset($course))
                                 @method('PUT')
@@ -94,6 +94,34 @@
                                     <option value="ยกเลิกคอร์ส"
                                         {{ old('state', $course->state ?? '') == 'ยกเลิกคอร์ส' ? 'selected' : '' }}>ยกเลิกคอร์ส</option>
                                 </select>
+                            </div>
+
+                            <!-- description -->
+                            <div class="mb-3">
+                                <label for="description" class="form-label">คำอธิบาย</label>
+                                <input type="text"  class="form-control" id="description" name="description" value="{{$course->description ?? ''}}">
+                            </div>
+
+                            <!-- listed -->
+                            <div class="mb-3">
+                                <label for="listed" class="form-label">Listed</label>
+                                <select name="listed" id="listed" class="form-control" required>
+                                    <option value="yes"
+                                        {{ old('yes', $course->listed ?? '') == 'yes' ? 'selected' : '' }}>yes</option>
+                                    <option value="no"
+                                        {{ old('no', $course->listed ?? '') == 'no' ? 'selected' : '' }}>no</option>
+                                </select>
+                            </div>
+
+                            <!-- Listed Date -->
+                            <div class="mb-3">
+                                <label for="listed_date" class="form-label">Listed Date</label>
+                                <input type="date"
+                                       name="listed_date"
+                                       id="listed_date"
+                                       class="form-control"
+                                       value="{{ old('listed_date') ? \Carbon\Carbon::parse(old('listed_date'))->format('Y-m-d') : ($course->listed_date ?? \Carbon\Carbon::now())->format('Y-m-d') }}"
+                                       required>
                             </div>
 
                             <!-- Submit Button -->

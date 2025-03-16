@@ -58,20 +58,70 @@ class CourseController extends Controller
             'location_id' => 'required|integer|exists:locations,id',
             'category_id' => 'required|integer|exists:course_categories,id',
             'state'       => 'required|string',
+            'description'  => 'string',
+            'listed'       => 'required|string',
+            'listed_date'  => 'required|date'
         ]);
+
 
         // Create a new course instance
         $course = new Course();
         $course->date_start   = $request->input('date_start');
         $course->date_end     = $request->input('date_end');
+        $course->listed     = $request->input('listed');
+        $course->listed_date     = $request->input('listed_date');
         $course->location_id  = $request->input('location_id');
         $course->category_id  = $request->input('category_id');
         $course->state        = $request->input('state');
-        // Add any other relevant fields here if needed
+        $course->description        = $request->input('description');
+        $location = Location::where("id",  $course->location_id )->first()->name;
+        $category = CourseCategory::where("id", $course->category_id )->first()->name;
 
+        $course->location = $location;
+        $course->category = $category;
+        $course->courseyear = Carbon::parse($course->date_start)->year;
+
+        $course->coursename =   $this->generateCourseName($course->date_start, $course->date_end);
         $course->save();
 
-        return redirect()->back()->with('success', 'Course saved successfully!');
+        return   redirect()->route('admin.courses.edit', ['course_id' => $course->id])->with('success', 'Course created successfully!');
+    }
+
+    function generateCourseName($start_date, $end_date) {
+        Carbon::setLocale('th');
+
+        $start = Carbon::parse($start_date);
+        $end = Carbon::parse($end_date);
+
+        $thai_days = [
+            'Sunday' => 'อา.',
+            'Monday' => 'จ.',
+            'Tuesday' => 'อ.',
+            'Wednesday' => 'พ.',
+            'Thursday' => 'พฤ.',
+            'Friday' => 'ศ.',
+            'Saturday' => 'ส.'
+        ];
+
+        $start_day_abbr = $thai_days[$start->format('l')]; // Get Thai abbreviation
+        $start_day = $start->format('d'); // Get day
+        $start_month = $start->translatedFormat('M'); // Get month
+        $start_year = $start->year + 543; // Convert to Buddhist year (พ.ศ.)
+
+        if ($start->equalTo($end)) {
+            return "{$start_day_abbr} {$start_day} {$start_month}. {$start_year}";
+        }
+
+        $end_day_abbr = $thai_days[$end->format('l')];
+        $end_day = $end->format('d');
+        $end_month = $end->translatedFormat('M');
+        $end_year = $end->year + 543;
+
+        if ($start->format('m') === $end->format('m') && $start->format('Y') === $end->format('Y')) {
+            return "{$start_day_abbr} {$start_day} - {$end_day_abbr} {$end_day} {$start_month}. {$start_year}";
+        }
+
+        return "{$start_day_abbr} {$start_day} {$start_month}. - {$end_day_abbr} {$end_day} {$end_month}. {$end_year}";
     }
 
     /**
@@ -92,22 +142,35 @@ class CourseController extends Controller
             'location_id' => 'required|integer|exists:locations,id',
             'category_id' => 'required|integer|exists:course_categories,id',
             'state'       => 'required|string',
+            'description'  => 'string',
+            'listed'       => 'required|string',
+            'listed_date'  => 'required|date'
         ]);
+
 
         // Fetch the existing course, or throw a 404 if not found
         $course = Course::findOrFail($id);
 
-        // Update course fields
         $course->date_start   = $request->input('date_start');
         $course->date_end     = $request->input('date_end');
+        $course->listed     = $request->input('listed');
+        $course->listed_date     = $request->input('listed_date');
         $course->location_id  = $request->input('location_id');
         $course->category_id  = $request->input('category_id');
         $course->state        = $request->input('state');
-        // Update any other relevant fields here if needed
+        $course->description        = $request->input('description');
+        $location = Location::where("id",  $course->location_id )->first()->name;
+        $category = CourseCategory::where("id", $course->category_id )->first()->name;
 
+        $course->location = $location;
+        $course->category = $category;
+        $course->courseyear = Carbon::parse($course->date_start)->year;
+
+        $course->coursename =   $this->generateCourseName($course->date_start, $course->date_end);
         $course->save();
 
-        return redirect()->back()->with('success', 'Course updated successfully!');
+        return   redirect()->route('admin.courses.edit', ['course_id' => $course->id])->with('success', 'Course updated successfully!');
+
     }
 
 

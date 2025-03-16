@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 class Course extends Model
 {
     //
-    protected $dates = ['date_start','date_end'];
+    protected $dates = ['date_start','date_end', 'listed_date'];
 
     public function getCourseLocationAttribute(){
 
