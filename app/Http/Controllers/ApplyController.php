@@ -182,7 +182,26 @@ class ApplyController extends Controller
             ->join('courses as c', 'c.id', '=', 'a.course_id')
             ->where('a.member_id', $member_id)
             ->orderBy('a.created_at', 'desc')
-            ->get();
+            ->get()
+            ->map(function ($course) {
+                // Parse the start and end dates
+                $startDate = Carbon::parse($course->date_start)->locale('th');
+                $endDate = Carbon::parse($course->date_end)->locale('th');
+
+                // Add 543 years to convert Gregorian year to Thai Buddhist year
+                $thaiYear = $endDate->year + 543;
+
+                // Format the date range with Thai Buddhist year
+                if ($startDate->isSameDay($endDate)) {
+                    $course->date_range = "{$startDate->translatedFormat('j F')} $thaiYear";
+                } else {
+                    $course->date_range = "{$startDate->translatedFormat('j')}–{$endDate->translatedFormat('j F')} $thaiYear";
+                }
+
+                $course->month_year = "{$endDate->translatedFormat('F')} $thaiYear";
+
+                return $course;
+            });
 
         return view('members.history', compact('applies', 'member_id', 'user'));
     }
