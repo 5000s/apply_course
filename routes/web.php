@@ -69,7 +69,7 @@ Route::prefix('admin')->middleware('auth', 'admin')->group(function () {
     Route::get('courses', [CourseController::class, 'courseList'])->name("admin.courses");
     Route::get('courses/create', [CourseController::class, 'courseCreate'])->name("admin.courses.create");
     Route::get('courses/edit/{course_id}', [CourseController::class, 'courseEdit'])->name("admin.courses.edit");
-    Route::get('courses/save', [CourseController::class, 'courseSave'])->name("admin.courses.save");
+    Route::post('courses/save', [CourseController::class, 'courseSave'])->name("admin.courses.save");
 
     Route::put('courses/update/{course_id}', [CourseController::class, 'courseUpdate'])->name("admin.courses.update");
 
