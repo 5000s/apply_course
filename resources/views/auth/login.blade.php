@@ -8,11 +8,12 @@
         <div class="row justify-content-center">
             <div class="col-md-12" id="course_button">
                 <div class="card">
-                    <a href="{{route('showCourseForStudent')}}" class="card-body text-center fs-5 bg-warning text-dark">
+                    <a href="{{route('showCourseForStudent')}}" class="card-body" style="text-align: center; font-size: 25px; background-color: #2d995b; color:black">
                         ดูตารางคอร์สปฏิบัติทั้งหมด
                     </a>
                 </div>
             </div>
+
 
             <div class="col-md-12" id="login_panel" style="padding-top: 20px;">
                 <div class="card">
