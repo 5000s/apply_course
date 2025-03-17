@@ -3,8 +3,8 @@
 @section('content')
 
     <div class="container">
-        <h1 class="text-center mt-4 mb-3">{{ $course->category }}, {{ $course->location }}</h1>
-        <h4 class="text-center mb-4">{{ $course->coursename }}</h4>
+{{--        <h1 class="text-center mt-4 mb-3">{{ $course->category }}, {{ $course->location }}</h1>--}}
+        <h4 class="text-center mb-4">{{ $course->coursename }}, {{ $course->location }}</h4>
 
         {{-- Alert Message --}}
         @if(session('success'))
@@ -128,6 +128,16 @@
             const submitButton = document.getElementById('submit_button');
 
             if (file) {
+                const fileSizeMB = file.size / (1024 * 1024); // แปลงขนาดเป็น MB
+
+                if (fileSizeMB > 2) {
+                    alert("ไฟล์ที่อัปโหลดต้องมีขนาดไม่เกิน 2MB");
+                    fileInput.value = ""; // รีเซ็ตค่าไฟล์
+                    preview.innerHTML = "";
+                    submitButton.disabled = true;
+                    return;
+                }
+
                 const fileType = file.type;
                 preview.innerHTML = "";
 
@@ -152,5 +162,6 @@
             }
         }
     </script>
+
 
 @endsection

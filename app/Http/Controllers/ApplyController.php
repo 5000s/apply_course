@@ -258,13 +258,24 @@ class ApplyController extends Controller
         ini_set('upload_max_filesize', '10M');
         ini_set('post_max_size', '12M');
 
+        $course_id = $request->input("course_id");
+        $cancel= $request->input("cancel");
+
+        if ($cancel != "cancel") {
+            $request->validate([
+                'registration_form' => 'required|mimes:jpeg,png,jpg,pdf|max:2048', // จำกัดขนาดไฟล์ 10MB (10240 KB)
+            ], [
+                'registration_form.max' => 'ไฟล์ต้องมีขนาดไม่เกิน 2MB',
+                'registration_form.mimes' => 'รองรับเฉพาะไฟล์ PNG, JPG, JPEG และ PDF เท่านั้น'
+            ]);
+
+        }
 
         if ( !$this->checkUserAccessMember($member_id)){
             return redirect()->route('profile')->withErrors('The Member is not found.');
         }
 
-        $course_id = $request->input("course_id");
-        $cancel= $request->input("cancel");
+
 
 
         $course = Course::where("id",$course_id)->first();
