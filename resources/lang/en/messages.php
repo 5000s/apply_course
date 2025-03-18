@@ -80,7 +80,7 @@ return [
     'register' => 'Register',
 
 
-    'course_list' => 'Course List',
+    'course_list' => 'Course Schedule',
     'location' => 'Location',
     'course' => 'Course',
     'year' => 'Year',

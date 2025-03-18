@@ -37,7 +37,7 @@
                     @guest
                         <li class="nav-item">
                             <a class="nav-link fw-bold text-primary" href="{{ route('login') }}">
-                                เข้าสู่ระบบ
+                                {{ __('messages.Login') }}
                             </a>
                         </li>
 
@@ -59,8 +59,8 @@
 
                     <!-- ปุ่มตารางคอร์สปฏิบัติ -->
                     <li class="nav-item ms-2">
-                        <a class="btn btn-danger text-white fw-bold px-3" href="{{ route('showCourseForStudent') }}">
-                            <i class="fas fa-calendar-alt"></i> ตารางคอร์สปฏิบัติ
+                        <a class="btn btn-danger text-white fw-bold px-3 shadow" href="{{ route('showCourseForStudent') }}">
+                            <i class="fas fa-calendar-alt"></i>   {{ __('messages.course_list') }}
                         </a>
                     </li>
 

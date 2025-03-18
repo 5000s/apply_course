@@ -124,7 +124,7 @@ class ApplyController extends Controller
                 if ($startDate->isSameDay($endDate)) {
                     $course->date_range = "{$startDate->translatedFormat('j F')} $thaiYear";
                 } else {
-                    $course->date_range = "{$startDate->translatedFormat('j')}–{$endDate->translatedFormat('j F')} $thaiYear";
+                    $course->date_range = "{$startDate->translatedFormat('j')} – {$endDate->translatedFormat('j F')} $thaiYear";
                 }
 
                 $course->month_year = "{$endDate->translatedFormat('F')} $thaiYear";

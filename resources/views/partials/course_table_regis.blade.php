@@ -13,7 +13,7 @@
                 <table class="table table-hover">
                     <thead class="table-light">
                     <tr class="text-center">
-                        <th style="width: 15%;">{{ __('messages.course_month') }}</th>
+{{--                        <th style="width: 15%;">{{ __('messages.course_month') }}</th>--}}
                         <th style="width: 30%;">{{ __('messages.course_date') }}</th>
                         <th style="width: 30%;">{{ __('messages.course_name') }}</th>
                         <th style="width: 15%;">{{ __('messages.status') }}</th>
@@ -23,7 +23,7 @@
                     <tbody>
                     @foreach ($courses as $course)
                         <tr class="align-middle">
-                            <td class="text-center">{{ $course->month_year }}</td>
+{{--                            <td class="text-center">{{ $course->month_year }}</td>--}}
                             <td class="text-center">{{ $course->date_range }}</td>
                             <td class="text-center">{{ $course->name }}</td>
                             <td class="text-center">
