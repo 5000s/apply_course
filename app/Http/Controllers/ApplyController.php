@@ -145,8 +145,10 @@ class ApplyController extends Controller
         $location = Location::where("id",$location_id)->first();
         $member = Member::where("id",$member_id)->first();
 
-
-        $locations = Location::where("id","!=",2)->get();
+        $customOrder = [4, 1, 3, 5]; // IDs in the order you want
+        $locations = Location::whereIn("id", $customOrder)
+            ->orderByRaw("FIELD(id, " . implode(",", $customOrder) . ")")
+            ->get();
 
         $data = [];
         $data['courses'] = $courses;
