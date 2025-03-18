@@ -147,4 +147,6 @@ Route::get('lang/{locale}', function ($locale) {
 })->name('lang.switch');
 
 
+use App\Http\Controllers\GmailController;
+Route::get('/send-test-email', [GmailController::class, 'sendTestEmail']);
 
