@@ -9,52 +9,38 @@
 
     <title>{{ config('app.name', 'Laravel') }}</title>
 
-    <!-- Scripts -->
-    <script src="{{ asset('js/app.js') }}" defer></script>
-
+    <!-- Bootstrap & FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- Fonts -->
-    <link rel="dns-prefetch" href="//fonts.gstatic.com">
-    <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-    <!-- Styles -->
+    <!-- Custom Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
 </head>
 <body>
 <div id="app">
-    <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
         <div class="container">
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
+            <!-- โลโก้ -->
+            <a class="navbar-brand d-flex align-items-center" href="{{ url('/') }}">
+                <img src="{{ asset('images/Bhodhi-Dhammayan-LOGO-TH.png') }}" alt="Logo" height="70">
+{{--                <span class="ms-2 fw-bold text-danger">โพธิธรรมญาณสถาน</span>--}}
+            </a>
+
+            <!-- ปุ่มเมนู (สำหรับมือถือ) -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <!-- Left Side Of Navbar -->
-                <ul class="navbar-nav me-auto"></ul>
-
-                <!-- Right Side Of Navbar -->
-                <ul class="navbar-nav ms-auto">
-                    <!-- Language Switcher -->
-                    <li class="nav-item dropdown">
-                        <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                            {{ strtoupper(app()->getLocale()) }}
-                        </a>
-                        <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                            <a class="dropdown-item" href="{{ route('lang.switch', 'en') }}">English</a>
-                            <a class="dropdown-item" href="{{ route('lang.switch', 'th') }}">ไทย</a>
-                        </div>
-                    </li>
-
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav align-items-center">
                     @guest
-                        @if (Route::has('login'))
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ route('login') }}">{{ __('messages.Login') }}</a>
-                            </li>
-                        @endif
+                        <li class="nav-item">
+                            <a class="nav-link fw-bold text-primary" href="{{ route('login') }}">
+                                เข้าสู่ระบบ
+                            </a>
+                        </li>
+
                     @else
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('profile') }}">{{ __('messages.profile') }}</a>
@@ -70,19 +56,43 @@
                             </form>
                         </li>
                     @endguest
-                </ul>
 
-                <!-- Admin Menu (Stick to Right) -->
-                @if(Auth::check() && Auth::user()->admin == 1)
-                    <ul class="navbar-nav ms-auto">
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('admin.courses') }}">จัดการคอร์ส</a>
+                    <!-- ปุ่มตารางคอร์สปฏิบัติ -->
+                    <li class="nav-item ms-2">
+                        <a class="btn btn-danger text-white fw-bold px-3" href="{{ route('showCourseForStudent') }}">
+                            <i class="fas fa-calendar-alt"></i> ตารางคอร์สปฏิบัติ
+                        </a>
+                    </li>
+
+                        @if(Auth::check() && Auth::user()->admin == 1)
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ route('admin.courses') }}">จัดการคอร์ส</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ route('admin.members') }}">จัดการสมาชิก</a>
+                                </li>
+                        @endif
+
+                    <!-- สลับภาษา -->
+                        <li class="nav-item dropdown ms-3">
+                            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="languageDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <img src="{{ asset(app()->getLocale() == 'th' ? 'images/th.svg' : 'images/eng.svg') }}"
+                                     alt="Language" width="24" class="rounded-circle">
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="languageDropdown">
+                                <li>
+                                    <a class="dropdown-item d-flex align-items-center" href="{{ route('lang.switch', 'en') }}">
+                                        <img src="{{ asset('images/eng.svg') }}" alt="English" width="24" class="me-2"> English
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item d-flex align-items-center" href="{{ route('lang.switch', 'th') }}">
+                                        <img src="{{ asset('images/th.svg') }}" alt="Thai" width="24" class="me-2"> ไทย
+                                    </a>
+                                </li>
+                            </ul>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('admin.members') }}">จัดการสมาชิก</a>
-                        </li>
-                    </ul>
-                @endif
+                </ul>
             </div>
         </div>
     </nav>
@@ -91,6 +101,8 @@
         @yield('content')
     </main>
 </div>
-</body>
 
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
 </html>
