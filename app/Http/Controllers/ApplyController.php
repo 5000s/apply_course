@@ -66,6 +66,7 @@ class ApplyController extends Controller
             ->whereDate('c.date_start', '>', $dateStart)
 //            ->whereIn('c.category_id', [1, 3, 5, 6, 8])
             ->where('c.location_id', $location_id)
+            ->orderBy('c.date_start', 'asc')
             ->get()
             ->map(function ($course) {
                 // Parse the start and end dates
@@ -79,7 +80,7 @@ class ApplyController extends Controller
                 if ($startDate->isSameDay($endDate)) {
                     $course->date_range = "{$startDate->translatedFormat('j F')} $thaiYear";
                 } else {
-                    $course->date_range = "{$startDate->translatedFormat('j')}–{$endDate->translatedFormat('j F')} $thaiYear";
+                    $course->date_range = "{$startDate->translatedFormat('j')} – {$endDate->translatedFormat('j F')} $thaiYear";
                 }
 
                 $course->month_year = "{$endDate->translatedFormat('F')} $thaiYear";
