@@ -70,18 +70,106 @@
                             </div>
 
                             <!-- Category -->
-                            <div class="mb-3">
-                                <label for="category_id" class="form-label">ประเภทคอร์ส</label>
-                                <select name="category_id" id="category_id" class="form-control" required>
-                                    <option value="" disabled selected>Select Category</option>
-                                    @foreach ($categories as $category)
+                            <select name="category_id" id="category_id" class="form-control" required>
+                                <option value="" disabled selected>Select Category</option>
+                                @foreach ($categories as $category)
+                                    @if ($category->active == 1 || old('category_id', $course->category_id ?? '') == $category->id)
                                         <option value="{{ $category->id }}"
-                                            {{ old('category_id', $course->category_id ?? '') == $category->id ? 'selected' : '' }}>
+                                                {{ old('category_id', $course->category_id ?? '') == $category->id ? 'selected' : '' }}
+                                                data-day="{{ $category->day ?? 0 }}">
                                             {{ $category->show_name }}
                                         </option>
-                                    @endforeach
-                                </select>
-                            </div>
+                                    @endif
+                                @endforeach
+                            </select>
+
+                            <script>
+                                $(document).ready(function () {
+                                    let descriptionEdited = false;
+
+                                    function formatDate(date) {
+                                        const yyyy = date.getFullYear();
+                                        const mm = ('0' + (date.getMonth() + 1)).slice(-2);
+                                        const dd = ('0' + date.getDate()).slice(-2);
+                                        return `${yyyy}-${mm}-${dd}`;
+                                    }
+
+                                    function updateEndDate() {
+                                        const selectedOption = $('#category_id option:selected');
+                                        const day = parseInt(selectedOption.data('day')) || 0;
+                                        const startDateStr = $('#date_start').val();
+
+                                        if (startDateStr) {
+                                            const startDate = new Date(startDateStr);
+
+                                            if (day > 0) {
+                                                startDate.setDate(startDate.getDate() + day);
+                                            }
+
+                                            // ถ้า day = 0 ให้ end = start
+                                            $('#date_end').val(formatDate(startDate));
+                                        }
+                                    }
+
+                                    function updateStartDate() {
+                                        const selectedOption = $('#category_id option:selected');
+                                        const day = parseInt(selectedOption.data('day')) || 0;
+                                        const endDateStr = $('#date_end').val();
+
+                                        if (endDateStr) {
+                                            const endDate = new Date(endDateStr);
+
+                                            if (day > 0) {
+                                                endDate.setDate(endDate.getDate() - day);
+                                            }
+
+                                            // ถ้า day = 0 ให้ start = end
+                                            $('#date_start').val(formatDate(endDate));
+                                        }
+                                    }
+
+
+                                    function updateDescriptionIfNotEditedOrEmpty() {
+                                        const selectedOption = $('#category_id option:selected');
+                                        const showName = selectedOption.text().trim();
+                                        const descriptionInput = $('#description');
+                                        const currentVal = descriptionInput.val().trim();
+
+                                        // อัปเดตถ้ายังไม่เคยแก้ หรือถ้าค่าว่าง
+                                        if (!descriptionEdited || currentVal === '') {
+                                            descriptionInput.val(showName).data('autofilled', true);
+                                        }
+                                    }
+
+                                    // เมื่อผู้ใช้พิมพ์เอง → หยุด auto update
+                                    $('#description').on('input', function () {
+                                        const currentVal = $(this).val().trim();
+                                        if (currentVal !== '') {
+                                            descriptionEdited = true;
+                                            $(this).data('autofilled', false);
+                                        }
+                                    });
+
+                                    $('#category_id').on('change', function () {
+                                        updateEndDate();
+                                        updateDescriptionIfNotEditedOrEmpty();
+                                    });
+
+                                    $('#date_start').on('change', function () {
+                                        updateEndDate();
+                                    });
+
+                                    $('#date_end').on('change', function () {
+                                        updateStartDate();
+                                    });
+
+                                    // โหลดหน้า: คำนวณ end date และ description ถ้ายังไม่ถูกแก้หรือว่าง
+                                    updateEndDate();
+                                    updateDescriptionIfNotEditedOrEmpty();
+                                });
+                            </script>
+
+
 
                             <!-- State -->
                             <div class="mb-3">
