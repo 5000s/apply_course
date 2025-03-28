@@ -194,10 +194,10 @@
                             <div class="mb-3">
                                 <label for="listed" class="form-label">Listed</label>
                                 <select name="listed" id="listed" class="form-control" required>
-                                    <option value="yes"
-                                        {{ old('yes', $course->listed ?? '') == 'yes' ? 'selected' : '' }}>yes</option>
                                     <option value="no"
                                         {{ old('no', $course->listed ?? '') == 'no' ? 'selected' : '' }}>no</option>
+                                    <option value="yes"
+                                        {{ old('yes', $course->listed ?? '') == 'yes' ? 'selected' : '' }}>yes</option>
                                 </select>
                             </div>
 

@@ -34,15 +34,37 @@ class GmailService
         }
 
         $this->client->setAccessToken($accessToken);
+        
 
-        // Refresh token if expired
         if ($this->client->isAccessTokenExpired()) {
             if (!isset($accessToken['refresh_token'])) {
                 throw new \Exception("❌ Missing refresh token. Delete token.json and re-authenticate.");
             }
-            $this->client->fetchAccessTokenWithRefreshToken($this->client->getRefreshToken());
-            file_put_contents($tokenPath, json_encode($this->client->getAccessToken(), JSON_PRETTY_PRINT));
+
+            // 🔍 Log the refresh token for debug
+            \Log::info('🔄 Refreshing token...', [
+                'refresh_token' => $this->client->getRefreshToken()
+            ]);
+
+            $newToken = $this->client->fetchAccessTokenWithRefreshToken($this->client->getRefreshToken());
+
+            // 🛑 If refresh fails
+            if (isset($newToken['error'])) {
+                throw new \Exception("❌ Google API error: " . $newToken['error_description'] ?? $newToken['error']);
+            }
+
+            // ✅ Merge old refresh_token (in case it's not included in new token)
+            if (!isset($newToken['refresh_token'])) {
+                $newToken['refresh_token'] = $accessToken['refresh_token'];
+            }
+
+            $newToken['created'] = time();
+
+            file_put_contents($tokenPath, json_encode($newToken, JSON_PRETTY_PRINT));
+            $this->client->setAccessToken($newToken);
         }
+
+
 
         $this->service = new Gmail($this->client);
     }
