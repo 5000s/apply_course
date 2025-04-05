@@ -31,12 +31,13 @@
                     <td class="text-center ">#</td>
                     <td class="text-center ">uid</td>
                     <td class="text-center ">สมัครเมื่อ</td>
-                    <td class="text-center ">ชื่อ</td>
+                    <td class="text-center " style="width: 100px;">ชื่อ</td>
                     <td class="text-center ">อายุ</td>
                     <td class="text-center ">เพศ</td>
+                    <td class="text-center ">การศึกษา/อาชีพ</td>
                     <td class="text-center ">buddhism</td>
                     <td class="text-center ">ศิษย์</td>
-                    <td class="text-center ">ติดต่อ</td>
+                    <td class="text-center " style="width: 145px;">ติดต่อ</td>
                     <td class="text-center ">role</td>
                     <td class="text-center ">ที่พัก</td>
                     <td class="text-center ">คอร์สล่าสุด</td>
@@ -54,20 +55,27 @@
                                 $date = \Carbon\Carbon::parse($member->apply_date);
                             @endphp
                             <td class="text-left" style="font-size: 12px">
-                                {{ $date->format('Y-m-d') }}<br>
+                                {{ $date->format('d-m-y') }}<br>
                                 {{ $date->format('H:i:s') }}
 
 
-                            <td class="text-left">{{ $member->name }} {{ $member->surname }}</td>
+                            <td class="text-left">{{ $member->name }}<br>{{ $member->surname }}</td>
                             <td class="text-center">{{ $member->age }}</td>
                             <td class="text-center">{{ $member->gender }}</td>
+                            <td class="text-center">
+                                @if(strlen($member->degree) > 1)   {{ $member->degree }}<br> @endif
+                                    @if(strlen($member->expertise) > 1)   {{ $member->expertise }} <br> @endif
+                                    @if(strlen($member->career) > 1)   {{ $member->career }} @endif
+                            </td>
                             <td class="text-center">{{ $member->buddhism }}</td>
                             <td class="text-center">{{ $member->status }}</td>
                             <td class="text-left" style="font-size: 12px">
 
-                                    P: {{ $member->phone }} <br>
-                                    E: {{ $member->email }}
-
+                                P: {{ $member->phone }} <br>
+                                @php
+                                    $email = str_replace('@', '<wbr>@', e($member->email));
+                                @endphp
+                                E: {!! $email !!}
                             </td>
                             <td class="text-center">{{ $member->role }}</td>
                             <td class="text-center">{{ $member->shelter }}</td>
@@ -82,7 +90,7 @@
                                 @endforeach
 
                                 @if(count($coursesService) > 0)
-                                    <div style="font-weight: bolder;">ธรรมบริกร</div> 
+                                    <div style="font-weight: bolder;">ธรรมบริกร</div>
                                     @foreach($coursesService as $course)
                                         {{ str_replace('คอร์ส', '', $course->category) }} ({{ \Carbon\Carbon::parse($course->date_start)->format('d/m/y') }})<br>
                                     @endforeach
