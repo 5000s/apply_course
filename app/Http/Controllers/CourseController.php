@@ -275,7 +275,9 @@ class CourseController extends Controller
             ->select(
                 DB::raw("DATE_FORMAT(a.created_at, '%Y-%m-%d %H:%i:%s') as apply_date"),
                 'a.id as apply_id',
+                'a.shelter as shelter',
                 'c.id as course_id',
+                'm.id as uid',
                 'm.name',
                 'm.surname',
                 'm.phone',
@@ -285,6 +287,7 @@ class CourseController extends Controller
                 'm.buddhism',
                 'm.status',
                 'a.state',
+                'a.role',
                 'a.updated_by'
             )
             ->join('applies as a', 'a.member_id', '=', 'm.id')
@@ -298,8 +301,33 @@ class CourseController extends Controller
             ->get();
 
 
+
+        $completedCoursesRaw = DB::table('applies as a')
+            ->join('courses as c', 'a.course_id', '=', 'c.id')
+            ->select(
+                'a.member_id',
+                'c.category',
+                'c.id as course_id',
+                DB::raw("DATE_FORMAT(c.date_start, '%Y-%m-%d') as date_start")
+            )
+            ->where('a.state', 'ผ่านการอบรม')
+            ->where(function ($query) {
+                $query->where('a.cancel', 0)->orWhereNull('a.cancel');
+            })
+            ->orderBy('a.created_at', 'desc')
+            ->get()
+            ->groupBy('member_id')
+            ->map(function ($group) {
+                return $group->take(3)->values()->toArray(); // Get last 3 as array
+            })
+            ->toArray();
+
+
+
+
         $data = [];
         $data['members'] = $members;
+        $data['completedCourses'] = $completedCoursesRaw;
 
         $course = Course::where("id", $course_id)->first();
 

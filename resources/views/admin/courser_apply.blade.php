@@ -28,19 +28,20 @@
             <table id="myTable" class="table table-striped">
                 <thead>
                 <tr>
-                    <td class="text-center ">ลำดับ</td>
+                    <td class="text-center ">#</td>
+                    <td class="text-center ">uid</td>
                     <td class="text-center ">สมัครเมื่อ</td>
                     <td class="text-center ">ชื่อ</td>
-                    <td class="text-center ">นามสกุล</td>
                     <td class="text-center ">อายุ</td>
                     <td class="text-center ">เพศ</td>
                     <td class="text-center ">buddhism</td>
                     <td class="text-center ">ศิษย์</td>
                     <td class="text-center ">ติดต่อ</td>
+                    <td class="text-center ">role</td>
+                    <td class="text-center ">ที่พัก</td>
+                    <td class="text-center ">คอร์สล่าสุด</td>
                     <td class="text-center ">สถานะ</td>
-                    <td class="text-center ">ข้อมูล</td>
-                    <td class="text-center ">status</td>
-                    <td class="text-center ">แก้ไขโดย</td>
+                    <td class="text-center ">ข้อมูล/status</td>
                 </tr>
                 </thead>
 
@@ -48,39 +49,59 @@
                     @foreach ($members as $index => $member)
                         <tr>
                             <td class="text-center">{{ $loop->iteration }}</td>
-                            <td class="text-center">{{ $member->apply_date }}</td>
-                            <td class="text-center">{{ $member->name }}</td>
-                            <td class="text-center">{{ $member->surname }}</td>
+                            <td class="text-center">{{ $member->uid }}</td>
+                            @php
+                                $date = \Carbon\Carbon::parse($member->apply_date);
+                            @endphp
+                            <td class="text-left" style="font-size: 12px">
+                                {{ $date->format('Y-m-d') }}<br>
+                                {{ $date->format('H:i:s') }}
+
+
+                            <td class="text-left">{{ $member->name }} {{ $member->surname }}</td>
                             <td class="text-center">{{ $member->age }}</td>
                             <td class="text-center">{{ $member->gender }}</td>
                             <td class="text-center">{{ $member->buddhism }}</td>
                             <td class="text-center">{{ $member->status }}</td>
-                            <td class="text-center">
-                                <div style="text-align: left">
+                            <td class="text-left" style="font-size: 12px">
+
                                     P: {{ $member->phone }} <br>
                                     E: {{ $member->email }}
+
+                            </td>
+                            <td class="text-center">{{ $member->role }}</td>
+                            <td class="text-center">{{ $member->shelter }}</td>
+                            <td class="text-left" style="font-size: 12px" >
+                                @php
+                                    $courses = $completedCourses[$member->uid] ?? [];
+                                @endphp
+
+                                @foreach($courses as $course)
+                                    {{ str_replace('คอร์ส', '', $course->category) }} ({{ \Carbon\Carbon::parse($course->date_start)->format('d/m/y') }})<br>
+                                @endforeach
+                            </td>
+                            <td class="text-center" style="font-size: 12px">
+                                {{ $member->state }} <br>
+                                แก้ไขโดย: {{ $member->updated_by === 'Anonymous' ? 'NA' : $member->updated_by }}
+                            </td>
+
+                            <td class="text-center">
+                                <div class="flex flex-col items-center gap-1">
+                                    <a href="{{ route('admin.courseApplyForm', ['course_id' => $member->course_id, 'apply_id' => $member->apply_id]) }}" target="_blank">
+                                        <button class="btn btn-sm btn-active btn-in-table">ดูข้อมูล</button>
+                                    </a>
+
+                                    <div class="dropdown dropdown-hover">
+                                        <div tabindex="0" role="button" class="btn btn-sm btn-active">แก้ไข</div>
+                                        <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
+                                            <li><a href="{{ route('admin.courseApplyStatus', ['course_id' => $member->course_id, 'apply_id' => $member->apply_id, 'status' => 'ยื่นใบสมัคร']) }}">ยื่นใบสมัคร</a></li>
+                                            <li><a href="{{ route('admin.courseApplyStatus', ['course_id' => $member->course_id, 'apply_id' => $member->apply_id, 'status' => 'ยืนยันแล้ว']) }}">ยืนยันแล้ว</a></li>
+                                            <li><a href="{{ route('admin.courseApplyStatus', ['course_id' => $member->course_id, 'apply_id' => $member->apply_id, 'status' => 'ผ่านการอบรม']) }}">ผ่านการอบรม</a></li>
+                                            <li><a href="{{ route('admin.courseApplyStatus', ['course_id' => $member->course_id, 'apply_id' => $member->apply_id, 'status' => 'ยุติกลางคัน']) }}">ยุติกลางคัน</a></li>
+                                        </ul>
+                                    </div>
                                 </div>
                             </td>
-                            <td class="text-center">{{ $member->state }}</td>
-
-                            <td>
-                                <a href="{{ route('admin.courseApplyForm', ['course_id' => $member->course_id, 'apply_id' => $member->apply_id]) }}" target="_blank"> <button class="btn btn-sm btn-active btn-in-table">ดูข้อมูล</button></a>
-                            </td>
-
-                            <td>
-                                <div class="dropdown dropdown-hover">
-                                    <div tabindex="0" role="button" class="btn btn-sm btn-active">แก้ไข</div>
-                                    <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
-                                        <li><a href="{{ route('admin.courseApplyStatus', ['course_id' => $member->course_id, 'apply_id' => $member->apply_id, 'status' => "ยื่นใบสมัคร"]) }}" target="self">ยื่นใบสมัคร</a></li>
-                                        <li><a href="{{ route('admin.courseApplyStatus', ['course_id' => $member->course_id, 'apply_id' => $member->apply_id, 'status' => "ยืนยันแล้ว"]) }}" target="self">ยืนยันแล้ว</a></li>
-                                        <li><a href="{{ route('admin.courseApplyStatus', ['course_id' => $member->course_id, 'apply_id' => $member->apply_id, 'status' => "ผ่านการอบรม"]) }}" target="self">ผ่านการอบรม</a></li>
-                                        <li><a href="{{ route('admin.courseApplyStatus', ['course_id' => $member->course_id, 'apply_id' => $member->apply_id, 'status' => "ยุติกลางคัน"]) }}" target="self">ยุติกลางคัน</a></li>
-                                    </ul>
-                                </div>
-
-                            </td>
-
-                            <td class="text-center">{{ $member->updated_by }}</td>
 
                         </tr>
                     @endforeach

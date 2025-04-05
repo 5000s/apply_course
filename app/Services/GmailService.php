@@ -34,7 +34,7 @@ class GmailService
         }
 
         $this->client->setAccessToken($accessToken);
-        
+
 
         if ($this->client->isAccessTokenExpired()) {
             if (!isset($accessToken['refresh_token'])) {
