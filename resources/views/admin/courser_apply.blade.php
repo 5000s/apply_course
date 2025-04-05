@@ -63,9 +63,9 @@
                             <td class="text-center">{{ $member->age }}</td>
                             <td class="text-center">{{ $member->gender }}</td>
                             <td class="text-center">
-                                @if(strlen($member->degree) > 1)   {{ $member->degree }}<br> @endif
                                     @if(strlen($member->expertise) > 1)   {{ $member->expertise }} <br> @endif
-                                    @if(strlen($member->career) > 1)   {{ $member->career }} @endif
+                                    @if(strlen($member->career) > 1)   {{ $member->career }} <br> @endif
+                                        @if(strlen($member->degree) > 1)   {{ $member->degree }}@endif
                             </td>
                             <td class="text-center">{{ $member->buddhism }}</td>
                             <td class="text-center">{{ $member->status }}</td>
