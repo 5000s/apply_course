@@ -306,28 +306,51 @@ class CourseController extends Controller
             ->join('courses as c', 'a.course_id', '=', 'c.id')
             ->select(
                 'a.member_id',
+                'a.role',
                 'c.category',
                 'c.id as course_id',
                 DB::raw("DATE_FORMAT(c.date_start, '%Y-%m-%d') as date_start")
             )
             ->where('a.state', 'ผ่านการอบรม')
+            ->where('a.role', "!=", 'ธรรมะบริกร')
             ->where(function ($query) {
                 $query->where('a.cancel', 0)->orWhereNull('a.cancel');
             })
             ->orderBy('a.created_at', 'desc')
             ->get()
-            ->groupBy('member_id')
+            ->groupBy('member_id', 'course_id')
             ->map(function ($group) {
-                return $group->take(3)->values()->toArray(); // Get last 3 as array
+                return $group->unique('course_id')->take(3)->values()->toArray();
             })
             ->toArray();
 
-
+        $completedServiceCoursesRaw = DB::table('applies as a')
+            ->join('courses as c', 'a.course_id', '=', 'c.id')
+            ->select(
+                'a.member_id',
+                'a.role',
+                'c.category',
+                'c.id as course_id',
+                DB::raw("DATE_FORMAT(c.date_start, '%Y-%m-%d') as date_start")
+            )
+            ->where('a.state', 'ผ่านการอบรม')
+            ->where('a.role', 'ธรรมะบริกร')
+            ->where(function ($query) {
+                $query->where('a.cancel', 0)->orWhereNull('a.cancel');
+            })
+            ->orderBy('a.created_at', 'desc')
+            ->get()
+            ->groupBy('member_id', 'course_id')
+            ->map(function ($group) {
+                return $group->unique('course_id')->take(3)->values()->toArray();
+            })
+            ->toArray();
 
 
         $data = [];
         $data['members'] = $members;
         $data['completedCourses'] = $completedCoursesRaw;
+        $data['completedServiceCourses'] = $completedServiceCoursesRaw;
 
         $course = Course::where("id", $course_id)->first();
 

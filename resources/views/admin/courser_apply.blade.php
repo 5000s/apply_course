@@ -74,11 +74,19 @@
                             <td class="text-left" style="font-size: 12px" >
                                 @php
                                     $courses = $completedCourses[$member->uid] ?? [];
+                                    $coursesService = $completedServiceCourses[$member->uid] ?? [];
                                 @endphp
 
                                 @foreach($courses as $course)
                                     {{ str_replace('คอร์ส', '', $course->category) }} ({{ \Carbon\Carbon::parse($course->date_start)->format('d/m/y') }})<br>
                                 @endforeach
+
+                                @if(count($coursesService) > 0)
+                                    <div style="font-weight: bolder;">ธรรมบริกร</div> 
+                                    @foreach($coursesService as $course)
+                                        {{ str_replace('คอร์ส', '', $course->category) }} ({{ \Carbon\Carbon::parse($course->date_start)->format('d/m/y') }})<br>
+                                    @endforeach
+                                @endif
                             </td>
                             <td class="text-center" style="font-size: 12px">
                                 {{ $member->state }} <br>
