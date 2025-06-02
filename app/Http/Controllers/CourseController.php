@@ -181,7 +181,7 @@ class CourseController extends Controller
         $locationChoose = "";
 
         // Initial
-        $location_id = $request->input('location', 1);
+        $location_id = $request->input('location', 0);
         $category_id = $request->input('category', 0);
         $status = $request->input('status', 'เปิดรับสมัคร');
 
@@ -270,8 +270,10 @@ class CourseController extends Controller
 
     public function courseApplyList(Request $request, $course_id)
     {
+        $group = $request->input('group', "all");
 
-        $members = DB::table('members as m')
+
+        $base = DB::table('members as m')
             ->select(
                 DB::raw("DATE_FORMAT(a.created_at, '%Y-%m-%d %H:%i:%s') as apply_date"),
                 'a.id as apply_id',
@@ -300,9 +302,70 @@ class CourseController extends Controller
                 $query->where('a.cancel', 0)
                     ->orWhereNull('a.cancel');
             })
-            ->orderByRaw("DATE_FORMAT(a.created_at, '%Y-%m-%d %H:%i:%s')")
-            ->get();
+            ->orderByRaw("DATE_FORMAT(a.created_at, '%Y-%m-%d %H:%i:%s')");
 
+        // ----------------- ดึงข้อมูลตามแท็บที่เลือก -----------------
+        switch ($group) {
+            case 'male':
+                $members = (clone $base)
+                    ->where('a.shelter','ทั่วไป'  )
+                    ->where('m.gender','ชาย')
+                    ->where('m.buddhism','ฆราวาส')
+                    ->get();
+                break;
+
+            case 'female':
+                $members = (clone $base)
+                    ->where('a.shelter','ทั่วไป'  )
+                    ->where('m.gender','หญิง')
+                    ->where('m.buddhism','ฆราวาส')
+                    ->get();
+                break;
+
+            case 'malespecial':
+                $members = (clone $base)
+                    ->where('a.shelter','กุฏิพิเศษ'  )
+                    ->where('m.gender','ชาย')
+                    ->where('m.buddhism','ฆราวาส')
+                    ->get();
+                break;
+
+            case 'femalespecial':
+                $members = (clone $base)
+                    ->where('a.shelter','กุฏิพิเศษ'  )
+                    ->where('m.gender','หญิง')
+                    ->where('m.buddhism','ฆราวาส')
+                    ->get();
+                break;
+
+
+            case 'monk':
+                $members = (clone $base)
+                    ->where('m.buddhism','ภิกษุ')
+                    ->get();
+                break;
+
+            case 'nun':
+                $members = (clone $base)
+                    ->where('m.buddhism','แม่ชี')
+                    ->get();
+                break;
+
+            default:        // all
+                $members = (clone $base)->get();
+                break;
+        }
+
+// ----------------- นับจำนวนแต่ละกลุ่ม (เอาไว้โชว์บนแท็บ/สรุป) -----------------
+        $stats = [
+            'male'   => (clone $base)->where('a.shelter','ทั่วไป'  )->where('m.gender','ชาย'  )->where('m.buddhism','ฆราวาส')->count(),
+            'female' => (clone $base)->where('a.shelter','ทั่วไป'  )->where('m.gender','หญิง')->where('m.buddhism','ฆราวาส')->count(),
+            'malespecial'   => (clone $base)->where('a.shelter','กุฏิพิเศษ'  )->where('m.gender','ชาย'  )->where('m.buddhism','ฆราวาส')->count(),
+            'femalespecial' => (clone $base)->where('a.shelter','กุฏิพิเศษ'  )->where('m.gender','หญิง')->where('m.buddhism','ฆราวาส')->count(),
+            'monk'   => (clone $base)->where('m.buddhism','ภิกษุ')->count(),
+            'nun'    => (clone $base)->where('m.buddhism','แม่ชี')->count(),
+            'all'    => (clone $base)->count(),
+        ];
 
 
         $completedCoursesRaw = DB::table('applies as a')
@@ -352,6 +415,7 @@ class CourseController extends Controller
 
         $data = [];
         $data['members'] = $members;
+        $data['stats'] = $stats;
         $data['completedCourses'] = $completedCoursesRaw;
         $data['completedServiceCourses'] = $completedServiceCoursesRaw;
 
