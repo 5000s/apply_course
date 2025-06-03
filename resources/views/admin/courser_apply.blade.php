@@ -37,7 +37,7 @@
     <div class="row mb-8">
         <div class="col-12 flex justify-center">
             @php
-                $active  = request('group', 'male');
+                $active  = request('group', 'all');
                 $base    = 'px-6 md:px-8 py-3 md:py-3.5 text-lg md:text-2xl font-semibold tracking-wide transition rounded-full shadow-sm';
                 $makeTab = function($v,$label,$count) use($active,$base){
                     $activeCls = 'bg-primary text-white hover:bg-primary/90';
@@ -72,9 +72,14 @@
                     <td class="text-center ">อายุ</td>
                     <td class="text-center ">เพศ</td>
                     <td class="text-center " style="width: 120px;">การศึกษา/อาชีพ</td>
+                    <td class="text-center " style="display: none;">ความเชี่ยวชาญ</td>
+                    <td class="text-center " style="display: none;">อาชีพ</td>
+                    <td class="text-center " style="display: none;">การศึกษา</td>
                     <td class="text-center ">buddhism</td>
                     <td class="text-center ">ศิษย์</td>
                     <td class="text-center " style="width: 145px;">ติดต่อ</td>
+                    <td class="text-center " style="display: none;">โทร</td>
+                    <td class="text-center " style="display: none;">อีเมล</td>
                     <td class="text-center ">role</td>
                     <td class="text-center ">ที่พัก</td>
                     <td class="text-center " style="width: 200px;">คอร์สล่าสุด</td>
@@ -92,13 +97,14 @@
                             $date = \Carbon\Carbon::parse($member->apply_date);
                         @endphp
                         <td class="text-left" style="font-size: 12px">
-                            {{ $date->format('d-m-y') }}<br>
-                        {{ $date->format('H:i:s') }}
+                            {{ $date->format('d-m-y') }}&nbsp;<br>{{ $date->format('H:i:s') }}
 
 
-                        <td class="text-left">{{ $member->name }}<br>{{ $member->surname }}</td>
+                        <td class="text-left">{{ $member->name }}&nbsp;<br>{{ $member->surname }}</td>
                         <td class="text-center">{{ $member->age }}</td>
-                        <td class="text-center">{{ $member->gender }}</td>
+                        <td class="text-center" >{{ $member->gender }}</td>
+
+
                         <td class="text-center">
                             @if(strlen($member->expertise) > 1)
                                 {{ $member->expertise }} <br>
@@ -110,16 +116,30 @@
                                 {{ $member->degree }}
                             @endif
                         </td>
+
+                        <td class="text-center" style="display: none;">{{ $member->expertise }}</td>
+                        <td class="text-center" style="display: none;">{{ $member->career }}</td>
+                        <td class="text-center" style="display: none;">{{ $member->degree }}</td>
+
+
                         <td class="text-center">{{ $member->buddhism }}</td>
                         <td class="text-center">{{ $member->status }}</td>
                         <td class="text-left" style="font-size: 12px">
 
-                            P: {{ $member->phone }} <br>
+                            P: {{ $member->phone }}<br>
                             @php
                                 $email = str_replace('@', '<wbr>@', e($member->email));
                             @endphp
                             E: {!! $email !!}
                         </td>
+
+                        <td class="text-left" style="display: none">
+                           {{ $member->phone }}
+                        </td>
+                        <td class="text-left" style="display: none">
+                            {!! $member->email !!}
+                        </td>
+
                         <td class="text-center">{{ $member->role }}</td>
                         <td class="text-center">{{ $member->shelter }}</td>
                         <td class="text-left" style="font-size: 12px">
@@ -193,7 +213,7 @@
                     title: '{{ $course->category }} ({{ $course->date_start }})',
                     exportOptions: {
                         // include only columns up to "คอร์สล่าสุด" (0‑based index 0‑12)
-                        columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,13]
+                        columns: [  0, 1, 2 , 3, 4, 5, 7,8,9,10,11 , 13,14,15,16,18]
                     }
                 }]
             }).columns.adjust();
