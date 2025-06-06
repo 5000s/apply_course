@@ -128,8 +128,11 @@ Route::middleware(['verified'])->group(function () {
 
     Route::get('apply/{member_id}/courses/{course_id}', [ApplyController::class, 'show'])->name('courses.show');
     Route::post('apply/{member_id}/courses', [ApplyController::class, 'save'] )->name('courses.save');
+    Route::post('apply/{member_id}/courses/{apply}', [ApplyController::class, 'update'] )->name('courses.update');
+
+    Route::post('apply/{member_id}/courses/{apply}/cancel', [ApplyController::class, 'cancel'] )->name('courses.cancel');
+
     Route::get('apply/{member_id}/courses/edit/{course_id}', [ApplyController::class, 'edit'] )->name('courses.edit');
-    Route::post('apply/{member_id}/courses/cancel/{course_id}', [ApplyController::class, 'cancel'] )->name('courses.cancel');
 
 });
 

@@ -36,19 +36,29 @@
                                     </span>
                             </td>
                             <td class="text-center">
-                                @if($course->state === 'เปิดรับสมัคร')
-                                    @if(is_null($course->apply_id))
-                                        <a href="{{ route('courses.show', [$member_id, $course->id]) }}" class="btn btn-sm btn-outline-success">
-                                            <i class="fas fa-sign-in-alt"></i> {{ __('messages.register') }}
-                                        </a>
+
+
+                                @if(in_array($course->category_id, $allow_types, true))
+
+                                    @if($course->state === 'เปิดรับสมัคร')
+                                        @if(is_null($course->apply_id))
+                                            <a href="{{ route('courses.show', [$member_id, $course->id]) }}" class="btn btn-sm btn-outline-success">
+                                                <i class="fas fa-sign-in-alt"></i> {{ __('messages.register') }}
+                                            </a>
+                                        @else
+                                            <a href="{{ route('courses.show', [$member_id, $course->id]) }}" class="btn btn-sm btn-outline-secondary">
+                                                <i class="fas fa-edit"></i> {{ __('messages.edit') }}
+                                            </a>
+                                        @endif
                                     @else
-                                        <a href="{{ route('courses.show', [$member_id, $course->id]) }}" class="btn btn-sm btn-outline-secondary">
-                                            <i class="fas fa-edit"></i> {{ __('messages.edit') }}
-                                        </a>
+                                        {{--                                    <span class="text-muted" style="font-size: 14px;">{{ __('messages.closed') }}</span>--}}
                                     @endif
+
                                 @else
-{{--                                    <span class="text-muted" style="font-size: 14px;">{{ __('messages.closed') }}</span>--}}
+
+
                                 @endif
+
                             </td>
                         </tr>
                     @endforeach

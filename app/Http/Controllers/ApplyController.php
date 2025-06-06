@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Apply;
+use App\Models\CourseCategory;
 use App\Models\Location;
 use App\Models\Member;
 use Carbon\Carbon;
@@ -104,6 +105,7 @@ class ApplyController extends Controller
                 'cc.show_name as name', // Get course category name
                 'c.date_end',
                 'c.category',
+                'c.category_id',
                 'c.state',
                 'a.id as apply_id', // Member's application ID
                 'a.cancel'
@@ -150,6 +152,7 @@ class ApplyController extends Controller
             ->orderByRaw("FIELD(id, " . implode(",", $customOrder) . ")")
             ->get();
 
+
         $data = [];
         $data['courses'] = $courses;
         $data['course_location'] = $location;
@@ -157,6 +160,20 @@ class ApplyController extends Controller
         $data['selected_location_id'] = $location_id;
         $data['member_id'] = $member_id;
         $data['member'] = $member;
+
+        $member_status = $member->status;
+
+        if ($member_status == "ผู้สมัครใหม่" || $member_status == "ศิษย์อานาฯ ๑ วัน"){
+            $data['allow_types'] = CourseCategory::where('allow_new', 1)->pluck('id')->all();
+        }else if ($member_status == "ศิษย์อานาปานสติ"){
+            $data['allow_types'] = CourseCategory::where('allow_anapa', 1)->pluck('id')->all();
+        }else if ($member_status == "ศิษย์เตโชวิปัสสนา"){
+            $data['allow_types'] = CourseCategory::where('allow_techo', 1)->pluck('id')->all();
+        }
+
+
+
+
 
         return view('courses.index', $data); // Return the view with the courses list
     }
@@ -262,26 +279,101 @@ class ApplyController extends Controller
         ini_set('post_max_size', '12M');
 
         $course_id = $request->input("course_id");
-        $cancel= $request->input("cancel");
-
-        if ($cancel != "cancel") {
-            $request->validate([
-                'registration_form' => 'required|mimes:jpeg,png,jpg,pdf|max:2048', // จำกัดขนาดไฟล์ 10MB (10240 KB)
-            ], [
-                'registration_form.max' => 'ไฟล์ต้องมีขนาดไม่เกิน 2MB',
-                'registration_form.mimes' => 'รองรับเฉพาะไฟล์ PNG, JPG, JPEG และ PDF เท่านั้น'
-            ]);
-
-        }
 
         if ( !$this->checkUserAccessMember($member_id)){
             return redirect()->route('profile')->withErrors('The Member is not found.');
         }
 
 
-
+        $course = Course::where("id",$course_id)->first();
+        $van = $request->input("van");
 
         $course = Course::where("id",$course_id)->first();
+        if(!$course){
+            return redirect()->route('profile')->withErrors('The Course is not found.');
+        }
+
+
+        if($course){
+            $apply = new Apply();
+            $apply->member_id = $member_id;
+            $apply->course_id = $course_id;
+            $apply->van = $van;
+            $apply->cancel = 0;
+            $apply->state = "ยื่นใบสมัคร";
+            $apply->created_by = "USER";
+            $apply->save();
+
+
+            if ($request->hasFile('registration_form')) {
+
+                $request->validate([
+                    'course_id' => 'required|exists:courses,id',
+                    'van' => 'required|in:no,yes',
+                    'registration_form' => 'required|file|mimes:pdf,jpg,jpeg,png|max:8192', // 4MB Max
+                ]);
+
+
+                $file = $request->file('registration_form');
+
+                logger()->info('File size being uploaded: ' . $file->getSize());
+
+                $extension = $file->getClientOriginalExtension();
+                $filename = $this->generateFileName($member_id,$course_id,$extension);
+                $storagePath = 'uploads/courses/' . $course_id;
+
+                $file->storeAs($storagePath, $filename, 'public');
+                $apply->application = $storagePath . '/' . $filename;
+
+                $apply->save();
+
+                return redirect()->route('courses.show', ['member_id' => $member_id, 'course_id' => $course_id]);
+
+            }else{
+                dd($request->file('registration_form'));
+            }
+        }else{
+            return redirect()->route('profile')->withErrors('The Course is not found.');
+        }
+    }
+
+
+    public function update(Request $request, $member_id, $apply_id)
+    {
+
+        $course_id = $request->input("course_id");
+
+        if ( !$this->checkUserAccessMember($member_id)){
+            return redirect()->route('profile')->withErrors('The Member is not found.');
+        }
+
+        $course = Course::where("id",$course_id)->first();
+        if(!$course){
+            return redirect()->route('profile')->withErrors('The Course is not found.');
+        }
+
+
+        $apply = Apply::where("id",$apply_id)->where("member_id",$member_id)->first();
+        $van = $request->input("van");
+
+        $apply->van = $van;
+        $apply->save();
+
+        return redirect()->route('courses.show', ['member_id' => $member_id, 'course_id' => $course_id]);
+
+    }
+
+
+    public function cancel(Request $request, $member_id)
+    {
+
+        $course_id = $request->input("course_id");
+        $cancel= $request->input("cancel");
+
+        if ( !$this->checkUserAccessMember($member_id)){
+            return redirect()->route('profile')->withErrors('The Member is not found.');
+        }
+
 
         if ($cancel == "cancel") {
             $applys = Apply::where("course_id",$course_id)->where("member_id",$member_id)->get();
@@ -295,86 +387,11 @@ class ApplyController extends Controller
 
             return redirect()->route('courses.show', ['member_id' => $member_id, 'course_id' => $course_id]);
 
-        }else if ($request->hasFile('registration_form')) {
-
-            $request->validate([
-                'course_id' => 'required|exists:courses,id',
-                'registration_form' => 'required|file|mimes:pdf,jpg,jpeg,png|max:8192', // 4MB Max
-            ]);
-
-            $apply = new Apply();
-
-            $apply->member_id = $member_id;
-            $apply->course_id = $course_id;
-            $apply->cancel = 0;
-            $apply->state = "ยื่นใบสมัคร";
-
-            $apply->created_by = "USER";
-
-
-            $file = $request->file('registration_form');
-
-            logger()->info('File size being uploaded: ' . $file->getSize());
-
-            $extension = $file->getClientOriginalExtension();
-            $filename = $this->generateFileName($member_id,$course_id,$extension);
-            $storagePath = 'uploads/courses/' . $course_id;
-
-            $file->storeAs($storagePath, $filename, 'public');
-            $apply->application = $storagePath . '/' . $filename;
-
-            $apply->save();
-            // Save course application with file path (adjust according to your database structure)
-            // Application::create([...]);
-
-
-
-             return redirect()->route('courses.show', ['member_id' => $member_id, 'course_id' => $course_id]);
-
-//            return redirect()->route('courses.index',['member_id' => $member_id])->with('status', 'Applied successfully');
-        }else if($course->category_id == 8){
-            // อานาปา 1 วัน
-
-            $regstration_name = $request->input("regstration_name");
-
-            $apply = new Apply();
-
-            $apply->member_id = $member_id;
-            $apply->course_id = $course_id;
-            $apply->cancel = 0;
-            $apply->state = "ยื่นใบสมัคร";
-
-            $apply->created_by = "USER";
-            $apply->application = $regstration_name;
-            $apply->save();
-
-            return redirect()->route('courses.show', ['member_id' => $member_id, 'course_id' => $course_id]);
-
         }else{
             dd($request->file('registration_form'));
         }
     }
 
-    public function edit($id)
-    {
-        $courseApplication = CourseApplication::findOrFail($id); // Assuming you have a CourseApplication model
-
-        // Check if the application belongs to the authenticated user
-        // This check is important for security reasons
-        // if ($courseApplication->user_id != auth()->id()) {
-        //     abort(403);
-        // }
-
-        return view('courses.edit', compact('courseApplication'));
-    }
-
-    public function cancel(Request $request, $id)
-    {
-        // Similar to edit, find the application and cancel it
-        // $courseApplication = CourseApplication::findOrFail($id);
-        // Perform the cancellation logic
-        return redirect()->route('courses.index')->with('status', 'Application cancelled');
-    }
 
     function generateFileName($course_id, $member_id, $fileExtension) {
         $inputString = $member_id . "_" . $course_id;

@@ -1,9 +1,10 @@
 @extends('layouts.app')
 
 @section('content')
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <div class="container">
-{{--        <h1 class="text-center mt-4 mb-3">{{ $course->category }}, {{ $course->location }}</h1>--}}
+        {{--        <h1 class="text-center mt-4 mb-3">{{ $course->category }}, {{ $course->location }}</h1>--}}
         <h4 class="text-center mb-4">{{ $course->coursename }}, {{ $course->location }}</h4>
 
         {{-- Alert Message --}}
@@ -71,70 +72,86 @@
                     </div>
                 @endif
 
-                {{-- 📌 ฟอร์มอัปโหลดใบสมัคร --}}
-                <form action="{{ route('courses.save', $member_id) }}" method="POST" enctype="multipart/form-data">
+                {{-- ======================== ฟอร์ม 1 : สมัคร / แก้ไข  ======================== --}}
+                <form id="application_form"
+                      action="{{ $apply->id == null ? route('courses.save', $member_id)
+                                    : route('courses.update', [$member_id, 'apply' => $apply->id]) }}"
+                      method="POST" enctype="multipart/form-data">
                     @csrf
+
+
                     <input type="hidden" name="course_id" value="{{ $course->id }}">
 
-                    @if($apply->application == "")
-                        <div class="mb-4">
-                            <label for="registration_form" class="form-label">
-                                กรุณาอัปโหลดแบบฟอร์มการสมัคร (ไฟล์รูปภาพ หรือ PDF)
-                            </label>
-                            <input type="file" class="form-control"
-                                   name="registration_form" required onchange="previewFile()"
-                                   accept="image/png, image/jpeg, application/pdf">
+                    {{-- 📌 การเดินทาง (เลือกอย่างใดอย่างหนึ่ง) --}}
+                    <div class="mb-4">
+                        <label class="form-label fw-bold d-block">การเดินทาง</label>
+                        @php $currentVan = old('van', $apply->van ?? ''); @endphp
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" id="travel_self" name="van" value="no" {{ $currentVan === 'no' ? 'checked' : '' }}>
+                            <label class="form-check-label" for="travel_self">เดินทางด้วยตนเอง</label>
                         </div>
-                    @else
-                        <input type="hidden" name="cancel" value="cancel">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" id="travel_van" name="van" value="yes" {{ $currentVan === 'yes' ? 'checked' : '' }}>
+                            <label class="form-check-label" for="travel_van">เดินทางด้วยรถตู้</label>
+                        </div>
+                    </div>
+
+                    {{-- 📌 อัปโหลดไฟล์ ใบสมัคร --}}
+                    @if(empty($apply->application))
+                        <div class="mb-4">
+                            <label for="registration_form" class="form-label">กรุณาอัปโหลดแบบฟอร์มการสมัคร (PNG, JPG, JPEG, PDF)</label>
+                            <input type="file" class="form-control" name="registration_form" required onchange="previewFile()" accept="image/png, image/jpeg, application/pdf">
+                        </div>
                     @endif
 
-                    {{-- 📌 แสดงตัวอย่างไฟล์ที่อัปโหลด --}}
+                    {{-- 📌 แสดงตัวอย่างไฟล์ที่อัปโหลดแล้ว --}}
                     <div id="preview" class="mt-3">
-                        @if($apply->application != "")
-                            @php
-                                $extension = strtolower(pathinfo($apply->application, PATHINFO_EXTENSION));
-                            @endphp
-
+                        @if(!empty($apply->application))
+                            @php $extension = strtolower(pathinfo($apply->application, PATHINFO_EXTENSION)); @endphp
                             @if(in_array($extension, ['jpg', 'jpeg', 'png', 'gif']))
                                 <img src="{{ asset('storage/' . $apply->application) }}" alt="Uploaded Image" class="img-fluid">
-                            @elseif($extension == 'pdf')
-                                <object data="{{ asset('storage/' . $apply->application) }}" type="application/pdf" width="100%" height="600px">
-                                    <p>เบราว์เซอร์ของคุณไม่รองรับการแสดง PDF <a href="{{ asset('storage/' . $apply->application) }}">ดาวน์โหลดที่นี่</a>.</p>
-                                </object>
+                            @elseif($extension === 'pdf')
+                                <object data="{{ asset('storage/' . $apply->application) }}" type="application/pdf" width="100%" height="600px"></object>
                             @endif
                         @endif
                     </div>
 
-                    {{-- 📌 ปุ่มสมัคร / ยกเลิกการสมัคร --}}
                     <div class="text-end mt-4">
-                        @if($apply->application != "" && $apply->application != null )
-                            <button id="submit_button" type="submit" class="btn btn-danger btn-lg">ยกเลิกการสมัคร</button>
-                        @else
-                            <button id="submit_button" type="submit" class="btn btn-primary btn-lg" disabled>สมัคร</button>
-                        @endif
+                        <button id="apply_button" type="submit" class="btn btn-primary btn-lg" {{ empty($apply->application) ? 'disabled' : '' }}>
+                            {{ empty($apply->application) ? 'สมัคร' : 'แก้ไขใบสมัคร' }}
+                        </button>
                     </div>
                 </form>
+
+                {{-- ======================== ฟอร์ม 2 : ยกเลิกการสมัคร  ======================== --}}
+                @if(!empty($apply->application))
+                    <form id="cancel_form" action="{{ route('courses.cancel', [$member_id, 'apply' => $apply->id]) }}" method="POST" class="text-end mt-2">
+                        @csrf
+                        <input type="hidden" name="course_id" value="{{ $course->id }}">
+                        <input type="hidden" name="cancel" value="cancel">
+                        <button id="cancel_button" type="submit" class="btn btn-danger btn-lg">ยกเลิกการสมัคร</button>
+                    </form>
+                @endif
             </div>
         </div>
     </div>
 
+    {{-- =====================  Scripts  ===================== --}}
     <script>
         function previewFile() {
             const preview = document.getElementById('preview');
             const fileInput = document.querySelector('input[type=file]');
             const file = fileInput.files[0];
             const reader = new FileReader();
-            const submitButton = document.getElementById('submit_button');
+            const applyBtn = document.getElementById('apply_button');
 
             if (file) {
-                const fileSizeMB = file.size / (1024 * 1024); // แปลงขนาดเป็น MB
-
+                const fileSizeMB = file.size / (1024 * 1024);
                 if (fileSizeMB > 2) {
                     alert("ไฟล์ที่อัปโหลดต้องมีขนาดไม่เกิน 2MB");
-                    fileInput.value = ""; // รีเซ็ตค่าไฟล์
+                    fileInput.value = "";
                     preview.innerHTML = "";
-                    submitButton.disabled = true;
+                    applyBtn.disabled = true;
                     return;
                 }
 
@@ -142,26 +159,55 @@
                 preview.innerHTML = "";
 
                 if (fileType.startsWith("image/")) {
-                    reader.onload = function(event) {
-                        preview.innerHTML = `<img src="${event.target.result}" alt="Image preview" class="img-fluid">`;
-                        submitButton.disabled = false;
+                    reader.onload = e => {
+                        preview.innerHTML = `<img src="${e.target.result}" alt="Image preview" class="img-fluid">`;
+                        applyBtn.disabled = false;
                     };
                     reader.readAsDataURL(file);
                 } else if (fileType === "application/pdf") {
                     preview.innerHTML = `<object data="${URL.createObjectURL(file)}" type="application/pdf" width="100%" height="600px"></object>`;
-                    submitButton.disabled = false;
+                    applyBtn.disabled = false;
                 } else {
                     alert("ไฟล์ที่รองรับ: PNG, JPG, JPEG, PDF");
                     fileInput.value = "";
                     preview.innerHTML = "";
-                    submitButton.disabled = true;
+                    applyBtn.disabled = true;
                 }
             } else {
                 preview.innerHTML = "";
-                submitButton.disabled = true;
+                applyBtn.disabled = true;
             }
         }
+
+        // ยืนยันฟอร์ม สมัคร / แก้ไข
+        document.getElementById('application_form').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const isEdit = {{ empty($apply->application) ? 'false' : 'true' }};
+            Swal.fire({
+                title: isEdit ? 'ยืนยันแก้ไขใบสมัคร?' : 'ยืนยันส่งใบสมัคร?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'ยืนยัน',
+                cancelButtonText: 'ยกเลิก',
+                reverseButtons: true
+            }).then(result => { if (result.isConfirmed) e.target.submit(); });
+        });
+
+        // ยืนยันฟอร์ม ยกเลิก
+        const cancelForm = document.getElementById('cancel_form');
+        if (cancelForm) {
+            cancelForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+                Swal.fire({
+                    title: 'ยืนยันยกเลิกการสมัคร?',
+                    text: 'ขั้นตอนนี้จะลบใบสมัครของคุณ',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'ยืนยัน',
+                    cancelButtonText: 'กลับ',
+                    reverseButtons: true
+                }).then(result => { if (result.isConfirmed) e.target.submit(); });
+            });
+        }
     </script>
-
-
 @endsection

@@ -30,6 +30,7 @@
         @include('partials.course_table_regis', [
               'location' => $course_location,
               'courses' => $courses,
+              'allow_types' => $allow_types,
         ])
     </div>
 
