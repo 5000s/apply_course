@@ -184,6 +184,16 @@
                     </div>
 
                     <div class="mb-3">
+                        <label for="shelter" class="form-label">Shelter Number <span class="text-danger"></span></label>
+                        <select class="form-control" id="shelter_number" name="shelter_number">
+                            <option {{ $member->shelter_number == 0 ? 'selected' : '' }} value="0">ทั่วไป</option>
+                            @for($i = 1; $i <= 20; $i++)
+                                <option  {{ $member->shelter_number == $i ? 'selected' : '' }} value="{{$i}}">{{$i}}</option>
+                            @endfor
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
                         <label for="buddhism" class="form-label">Buddhism <span class="text-danger"></span></label>
                         <select class="form-control" id="buddhism" name="buddhism">
                             @foreach(\App\Models\Member::getEnumValues('buddhism') as $value)

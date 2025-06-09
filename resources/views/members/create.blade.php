@@ -147,8 +147,19 @@
 
                     <div class="mb-3">
                         <label for="email" class="form-label">Email <span class="text-danger"></span></label>
-                        <input type="text" class="form-control" id="email" name="email">
+                        <input type="text" class="form-control" id="email" name="email"  value="{{ $user->email }}">
                     </div>
+
+                    <div class="mb-3">
+                        <label for="shelter" class="form-label">Shelter Number <span class="text-danger"></span></label>
+                        <select class="form-control" id="shelter_number" name="shelter_number">
+                            <option  value="0">ทั่วไป</option>
+                            @for($i = 1; $i <= 20; $i++)
+                                <option value="{{$i}}">{{$i}}</option>
+                            @endfor
+                        </select>
+                    </div>
+
 
                     <div class="mb-3">
                         <label for="buddhism" class="form-label">Buddhism <span class="text-danger"></span></label>

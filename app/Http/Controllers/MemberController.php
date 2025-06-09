@@ -494,7 +494,8 @@ class MemberController extends Controller
             'phone_emergency' => 'nullable|max:50',
             'relation_emergency' => 'nullable|max:100',
             'create_complete' => 'nullable|boolean',
-            'nationality' => 'nullable|max:255'
+            'nationality' => 'nullable|max:255',
+            'shelter_number' => 'nullable|integer|min:0'
         ]);
 
         $member_id = $request->member_id;
@@ -502,6 +503,8 @@ class MemberController extends Controller
         if (!$member){
             return redirect()->route('profile')->with('success', 'Member edit failed');
         }
+
+
 
         $member->update($request->input());
 

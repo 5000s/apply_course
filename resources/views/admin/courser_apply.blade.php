@@ -141,7 +141,9 @@
                         </td>
 
                         <td class="text-center">{{ $member->role }}</td>
-                        <td class="text-center">{{ $member->shelter }}</td>
+                        <td class="text-center">
+                          {{ $member->shelter }} @if($member->shelter == "กุฏิพิเศษ" ) ({{ $member->shelter_number }})  @endif
+                        </td>
                         <td class="text-left" style="font-size: 12px">
                             @php
                                 $courses = $completedCourses[$member->uid] ?? [];

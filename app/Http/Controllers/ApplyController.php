@@ -287,6 +287,7 @@ class ApplyController extends Controller
 
         $course = Course::where("id",$course_id)->first();
         $van = $request->input("van");
+        $shelter = $request->input("shelter", "ทั่วไป");
 
         $course = Course::where("id",$course_id)->first();
         if(!$course){
@@ -299,6 +300,7 @@ class ApplyController extends Controller
             $apply->member_id = $member_id;
             $apply->course_id = $course_id;
             $apply->van = $van;
+            $apply->shelter = $shelter;
             $apply->cancel = 0;
             $apply->state = "ยื่นใบสมัคร";
             $apply->created_by = "USER";
@@ -355,8 +357,10 @@ class ApplyController extends Controller
 
         $apply = Apply::where("id",$apply_id)->where("member_id",$member_id)->first();
         $van = $request->input("van");
+        $shelter = $request->input("shelter", "ทั่วไป");
 
         $apply->van = $van;
+        $apply->shelter = $shelter;
         $apply->save();
 
         return redirect()->route('courses.show', ['member_id' => $member_id, 'course_id' => $course_id]);
