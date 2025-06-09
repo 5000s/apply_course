@@ -256,8 +256,16 @@ class ApplyController extends Controller
 
         $course = Course::findOrFail($course_id); // Find the course or fail
         // Ensure the course status is 'open', otherwise show an error or redirect
-        $apply = Apply::where("course_id",$course_id)->where("member_id",$member_id)
-            ->where("cancel",0)->orderBy("id","desc")->first();
+        $apply = Apply::where('course_id', $course_id)
+            ->where('member_id', $member_id)
+            ->where(function ($q) {
+                $q->where('cancel', 0)
+                    ->orWhereNull('cancel');
+            })
+            ->orderByDesc('id')
+            ->first();
+
+
 
         $member = Member::where("id",$member_id)->first();
 

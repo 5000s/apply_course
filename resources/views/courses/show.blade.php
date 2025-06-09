@@ -117,7 +117,7 @@
                     @endif
 
                     {{-- 📌 อัปโหลดไฟล์ ใบสมัคร --}}
-                    @if(empty($apply->application))
+                    @if(empty($apply->application) && $apply->id == null )
                         <div class="mb-4">
                             <label for="registration_form" class="form-label">กรุณาอัปโหลดแบบฟอร์มการสมัคร (PNG, JPG, JPEG, PDF)</label>
                             <input type="file" class="form-control" name="registration_form" required onchange="previewFile()" accept="image/png, image/jpeg, application/pdf">
@@ -137,14 +137,14 @@
                     </div>
 
                     <div class="text-end mt-4">
-                        <button id="apply_button" type="submit" class="btn btn-primary btn-lg" {{ empty($apply->application) ? 'disabled' : '' }}>
-                            {{ empty($apply->application) ? 'สมัคร' : 'แก้ไขใบสมัคร' }}
+                        <button id="apply_button" type="submit" class="btn btn-primary btn-lg" {{ empty($apply->application) &&  $apply->id == null ? 'disabled' : '' }}>
+                            {{ $apply->id == null  ? 'สมัคร' : 'แก้ไขใบสมัคร' }}
                         </button>
                     </div>
                 </form>
 
                 {{-- ======================== ฟอร์ม 2 : ยกเลิกการสมัคร  ======================== --}}
-                @if(!empty($apply->application))
+                @if(!empty($apply->application) || $apply->id != null )
                     <form id="cancel_form" action="{{ route('courses.cancel', [$member_id, 'apply' => $apply->id]) }}" method="POST" class="text-end mt-2">
                         @csrf
                         <input type="hidden" name="course_id" value="{{ $course->id }}">
