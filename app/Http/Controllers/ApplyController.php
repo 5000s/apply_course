@@ -192,6 +192,7 @@ class ApplyController extends Controller
                 'a.created_at as apply_date',
                 'a.state as state',
                 'c.id as course_id',
+                'a.cancel as cancel',
                 'c.coursename',
                 'c.category',
                 'c.location',
