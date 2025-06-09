@@ -14,7 +14,7 @@
                 <a href="{{ route('profile') }}" class="btn btn-secondary">{{ __('messages.back') }}</a>
             @endif
         </div>
-        
+
 
         <div class="card shadow-sm p-3">
             <div class="table-responsive">
@@ -37,14 +37,20 @@
                             <td class="text-center">{{ $apply->date_range }}</td>
 {{--                            <td class="text-center">{{ \Carbon\Carbon::parse($apply->apply_date)->format('d/m/Y') }}</td>--}}
                             <td class="text-center">
+                                @if( $apply->cancel != 1)
                                     <span class="badge
                                         @if($apply->state === 'ผ่านการอบรม') bg-success
-                                        @elseif($apply->state === 'ยื่นใบสมัคร') bg-info
+                                        @elseif($apply->state === 'ยื่นใบสมัคร' ) bg-info
                                         @elseif($apply->state === 'ยุติกลางคัน') bg-danger
                                         @else bg-secondary
                                         @endif">
                                         {{ $apply->state }}
                                     </span>
+                                @else
+                                    <span class="badge bg-secondary">
+                                        ยกเลิกการสมัคร
+                                    </span>
+                                @endif
                             </td>
                             <td class="text-center">
                                 @if($apply->state === 'เปิดรับสมัคร' && $apply->days_until_start > 0)

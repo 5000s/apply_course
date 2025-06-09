@@ -82,34 +82,38 @@
 
                     <input type="hidden" name="course_id" value="{{ $course->id }}">
 
-                    {{-- 📌 การเดินทาง (เลือกอย่างใดอย่างหนึ่ง) --}}
-                    <div class="mb-4">
-                        <label class="form-label fw-bold d-block">การเดินทาง</label>
-                        @php $currentVan = old('van', $apply->van ?? 'no'); @endphp
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" id="travel_self" name="van" value="no" {{ $currentVan === 'no' ? 'checked' : '' }}>
-                            <label class="form-check-label" for="travel_self">เดินทางด้วยตนเอง</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" id="travel_van" name="van" value="yes" {{ $currentVan === 'yes' ? 'checked' : '' }}>
-                            <label class="form-check-label" for="travel_van">เดินทางด้วยรถตู้</label>
-                        </div>
-                    </div>
+                    @if($course->location_id == 1)
 
-                    {{-- ===== ที่พัก (เฉพาะสมาชิกที่มีสิทธิ์) ===== --}}
-                    @if($member->shelter_number >= 1)
+                        {{-- 📌 การเดินทาง (เลือกอย่างใดอย่างหนึ่ง) --}}
                         <div class="mb-4">
-                            <label class="form-label fw-bold d-block">ที่พัก</label>
-                            @php $curShelter = old('shelter', $apply->shelter ?? 'ทั่วไป'); @endphp
+                            <label class="form-label fw-bold d-block">การเดินทาง</label>
+                            @php $currentVan = old('van', $apply->van ?? 'no'); @endphp
                             <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" id="shelter_general" name="shelter" value="ทั่วไป" {{ $curShelter==='ทั่วไป'?'checked':'' }}>
-                                <label class="form-check-label" for="shelter_general">ทั่วไป</label>
+                                <input class="form-check-input" type="radio" id="travel_self" name="van" value="no" {{ $currentVan === 'no' ? 'checked' : '' }}>
+                                <label class="form-check-label" for="travel_self">เดินทางด้วยตนเอง</label>
                             </div>
                             <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" id="shelter_special" name="shelter" value="กุฏิพิเศษ" {{ $curShelter==='กุฏิพิเศษ'?'checked':'' }}>
-                                <label class="form-check-label" for="shelter_special">กุฏิพิเศษ</label>
+                                <input class="form-check-input" type="radio" id="travel_van" name="van" value="yes" {{ $currentVan === 'yes' ? 'checked' : '' }}>
+                                <label class="form-check-label" for="travel_van">เดินทางด้วยรถตู้</label>
                             </div>
                         </div>
+
+                        {{-- ===== ที่พัก (เฉพาะสมาชิกที่มีสิทธิ์) ===== --}}
+                        @if($member->shelter_number >= 1)
+                            <div class="mb-4">
+                                <label class="form-label fw-bold d-block">ที่พัก</label>
+                                @php $curShelter = old('shelter', $apply->shelter ?? 'ทั่วไป'); @endphp
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" id="shelter_general" name="shelter" value="ทั่วไป" {{ $curShelter==='ทั่วไป'?'checked':'' }}>
+                                    <label class="form-check-label" for="shelter_general">ทั่วไป</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" id="shelter_special" name="shelter" value="กุฏิพิเศษ" {{ $curShelter==='กุฏิพิเศษ'?'checked':'' }}>
+                                    <label class="form-check-label" for="shelter_special">กุฏิพิเศษ</label>
+                                </div>
+                            </div>
+                        @endif
+
                     @endif
 
                     {{-- 📌 อัปโหลดไฟล์ ใบสมัคร --}}
