@@ -81,6 +81,7 @@
                     <td class="text-center " style="display: none;">โทร</td>
                     <td class="text-center " style="display: none;">อีเมล</td>
                     <td class="text-center ">role</td>
+                    <td class="text-center ">ไปกลับรถตู้</td>
                     <td class="text-center ">ที่พัก</td>
                     <td class="text-center " style="width: 200px;">คอร์สล่าสุด</td>
                     <td class="text-center ">สถานะ</td>
@@ -141,6 +142,7 @@
                         </td>
 
                         <td class="text-center">{{ $member->role }}</td>
+                        <td class="text-center">{{ $member->van }}</td>
                         <td class="text-center">
                           {{ $member->shelter }} @if($member->shelter == "กุฏิพิเศษ" ) ({{ $member->shelter_number }})  @endif
                         </td>
@@ -170,6 +172,13 @@
 
                         <td class="text-center">
                             <div class="flex flex-col items-center gap-1">
+
+                                <a href="{{ route('courses.show', ['course_id' => $member->course_id, 'member_id' => $member->uid]) }}"
+                                   target="_blank">
+                                    <button class="btn btn-sm btn-active btn-in-table">ใบสมัคร</button>
+                                </a>
+
+
                                 <a href="{{ route('admin.courseApplyForm', ['course_id' => $member->course_id, 'apply_id' => $member->apply_id]) }}"
                                    target="_blank">
                                     <button class="btn btn-sm btn-active btn-in-table">ดูข้อมูล</button>
