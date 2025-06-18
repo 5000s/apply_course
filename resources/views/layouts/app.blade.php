@@ -72,6 +72,9 @@
                                 <li class="nav-item">
                                     <a class="nav-link" href="{{ route('admin.members') }}">จัดการสมาชิก</a>
                                 </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('teams.index') }}">จัดการทีม</a>
+                            </li>
                         @endif
 
                     <!-- สลับภาษา -->

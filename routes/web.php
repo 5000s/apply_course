@@ -18,6 +18,7 @@ use App\Http\Controllers\CourseController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MemberController;
 use App\Http\Controllers\PagesController;
+use App\Http\Controllers\TeamController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\EmailTestController;
 use Illuminate\Support\Facades\App;
@@ -93,6 +94,33 @@ Route::prefix('admin')->middleware('auth', 'admin')->group(function () {
     Route::get('login', [UserController::class, 'login'] )->name("adminLogin");
     Route::post('login', [UserController::class, 'login']);
     Route::get('logout', [UserController::class, 'logout'] );
+
+
+
+    Route::resource('teams', TeamController::class);
+
+// Team-Member CRUD (all in TeamController)
+    Route::prefix('teams/{team}')->name('teammembers.')->group(function () {
+        // List members
+        Route::get('members', [TeamController::class, 'indexMember'])
+            ->name('index');
+        // Show “add member” form
+        Route::get('members/create', [TeamController::class, 'createMember'])
+            ->name('create');
+        // Handle add
+        Route::post('members', [TeamController::class, 'addMember'])
+            ->name('store');
+        // Show “edit member” form
+        Route::get('members/{member}/edit', [TeamController::class, 'editMemberForm'])
+            ->name('edit');
+        // Handle edit
+        Route::put('members/{member}', [TeamController::class, 'editMember'])
+            ->name('update');
+        // Handle delete
+        Route::delete('members/{member}/delete', [TeamController::class, 'deleteMember'])
+            ->name('destroy');
+    });
+
 });
 
 
@@ -135,6 +163,9 @@ Route::middleware(['verified'])->group(function () {
     Route::get('apply/{member_id}/courses/edit/{course_id}', [ApplyController::class, 'edit'] )->name('courses.edit');
 
 });
+
+
+
 
 
 Route::get('/send-test-email', [EmailTestController::class, 'sendTestEmail'] );
