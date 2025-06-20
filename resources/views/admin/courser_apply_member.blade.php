@@ -96,6 +96,21 @@
                         <!-- Continue with other fields similarly -->
                     </div>
                 </div>
+                <h4>{{ __('messages.medical') }}</h4>
+                <div class="row">
+                    <div class="col-md-12 mb-3">
+                        <input
+                            disabled
+                            type="text"
+                            class="form-control"
+                            id="medical_condition"
+                            name="medical_condition"
+                            maxlength="255"
+                            value="{{ $member->medical_condition }}"
+                            required
+                        >
+                    </div>
+                </div>
                 <h4>การศึกษา และ อาชีพ</h4>
                 <div class="row">
                     <div class="col-md-6">

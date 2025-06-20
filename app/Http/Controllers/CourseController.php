@@ -291,6 +291,7 @@ class CourseController extends Controller
                 'm.email',
                 'm.age',
                 'm.gender',
+                'm.medical_condition',
                 'm.buddhism',
                 'm.status',
                 'a.state',

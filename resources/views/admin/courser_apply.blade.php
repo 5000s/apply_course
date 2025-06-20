@@ -71,6 +71,7 @@
                     <td class="text-center " style="width: 100px;">ชื่อ</td>
                     <td class="text-center ">อายุ</td>
                     <td class="text-center ">เพศ</td>
+                    <td class="text-center " style="display: none;">โรคประจำตัว</td>
                     <td class="text-center " style="width: 120px;">การศึกษา/อาชีพ</td>
                     <td class="text-center " style="display: none;">ความเชี่ยวชาญ</td>
                     <td class="text-center " style="display: none;">อาชีพ</td>
@@ -104,7 +105,7 @@
                         <td class="text-left">{{ $member->name }}&nbsp;<br>{{ $member->surname }}</td>
                         <td class="text-center">{{ $member->age }}</td>
                         <td class="text-center" >{{ $member->gender }}</td>
-
+                        <td class="text-center" style="display: none;">{{ $member->medical_condition }}</td>
 
                         <td class="text-center">
                             @if(strlen($member->expertise) > 1)
@@ -224,7 +225,7 @@
                     title: '{{ $course->category }} ({{ $course->date_start }})',
                     exportOptions: {
                         // include only columns up to "คอร์สล่าสุด" (0‑based index 0‑12)
-                        columns: [  0, 1, 2 , 3, 4, 5, 7,8,9,10,11 , 13,14,15,16,18]
+                        columns: [  0, 1, 2 , 3, 4, 5, 6, 8,9,10,11,12 , 14,15,16,17,20]
                     }
                 }]
             }).columns.adjust();

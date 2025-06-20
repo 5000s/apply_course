@@ -53,6 +53,7 @@ class Member extends Model
     'dharma_ex_desc',
     'know_source',
     'shelter_number',
+        'medical_condition'
     ];
 
     protected $dates = ['birthdate'];

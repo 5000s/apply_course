@@ -119,6 +119,23 @@
                     <!-- Continue with other fields similarly -->
                 </div>
             </div>
+                <h4>{{ __('messages.medical') }}</h4>
+                <div class="row">
+                    <div class="col-md-12 mb-3">
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="medical_condition"
+                            name="medical_condition"
+                            maxlength="255"
+                            value="{{ $member->medical_condition }}"
+                            required
+                        >
+                        @error('medical_condition')
+                        <div class="text-danger mt-1">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
             <h4>{{ __('messages.education') }}</h4>
             <div class="row">
                 <div class="col-md-6">

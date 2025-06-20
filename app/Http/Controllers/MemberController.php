@@ -278,7 +278,8 @@ class MemberController extends Controller
             'phone_emergency' => 'nullable|max:50',
             'relation_emergency' => 'nullable|max:100',
             'create_complete' => 'nullable|boolean',
-            'nationality' => 'nullable|max:255'
+            'nationality' => 'nullable|max:255',
+            'medical_condition' => 'nullable|max:255'
         ]);
         $validatedData['email'] = Auth::user()->email; // Link member to user by email
         $validatedData['created_by'] = Auth::user()->id; // Link member to user by email
@@ -342,7 +343,8 @@ class MemberController extends Controller
             'phone_emergency' => 'nullable|max:50',
             'relation_emergency' => 'nullable|max:100',
             'create_complete' => 'nullable|boolean',
-            'nationality' => 'nullable|max:255'
+            'nationality' => 'nullable|max:255',
+            'medical_condition' => 'nullable|max:255'
         ]);
 
         $validatedData['created_by'] = Auth::user()->id; // Link member to user by email
@@ -425,7 +427,8 @@ class MemberController extends Controller
             'phone_emergency' => 'nullable|max:50',
             'relation_emergency' => 'nullable|max:100',
             'create_complete' => 'nullable|boolean',
-            'nationality' => 'nullable|max:255'
+            'nationality' => 'nullable|max:255',
+            'medical_condition' => 'nullable|max:255'
         ]);
 
         $member_id = $request->member_id;

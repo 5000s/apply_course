@@ -53,6 +53,7 @@ return [
     'phone2' => 'Phone 2',
     'line' => 'Line',
     'facebook' => 'Facebook',
+    'medical' => 'Existing Medical Conditions',
     'education' => 'Education',
     'degree' => 'Degree',
     'career' => 'Career',
