@@ -271,7 +271,7 @@ class CourseController extends Controller
     public function courseApplyList(Request $request, $course_id)
     {
         $group = $request->input('group', "all");
-
+        $currentCourse = Course::findOrFail($course_id);
 
         $base = DB::table('members as m')
             ->select(
@@ -369,6 +369,33 @@ class CourseController extends Controller
             'nun'    => (clone $base)->where('m.buddhism','แม่ชี')->count(),
             'all'    => (clone $base)->count(),
         ];
+
+
+        // ─── add 'gap' onto each member ──────────────────────────────────────
+        $members = $members->map(function($member) use ($currentCourse) {
+            // find last completed 7-day course before this one
+            $lastDate = DB::table('applies as a')
+                ->join('courses as c', 'a.course_id', '=', 'c.id')
+                ->join('course_categories as cc', 'c.category_id', '=', 'cc.id')
+                ->where('a.member_id', $member->uid)
+                ->where('a.state', 'ผ่านการอบรม')
+                ->where('cc.day', ">=" ,7)
+                ->where('c.date_start', '<', $currentCourse->date_start)
+                ->orderByDesc('c.date_start')
+                ->value('c.date_start');
+
+            if ($lastDate) {
+                // calculate months between lastDate and the current course’s start date
+                $months = Carbon::parse($lastDate)
+                    ->diffInMonths(Carbon::parse($currentCourse->date_start));
+
+                $member->gap = "{$months}";
+            } else {
+                $member->gap = null;
+            }
+
+            return $member;
+        });
 
 
         $completedCoursesRaw = DB::table('applies as a')
@@ -1038,4 +1065,68 @@ class CourseController extends Controller
         return response()->download(storage_path("app/userform/$time/$member_id/$filename"));
 
     }
+
+
+
+    public function rankingMonk()
+    {
+
+    }
+
+
+    public function calculateGap(int $courseId)
+    {
+        // load current course
+        $currentCourse = Course::findOrFail($courseId);
+
+        // 1️⃣ all members who applied to this course
+        $memberIds = Apply::where('course_id', $courseId)
+            ->pluck('member_id')
+            ->unique();
+
+        $applicants = Member::whereIn('id', $memberIds)->get();
+
+        // 2️⃣ & 3️⃣ compute Y-M-D gap for each
+        $results = $applicants
+            ->map(function (Member $member) use ($currentCourse) {
+                $lastCourse = Course::join('applies', 'courses.id', '=', 'applies.course_id')
+                    ->join('course_categories', 'courses.category_id', '=', 'course_categories.id')
+                    ->where('applies.member_id', $member->id)
+                    ->where('applies.state', 'ผ่านการอบรม')
+                    ->where('course_categories.day', 7)
+                    ->where('courses.date_start', '<', $currentCourse->date_start)
+                    ->orderByDesc('courses.date_start')
+                    ->select('courses.date_start')
+                    ->first();
+
+                if ($lastCourse) {
+                    $diff = Carbon::now()->diff(Carbon::parse($lastCourse->date_start));
+                    $years  = $diff->y;
+                    $months = $diff->m;
+                    $days   = $diff->d;
+                } else {
+                    $years = $months = $days = null;
+                }
+
+                return [
+                    'member'    => $member,
+                    'last_date' => optional($lastCourse)->date_start,
+                    'years'     => $years,
+                    'months'    => $months,
+                    'days'      => $days,
+                ];
+            })
+            ->sortByDesc(function($row) {
+                // sort by total days as a rough proxy: years*365 + months*30 + days
+                if (is_null($row['years'])) return -1;
+                return $row['years'] * 365 + $row['months'] * 30 + $row['days'];
+            })
+            ->values();
+
+        return view('admin.gap', [
+            'course'  => $currentCourse,
+            'results' => $results,
+        ]);
+    }
+
 }

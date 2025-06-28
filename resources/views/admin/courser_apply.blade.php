@@ -66,24 +66,24 @@
                 <thead>
                 <tr>
                     <td class="text-center ">#</td>
-                    <td class="text-center ">uid</td>
-                    <td class="text-center ">สมัครเมื่อ</td>
-                    <td class="text-center " style="width: 100px;">ชื่อ</td>
-                    <td class="text-center ">อายุ</td>
-                    <td class="text-center ">เพศ</td>
-                    <td class="text-center " style="display: none;">โรคประจำตัว</td>
+                    <td class="text-center eprint" >uid</td>
+                    <td class="text-center eprint" style="width: 60px;">สมัครเมื่อ</td>
+                    <td class="text-center eprint">เพศ</td>
+                    <td class="text-center eprint" style="width: 100px;">ชื่อ</td>
+                    <td class="text-center eprint">อายุ</td>
+                    <td class="text-center eprint" style="display: none;">โรคประจำตัว</td>
                     <td class="text-center " style="width: 120px;">การศึกษา/อาชีพ</td>
                     <td class="text-center " style="display: none;">ความเชี่ยวชาญ</td>
                     <td class="text-center " style="display: none;">อาชีพ</td>
                     <td class="text-center " style="display: none;">การศึกษา</td>
-                    <td class="text-center ">buddhism</td>
-                    <td class="text-center ">ศิษย์</td>
+                    <td class="text-center eprint">ศิษย์</td>
+                    <td class="text-center eprint">รถตู้</td>
                     <td class="text-center " style="width: 145px;">ติดต่อ</td>
-                    <td class="text-center " style="display: none;">โทร</td>
+                    <td class="text-center eprint" style="display: none;">โทร</td>
                     <td class="text-center " style="display: none;">อีเมล</td>
-                    <td class="text-center ">role</td>
-                    <td class="text-center ">ไปกลับรถตู้</td>
-                    <td class="text-center ">ที่พัก</td>
+                    <td class="text-center eprint">role</td>
+                    <td class="text-center eprint">ที่พัก</td>
+                    <td class="text-center eprint" style="width: 100px;">ห่างคอร์ส(เดือน)</td>
                     <td class="text-center " style="width: 200px;">คอร์สล่าสุด</td>
                     <td class="text-center ">สถานะ</td>
                     <td class="text-center ">ข้อมูล/status</td>
@@ -102,9 +102,31 @@
                             {{ $date->format('d-m-y') }}&nbsp;<br>{{ $date->format('H:i:s') }}
 
 
+                        @php
+                            // compute sort-order
+                            $order = $member->buddhism !== 'ฆราวาส'
+                                // if not a layperson, พระ first (1), แม่ชี second (2)
+                                ? ($member->buddhism === 'ภิกษุ' ? 1 : 2)
+                                // otherwise ชาย third (3), หญิง fourth (4), else fifth (5)
+                                : ($member->gender === 'ชาย'
+                                    ? 3
+                                    : ($member->gender === 'หญิง' ? 4 : 5)
+                                  );
+
+                            // compute display text
+                            $display = $member->buddhism !== 'ฆราวาส'
+                                ? $member->buddhism
+                                : $member->gender;
+                        @endphp
+
+
+                        <td class="text-center"    data-order="{{ $order }}">
+                            {{ $display }}
+                        </td>
+
                         <td class="text-left">{{ $member->name }}&nbsp;<br>{{ $member->surname }}</td>
                         <td class="text-center">{{ $member->age }}</td>
-                        <td class="text-center" >{{ $member->gender }}</td>
+
                         <td class="text-center" style="display: none;">{{ $member->medical_condition }}</td>
 
                         <td class="text-center">
@@ -124,8 +146,13 @@
                         <td class="text-center" style="display: none;">{{ $member->degree }}</td>
 
 
-                        <td class="text-center">{{ $member->buddhism }}</td>
-                        <td class="text-center">{{ $member->status }}</td>
+                        <td class="text-center">
+                            {{ $member->status === 'ศิษย์เตโชวิปัสสนา' ? 'O' : 'N' }}
+                        </td>
+                        <td class="text-center">
+                            {{ $member->van === 'yes' ? 'Y' : '' }}
+                        </td>
+
                         <td class="text-left" style="font-size: 12px">
 
                             P: {{ $member->phone }}<br>
@@ -143,10 +170,15 @@
                         </td>
 
                         <td class="text-center">{{ $member->role }}</td>
-                        <td class="text-center">{{ $member->van }}</td>
+
                         <td class="text-center">
                           {{ $member->shelter }} @if($member->shelter == "กุฏิพิเศษ" ) ({{ $member->shelter_number }})  @endif
                         </td>
+
+                        <td class="text-center" style="font-size: 12px"     data-order="{{ $member->gap }}">
+                            {{ $member->gap ?? '—' }}
+                        </td>
+
                         <td class="text-left" style="font-size: 12px">
                             @php
                                 $courses = $completedCourses[$member->uid] ?? [];
@@ -166,6 +198,8 @@
                                 @endforeach
                             @endif
                         </td>
+
+
                         <td class="text-center" style="font-size: 12px">
                             {{ $member->state }} <br>
                             แก้ไขโดย: {{ $member->updated_by === 'Anonymous' ? 'NA' : $member->updated_by }}
@@ -218,14 +252,17 @@
                 pageLength: 100,
                 order: [[1, 'asc']],
                 dom: 'Bfrtip',
+                columnDefs: [
+                    { targets: 18, type: 'num' }
+                ],
                 buttons: [{
                     extend: 'excelHtml5',
                     text: 'Export to Excel',
                     filename: '{{ $course->category .'_'. $course->date_start }}',
                     title: '{{ $course->category }} ({{ $course->date_start }})',
                     exportOptions: {
-                        // include only columns up to "คอร์สล่าสุด" (0‑based index 0‑12)
-                        columns: [  0, 1, 2 , 3, 4, 5, 6, 8,9,10,11,12 , 14,15,16,17,20]
+                        // export only columns whose header has class "eprint"
+                        columns: '.eprint'
                     }
                 }]
             }).columns.adjust();

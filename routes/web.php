@@ -89,6 +89,12 @@ Route::prefix('admin')->middleware('auth', 'admin')->group(function () {
     Route::get('member/course', [AdminMemberController::class, 'adminMemberCourse']);
 
 
+    Route::get('gap/course/{course_id}', [CourseController::class, 'calculateGap']);
+
+
+
+
+
 
 ##### LOGIN DO BY SRA
     Route::get('login', [UserController::class, 'login'] )->name("adminLogin");
