@@ -65,8 +65,8 @@
             <table id="myTable" class="table table-striped">
                 <thead>
                 <tr>
-                    <td class="text-center ">#</td>
-                    <td class="text-center eprint" >uid</td>
+                    <td class="text-center "  style="width: 30px;">#</td>
+                    <td class="text-center eprint"  style="width: 30px;" >uid</td>
                     <td class="text-center eprint" style="width: 60px;">สมัครเมื่อ</td>
                     <td class="text-center eprint">เพศ</td>
                     <td class="text-center eprint" style="width: 100px;">ชื่อ</td>
@@ -76,15 +76,16 @@
                     <td class="text-center " style="display: none;">ความเชี่ยวชาญ</td>
                     <td class="text-center " style="display: none;">อาชีพ</td>
                     <td class="text-center " style="display: none;">การศึกษา</td>
-                    <td class="text-center eprint">ศิษย์</td>
-                    <td class="text-center eprint">รถตู้</td>
-                    <td class="text-center " style="width: 145px;">ติดต่อ</td>
+                    <td class="text-center eprint"  style="width: 20px;">ศิษย์</td>
+                    <td class="text-center eprint"  style="width: 20px;">รถตู้</td>
                     <td class="text-center eprint" style="display: none;">โทร</td>
                     <td class="text-center " style="display: none;">อีเมล</td>
                     <td class="text-center eprint">role</td>
                     <td class="text-center eprint">ที่พัก</td>
-                    <td class="text-center eprint" style="width: 100px;">ห่างคอร์ส(เดือน)</td>
+                    <td class="text-center " style="width: 145px;">ติดต่อ</td>
+                    <td class="text-center eprint" style="width: 20px;">ห่างคอร์ส<br>(เดือน)</td>
                     <td class="text-center " style="width: 200px;">คอร์สล่าสุด</td>
+                    <td class="text-center remark-col eprint"  style="max-width: 200px;">เพิ่มเติม</td>
                     <td class="text-center ">สถานะ</td>
                     <td class="text-center ">ข้อมูล/status</td>
                 </tr>
@@ -153,6 +154,22 @@
                             {{ $member->van === 'yes' ? 'Y' : '' }}
                         </td>
 
+
+
+                        <td class="text-left" style="display: none">
+                            {{ $member->phone }}
+                        </td>
+                        <td class="text-left" style="display: none">
+                            {!! $member->email !!}
+                        </td>
+
+                        <td class="text-center">{{ $member->role }}</td>
+
+                        <td class="text-center">
+                            {{ $member->shelter }} @if($member->shelter == "กุฏิพิเศษ" ) ({{ $member->shelter_number }})  @endif
+                        </td>
+
+
                         <td class="text-left" style="font-size: 12px">
 
                             P: {{ $member->phone }}<br>
@@ -162,23 +179,9 @@
                             E: {!! $email !!}
                         </td>
 
-                        <td class="text-left" style="display: none">
-                           {{ $member->phone }}
-                        </td>
-                        <td class="text-left" style="display: none">
-                            {!! $member->email !!}
-                        </td>
-
-                        <td class="text-center">{{ $member->role }}</td>
-
-                        <td class="text-center">
-                          {{ $member->shelter }} @if($member->shelter == "กุฏิพิเศษ" ) ({{ $member->shelter_number }})  @endif
-                        </td>
-
                         <td class="text-center" style="font-size: 12px"     data-order="{{ $member->gap }}">
                             {{ $member->gap ?? '—' }}
                         </td>
-
                         <td class="text-left" style="font-size: 12px">
                             @php
                                 $courses = $completedCourses[$member->uid] ?? [];
@@ -198,6 +201,20 @@
                                 @endforeach
                             @endif
                         </td>
+                        <td class="text-left align-center relative px-2 remark-col" data-order="{{ $member->remark ?? 0 }}">
+                            <div class="remark-display truncate pr-8 remark-display">
+                                {{ $member->remark ?? '' }}
+                            </div>
+                            <button
+                                class="btn btn-sm btn-circle btn-outline absolute top-1 right-1 edit-remark"
+                                data-apply-id="{{ $member->apply_id }}"
+                                data-value="{{ e($member->remark) }}"
+                                title="แก้ไขข้อมูลเพิ่มเติม"
+                            >✏️</button>
+                        </td>
+
+
+
 
 
                         <td class="text-center" style="font-size: 12px">
@@ -246,27 +263,121 @@
             </table>
         </div>
     </div>
+
+    <input type="checkbox" id="modal-remark" class="modal-toggle" />
+    <div class="modal">
+        <div class="modal-box max-w-md p-4 relative">
+            <label for="modal-remark"
+                   class="btn btn-sm btn-circle absolute right-2 top-2">✕</label>
+            <h3 class="text-xl font-medium mb-2">แก้ไขข้อมูลเพิ่มเติม</h3>
+
+            <form id="form-remark">
+                @csrf
+                <input type="hidden" name="apply_id" id="remark-apply-id" />
+                <textarea
+                    id="remark-value"
+                    name="remark"
+                    class="w-full textarea textarea-bordered mb-4"
+                    rows="3"
+                    placeholder="ระบุข้อมูลเพิ่มเติม…"
+                >{{ old('remark') }}</textarea>
+
+                <div class="flex justify-end space-x-2">
+                    <label for="modal-remark" class="btn btn-ghost btn-sm">ยกเลิก</label>
+                    <button type="submit" class="btn btn-primary btn-sm">บันทึก</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+
+
     <script>
-        $(function () {
-            $('#myTable').DataTable({
+        $(function(){
+
+            // 1) init DataTable + Buttons
+            var table = $('#myTable').DataTable({
                 pageLength: 100,
                 order: [[1, 'asc']],
                 dom: 'Bfrtip',
                 columnDefs: [
-                    { targets: 18, type: 'num' }
+                    { targets: 18, type: 'num' } // your gap column
                 ],
                 buttons: [{
                     extend: 'excelHtml5',
                     text: 'Export to Excel',
-                    filename: '{{ $course->category .'_'. $course->date_start }}',
+                    filename: '{{ $course->category . "_" . $course->date_start }}',
                     title: '{{ $course->category }} ({{ $course->date_start }})',
-                    exportOptions: {
-                        // export only columns whose header has class "eprint"
-                        columns: '.eprint'
-                    }
+                    exportOptions: { columns: '.eprint',
+                        format: {
+                            body: function(data, row, col, node) {
+                                var $cell = $(node);
+                                // if this cell has a .remark-display inside, export only that
+                                var $disp = $cell.find('.remark-display');
+                                if ($disp.length) {
+                                    return $disp.text().trim();
+                                }
+                                // otherwise fall back to the cell’s plain text
+                                return $cell.text().trim();
+                            }
+                        }
+                    },
+
                 }]
-            }).columns.adjust();
+            });
+
+            // find the zero-based index of our “เพิ่มเติม” column
+            var remarkColIndex = table.column('.remark-col').index();
+
+            // 2) open modal
+            $('#myTable').on('click', '.edit-remark', function(){
+                var btn = $(this);
+                $('#remark-apply-id').val(btn.data('apply-id'));
+                $('#remark-value').val(btn.data('value') || '');
+                $('#modal-remark').prop('checked', true);
+            });
+
+            // 3) AJAX submit
+            $('#form-remark').on('submit', function(e){
+                e.preventDefault();
+
+                var applyId = $('#remark-apply-id').val(),
+                    newVal  = $('#remark-value').val().trim() || '—';
+
+                $.post('/admin/apply/' + applyId + '/remark', {
+                    _token: $('meta[name="csrf-token"]').attr('content'),
+                    remark: newVal
+                })
+                    .done(function(){
+                        // locate the row and its <td>
+                        var $btn = $('#myTable button[data-apply-id="' + applyId + '"]'),
+                            $tr  = $btn.closest('tr'),
+                            $td  = $tr.children('td').eq(remarkColIndex);
+
+                        // 1️⃣ update the displayed text
+                        $td.find('.remark-display').text(newVal);
+
+                        // 2️⃣ update the data-order (for sorting/export)
+                        $td.attr('data-order', newVal === '—' ? 0 : newVal);
+
+                        // 3️⃣ let DataTables refresh its view (no cell.data() needed)
+                        table.row($tr).invalidate().draw(false);
+
+                        // 4️⃣ update the button’s stored value
+                        $btn.data('value', newVal);
+
+                        // close modal
+                        $('#modal-remark').prop('checked', false);
+                    })
+                    .fail(function(xhr){
+                        alert('บันทึกไม่สำเร็จ: ' + xhr.responseText);
+                    });
+            });
+
         });
     </script>
+
+
 
 @endsection

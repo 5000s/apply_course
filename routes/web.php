@@ -91,6 +91,8 @@ Route::prefix('admin')->middleware('auth', 'admin')->group(function () {
 
     Route::get('gap/course/{course_id}', [CourseController::class, 'calculateGap']);
 
+    Route::post('/apply/{apply_id}/remark', [ApplyController::class, 'updateRemark'])
+        ->name('admin.apply.remark');
 
 
 

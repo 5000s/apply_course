@@ -425,4 +425,18 @@ class ApplyController extends Controller
 
         return $hashedFilename;
     }
+
+    public function updateRemark(int $apply_id)
+    {
+        $apply = Apply::find($apply_id);
+
+        if ($apply){
+            $apply->remark = request('remark');
+            $apply->save();
+            return response()->json(['status'=>'ok']);
+        }else{
+            return response()->json(['status'=>'error']);
+        }
+
+    }
 }

@@ -278,6 +278,7 @@ class CourseController extends Controller
                 DB::raw("DATE_FORMAT(a.created_at, '%Y-%m-%d %H:%i:%s') as apply_date"),
                 'a.id as apply_id',
                 'a.shelter as shelter',
+                'a.remark as remark',
                 'a.van as van',
                 'c.id as course_id',
                 'm.id as uid',
