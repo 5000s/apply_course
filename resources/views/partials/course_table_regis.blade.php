@@ -68,13 +68,13 @@
                                     && in_array($course->category_id, $allow_types, true))
 
                                     @if(is_null($course->apply_id))
-                                        <a href="{{ route('courses.show', [$member_id, $course->id]) }}"
+                                        <a target="_blank" href="{{ route('courses.show', [$member_id, $course->id]) }}"
                                            class="btn btn-sm btn-outline-success">
                                             <i class="fas fa-sign-in-alt"></i>
                                             {{ __('messages.register') }}
                                         </a>
                                     @else
-                                        <a href="{{ route('courses.show', [$member_id, $course->id]) }}"
+                                        <a target="_blank" href="{{ route('courses.show', [$member_id, $course->id]) }}"
                                            class="btn btn-sm btn-outline-secondary">
                                             <i class="fas fa-edit"></i>
                                             {{ __('messages.edit') }}
@@ -86,14 +86,22 @@
 
                             @if($user->admin == 1)
                                 <td>
-                                    <a href="{{ route('courses.show', [$member_id, $course->id]) }}"
-                                       class="btn btn-sm btn-outline-success">
-                                        <i class="fas fa-sign-in-alt"></i>
-                                        {{ __('messages.register') }}
-                                    </a>
+                                    @if(is_null($course->apply_id))
+                                        <a target="_blank" href="{{ route('courses.show', [$member_id, $course->id]) }}"
+                                           class="btn btn-sm btn-outline-success">
+                                            <i class="fas fa-sign-in-alt"></i>
+                                            {{ __('messages.register') }}
+                                        </a>
+                                    @else
+                                        <a target="_blank" href="{{ route('courses.show', [$member_id, $course->id]) }}"
+                                           class="btn btn-sm btn-outline-secondary">
+                                            <i class="fas fa-edit"></i>
+                                            {{ __('messages.edit') }}
+                                        </a>
+                                    @endif
                                 </td>
                                 <td>
-                                    <a href="{{ route('admin.courseList', [$course->id]) }}"
+                                    <a target="_blank" href="{{ route('admin.courseList', [$course->id]) }}"
                                        class="btn btn-sm btn-outline-secondary">
                                         <i class="fas fa-edit"></i>
                                             รายการ
