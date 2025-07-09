@@ -5,6 +5,12 @@
     <link rel="stylesheet" href="{{ asset('css/course_table.css') }}">
 
     <div class="container">
+
+        @if($user->admin == 1)
+            <h1>User สิทธิ Admin</h1>
+            <h2>จัดการ สมัครให้ ({{$member->id}})  {{$member->name}} {{$member->surname}}  </h2>
+        @endif
+
         {{-- Title + Back Button --}}
         <div class="d-flex justify-content-between align-items-center my-4">
             <h1 class="text-center text-primary fw-bold">{{ __('messages.course_list') }}</h1>

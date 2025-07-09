@@ -22,6 +22,10 @@
                         <th style="width: 30%;">{{ __('messages.course_name') }}</th>
                         <th style="width: 15%;">{{ __('messages.status') }}</th>
                         <th style="width: 10%;">{{ __('messages.register') }}</th>
+                        @if($user->admin == 1)
+                            <th style="width: 10%;"> Admin สมัคร </th>
+                            <th style="width: 10%;"> Admin รายการ</th>
+                        @endif
                     </tr>
                     </thead>
                     <tbody>
@@ -77,7 +81,27 @@
                                         </a>
                                     @endif
                                 @endif
+
                             </td>
+
+                            @if($user->admin == 1)
+                                <td>
+                                    <a href="{{ route('courses.show', [$member_id, $course->id]) }}"
+                                       class="btn btn-sm btn-outline-success">
+                                        <i class="fas fa-sign-in-alt"></i>
+                                        {{ __('messages.register') }}
+                                    </a>
+                                </td>
+                                <td>
+                                    <a href="{{ route('admin.courseList', [$course->id]) }}"
+                                       class="btn btn-sm btn-outline-secondary">
+                                        <i class="fas fa-edit"></i>
+                                            รายการ
+                                    </a>
+                                </td>
+                            @endif
+
+
                         </tr>
                     @endforeach
                     </tbody>

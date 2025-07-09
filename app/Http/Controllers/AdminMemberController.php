@@ -10,6 +10,7 @@ class AdminMemberController extends Controller
 {
     public function profile()
     {
+        ini_set('memory_limit', '256M');
 
 
         // Retrieve all members related to this user by email

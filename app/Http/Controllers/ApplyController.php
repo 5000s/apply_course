@@ -139,6 +139,8 @@ class ApplyController extends Controller
 
     public function index(Request $request, $member_id)
     {
+        $user = Auth::user();
+
         $location_id = $request->input('location', 1);
         $now = Carbon::now();
 
@@ -160,6 +162,7 @@ class ApplyController extends Controller
         $data['selected_location_id'] = $location_id;
         $data['member_id'] = $member_id;
         $data['member'] = $member;
+        $data['user'] = $user;
 
         $member_status = $member->status;
 
