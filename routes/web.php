@@ -15,6 +15,7 @@ use App\Http\Controllers\AdminMemberController;
 use App\Http\Controllers\ApplyController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CourseController;
+use App\Http\Controllers\GoogleSheetController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MemberController;
 use App\Http\Controllers\PagesController;
@@ -96,6 +97,13 @@ Route::prefix('admin')->middleware('auth', 'admin')->group(function () {
 
 
 
+    // IMPORT GOOGLE SHEET
+
+    Route::get('/setCourseData', [CourseController::class, 'setCourseData'])->name('admin.course.sync');
+    Route::get('/sheet', [GoogleSheetController::class, 'showSheetButtons'])->name('admin.import.sheet.buttons');
+    Route::get('/sheet/{index}', [GoogleSheetController::class, 'importSheetByIndex'])->name('admin.import.sheet.direct');
+    Route::get('/sheet/member/{locationId}', [GoogleSheetController::class, 'showUnsyncedApplications'])->name('admin.applications.sync');
+    Route::post('/sheet/member/{locationId}/sync', [GoogleSheetController::class, 'syncToMembers'])->name('admin.applications.sync.store');
 
 
 ##### LOGIN DO BY SRA
@@ -191,4 +199,10 @@ Route::get('lang/{locale}', function ($locale) {
 
 use App\Http\Controllers\GmailController;
 Route::get('/send-test-email', [GmailController::class, 'sendTestEmail']);
+
+
+
+
+
+
 

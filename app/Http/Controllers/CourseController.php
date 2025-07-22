@@ -10,6 +10,7 @@ use App\Models\Location;
 use App\Models\Member;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
+use Google\Service\Drive\Label;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -1128,6 +1129,52 @@ class CourseController extends Controller
             'course'  => $currentCourse,
             'results' => $results,
         ]);
+    }
+
+
+
+    public function setCourseData()
+    {
+        $courses = Course::all();
+
+
+        $categoryMap = [
+            'คอร์สเตโชวิปัสสนา' => 1,
+            'คอร์สฤาษี (๑๔ วัน)' => 2,
+            'คอร์สเตโชฯ (ศิษย์เก่า)' => 3,
+            'คอร์สวิถีอาสวะ' => 4,
+            'คอร์สอานาปานสติ' => 5,
+            'คอร์สศิษย์เก่า (๓ วัน)' => 6,
+            'ธรรมะแคมป์' => 7,
+            'คอร์สเตโชฯ (อาวุโส)' => 8,
+            'คอร์สอานาปานสติ ๑ วัน' => 11,
+            'คอร์สอินเตอร์' => null,
+            'คอร์สวิปัสสานาสติปัฏฐานสี่ เผากิเลส (ไทย-อังกฤษ)' => 15,
+            'คอร์สวิปัสสานาสติปัฏฐานสี่ เผากิเลส' => 1,
+            'คอร์สวิปัสสานาสติปัฏฐานสี่ เผากิเลส (คอร์สทดลอง)' => 16,
+            'คอร์สสมาธิอานาปานสติ 3 วัน 2 คืน' => 13,
+            'คอร์สสมาธิอานาปานสติ 1 วัน' => 11,
+            'คอร์สสมาธิอานาปานสติ 4 วัน 3 คืน' => 14,
+            'คอร์สวิปัสสานาสติปัฏฐานสี่ เผากิเลส 3 วัน 2 คืน (ศิษย์เก่า)' => 10,
+            'คอร์สวิปัสสานาสติปัฏฐานสี่ เผากิเลส (ศิษย์เก่า)' => 3,
+        ];
+
+        $locationMap = [
+            'แก่งคอย' => 1,
+            'ลานหิน' => 2,
+            'หาดใหญ่' => 3,
+            'มูลนิธิ อ่อนนุช' => 4,
+            'ภูเก็ต' => 5,
+        ];
+
+        foreach ($courses as $course) {
+
+            $course->location_id = $locationMap[$course->location] ?? null;
+            $course->category_id = $categoryMap[$course->category] ?? null;
+
+
+            $course->save();
+        }
     }
 
 }

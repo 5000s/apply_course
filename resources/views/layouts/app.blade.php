@@ -66,14 +66,24 @@
                     </li>
 
                         @if(Auth::check() && Auth::user()->admin == 1)
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('admin.courses') }}">จัดการคอร์ส</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('admin.members') }}">จัดการสมาชิก</a>
-                                </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ route('teams.index') }}">จัดการทีม</a>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle text-primary fw-bold" href="#" id="adminMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-user-shield"></i> เมนูแอดมิน
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="adminMenu">
+                                    <li>
+                                        <a class="dropdown-item" href="{{ route('admin.courses') }}">จัดการคอร์ส</a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="{{ route('admin.members') }}">จัดการสมาชิก</a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="{{ route('teams.index') }}">จัดการทีม</a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="{{ route('admin.import.sheet.buttons') }}">นำเข้าจาก Google Sheet</a>
+                                    </li>
+                                </ul>
                             </li>
                         @endif
 
