@@ -23,7 +23,7 @@
                     </option>
                     @foreach($courseListDates as $date)
                         <option value="{{ $date }}" {{ request('date') == $date ? 'selected' : '' }}>
-                            {{ \Carbon\Carbon::parse($date)->format('d-m-Y') }}
+                            {{ \Carbon\Carbon::parse($date)->addYear(543)->format('d-m-Y') }}
                         </option>
                     @endforeach
                 </select>
@@ -44,7 +44,7 @@
                     สร้าง Member ใหม่, คอร์ส และ ข้อมูลการสมัคร ที่ยังไม่มีในฐานข้อมูล
                 </button>
             @endif
-            <h5>🟡 ยังไม่มี Member ในระบบ</h5>
+            <h5>❎ ยังไม่มี Member ในระบบ </h5>
             <table class="table table-bordered table-sm" id="unsyncedTable">
                 <thead>
                 <tr>
@@ -66,19 +66,28 @@
                         <td>{{ $app->age }}</td>
                         <td>{{ $app->phone }}</td>
                         <td>{{ $app->email }}</td>
-                        <td>{{ $app->course_preference }}</td>
+                        <td>{{ implode(', ', $app->courseDates) }}</td>
+
                     </tr>
                 @endforeach
                 </tbody>
             </table>
 
-            <h5 class="mt-5">✅ มีในระบบสมาชิกแล้ว แต่ยังไม่มีข้อมูล สมัคร</h5>
-            <table class="table table-bordered table-sm" id="noApplyTable">
+            <hr>
+
+            <h5 class="mt-5">✅ มีในระบบสมาชิกแล้ว ❎ แต่ยังไม่มีข้อมูล สมัคร</h5>
+
+            <table class="table table-bordered table-sm" id="syncedTable">
                 <thead>
                 <tr>
                     <th>#</th>
                     <th>Member ID</th>
+                    <th>ประวัติ</th>
                     <th>ชื่อ - นามสกุล</th>
+                    <th>เพศ</th>
+                    <th>อายุ</th>
+                    <th>เบอร์โทร</th>
+                    <th>อีเมล</th>
                     <th>วันที่สมัคร</th>
                 </tr>
                 </thead>
@@ -87,14 +96,24 @@
                     <tr>
                         <td>{{ $i + 1 }}</td>
                         <td>{{ $app->member_id ?? '-' }}</td>
+                        <td style="text-align: center">
+                            <a target="_blank" href="{{ route('courses.history', $app->member_id) }}" class="btn btn-secondary">{{ __('messages.history') }}</a>
+                        </td>
                         <td>{{ $app->first_name }} {{ $app->last_name }}</td>
-                        <td>{{ $app->course_preference }}</td>
+                        <td>{{ str_contains($app->gender, 'ชาย') ? 'ชาย' : 'หญิง' }}</td>
+                        <td>{{ $app->age }}</td>
+                        <td>{{ $app->phone }}</td>
+                        <td>{{ $app->email }}</td>
+                        <td>{{ implode(', ', $app->courseDates) }}</td>
+
                     </tr>
                 @endforeach
                 </tbody>
             </table>
 
-            <h5 class="mt-5">✅ มีในระบบสมาชิกแล้ว และ ลงข้อมูลสมัคร แล้ว</h5>
+            <hr>
+
+            <h5 class="mt-5">✅ มีในระบบสมาชิกแล้ว และ ✅ ลงข้อมูลสมัคร แล้ว</h5>
             <table class="table table-bordered table-sm" id="syncedTable">
                 <thead>
                 <tr>
@@ -122,7 +141,8 @@
                         <td>{{ $app->age }}</td>
                         <td>{{ $app->phone }}</td>
                         <td>{{ $app->email }}</td>
-                        <td>{{ $app->course_preference }}</td>
+                        <td>{{ implode(', ', $app->courseDates) }}</td>
+
                     </tr>
                 @endforeach
                 </tbody>

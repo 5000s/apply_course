@@ -517,6 +517,20 @@ class GoogleSheetController extends Controller
                 }
             }
 
+
+            $notMemberApplyDates = [];
+            foreach ($courseDates as $date) {
+                if (!empty($dateCheck)) {
+                    if ($dateCheck == $date){
+                        $notMemberApplyDates[$date] = Carbon::parse($date)->addYear("543")->format('d-m-Y');
+                    }
+                }else{
+                    $notMemberApplyDates[$date] = Carbon::parse($date)->addYear("543")->format('d-m-Y');
+                }
+            }
+
+            $app->courseDates = $notMemberApplyDates;
+
             if ($app->member_id && $app->course_preference) {
 
 //                if ($app->member_id == 217799)
@@ -532,9 +546,12 @@ class GoogleSheetController extends Controller
 
                         $isCheckApplyMore = true;
                         if (!empty($dateCheck)) {
-                            if ($dateCheck != $date){
+                            if ($dateCheck == $date){
                                 $app->has_apply = true;
                                 $isCheckApplyMore = false;
+                                $courseDateSelect = [];
+                                $courseDateSelect[$date] = $course->date_start->addYear(543)->format("d-m-Y");
+                                $app->courseDates = $courseDateSelect;
                             }
                         }
 
@@ -547,7 +564,9 @@ class GoogleSheetController extends Controller
                                 $app->has_apply = true;
                             }else{
                                 $app->has_apply = false;
-                                break;
+                                if (empty($dateCheck)) {
+                                    break;
+                                }
                             }
                         }
 
