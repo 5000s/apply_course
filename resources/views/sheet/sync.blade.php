@@ -35,13 +35,22 @@
 
         <form id="syncForm" method="POST" action="{{ route('admin.applications.sync.store', ['locationId' =>  $location->id]) }}">
             @csrf
+
+
+            <h6> เลือกข้อมูลที่จะสร้างจาก Google Sheet</h6>
+
+            <select name="import" >
+                <option value="all">ทั้งหมด (ผู้สมัคร, คอร์ส, และ การสมัคร)</option>
+                <option value="course">เฉพาะ คอร์ส</option>
+            </select>
+
             <input type="hidden" name="location_id" value="{{ $location->id }}">
             <input type="hidden" name="date" id="hiddenDateInput" value="{{ request('date') }}">
 
 
         @if($countUnsynced > 0 || $countNoApply > 0)
                 <button type="button" id="confirmSync" class="btn btn-primary mb-3">
-                    สร้าง Member ใหม่, คอร์ส และ ข้อมูลการสมัคร ที่ยังไม่มีในฐานข้อมูล
+                    สร้างข้อมูลจาก Google Sheet
                 </button>
             @endif
             <h5>❎ ยังไม่มี Member ในระบบ </h5>

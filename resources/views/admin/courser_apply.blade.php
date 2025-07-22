@@ -76,6 +76,7 @@
                     <td class="text-center " style="display: none;">ความเชี่ยวชาญ</td>
                     <td class="text-center " style="display: none;">อาชีพ</td>
                     <td class="text-center " style="display: none;">การศึกษา</td>
+                    <td class="text-center eprint" >สัญชาติ</td>
                     <td class="text-center eprint"  style="width: 20px;">ศิษย์</td>
                     <td class="text-center eprint"  style="width: 20px;">รถตู้</td>
                     <td class="text-center eprint" style="display: none;">โทร</td>
@@ -145,6 +146,8 @@
                         <td class="text-center" style="display: none;">{{ $member->expertise }}</td>
                         <td class="text-center" style="display: none;">{{ $member->career }}</td>
                         <td class="text-center" style="display: none;">{{ $member->degree }}</td>
+
+                        <td class="text-center" >{{ $member->nationality }}</td>
 
 
                         <td class="text-center">

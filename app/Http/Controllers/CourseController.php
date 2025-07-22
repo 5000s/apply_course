@@ -289,6 +289,7 @@ class CourseController extends Controller
                 'm.degree',
                 'm.expertise',
                 'm.career',
+                'm.nationality',
                 'm.shelter_number',
                 'm.email',
                 'm.age',

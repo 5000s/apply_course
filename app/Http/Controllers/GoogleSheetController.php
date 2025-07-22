@@ -403,6 +403,8 @@ class GoogleSheetController extends Controller
     public function showUnsyncedApplications(Request $request, $locationId)
     {
 
+        set_time_limit(600);
+
         $dateCheck = $request->input("date");
 
         $force_check = $request->input("check");
@@ -419,6 +421,7 @@ class GoogleSheetController extends Controller
         $courses = Course::where('location_id', $locationId)
             ->where('category_id', $categoryId)
             ->get();
+
 
         $courseArray = [];
         foreach ($courses as $course) {
@@ -543,11 +546,19 @@ class GoogleSheetController extends Controller
                     if (isset($courseArray[$date])) {
                         $course = $courseArray[$date];
 
+                        $apply = Apply::where('course_id', $course->id)
+                            ->where('member_id', $app->member_id)
+                            ->first();
 
                         $isCheckApplyMore = true;
                         if (!empty($dateCheck)) {
                             if ($dateCheck == $date){
-                                $app->has_apply = true;
+                                if ($apply){
+                                    $app->has_apply = true;
+                                    dd($apply);
+                                }else{
+                                    $app->has_apply = false;
+                                }
                                 $isCheckApplyMore = false;
                                 $courseDateSelect = [];
                                 $courseDateSelect[$date] = $course->date_start->addYear(543)->format("d-m-Y");
@@ -556,9 +567,7 @@ class GoogleSheetController extends Controller
                         }
 
                         if ($isCheckApplyMore){
-                            $apply = Apply::where('course_id', $course->id)
-                                ->where('member_id', $app->member_id)
-                                ->first();
+
                             if ($apply) {
 
                                 $app->has_apply = true;
@@ -607,6 +616,7 @@ class GoogleSheetController extends Controller
 
         $locationId = $request->input('location_id');
         $dateCheck = $request->input("date");
+        $import = $request->input("import");
 
         $applications = Application::where('location_id', $locationId)->get();
 
@@ -666,35 +676,41 @@ class GoogleSheetController extends Controller
             }
 
             if (!$member) {
-                $member = Member::create([
-                    'gender' => $normalizedGender,
-                    'name' => $app->first_name,
-                    'surname' => $app->last_name,
-                    'nickname' => $app->nickname,
-                    'age' => $app->age ?? 0,
-                    'birthdate' => $app->birthday,
-                    'buddhism' => $app->status ?? 'ฆราวาส',
-                    'status' => 'ผู้สมัครใหม่',
-                    'phone' => $app->phone,
-                    'email' => $app->email ?? '-',
-                    'province' => $app->province,
-                    'nationality' => $app->nationality,
-                    'degree' => $app->education,
-                    'career' => $app->occupation,
-                    'dharma_ex' => $app->has_experience ? 'เคย' : 'ไม่เคย',
-                    'dharma_ex_desc' => $app->meditation_history,
-                    'know_source' => $app->heard_from,
-                    'name_emergency' => $app->emergency_contact_name,
-                    'phone_emergency' => $app->emergency_contact_phone,
-                    'relation_emergency' => $app->emergency_contact_relationship,
-                    'created_by' => auth()->user()->name ?? 'system',
-                    'updated_by' => auth()->user()->name ?? 'system'
-                ]);
-                $app->member_id = $member->id;
-                $app->is_synced = 1;
+
+                if ($import == "all"){
+                    $member = Member::create([
+                        'gender' => $normalizedGender,
+                        'name' => $app->first_name,
+                        'surname' => $app->last_name,
+                        'nickname' => $app->nickname,
+                        'age' => $app->age ?? 0,
+                        'birthdate' => $app->birthday,
+                        'buddhism' => $app->status ?? 'ฆราวาส',
+                        'status' => 'ผู้สมัครใหม่',
+                        'phone' => $app->phone,
+                        'email' => $app->email ?? '-',
+                        'province' => $app->province,
+                        'nationality' => $app->nationality,
+                        'degree' => $app->education,
+                        'career' => $app->occupation,
+                        'dharma_ex' => $app->has_experience ? 'เคย' : 'ไม่เคย',
+                        'dharma_ex_desc' => $app->meditation_history,
+                        'know_source' => $app->heard_from,
+                        'name_emergency' => $app->emergency_contact_name,
+                        'phone_emergency' => $app->emergency_contact_phone,
+                        'relation_emergency' => $app->emergency_contact_relationship,
+                        'created_by' => auth()->user()->name ?? 'system',
+                        'updated_by' => auth()->user()->name ?? 'system'
+                    ]);
+                    $app->member_id = $member->id;
+                    $app->is_synced = 1;
+                    $imported++;
+                }
 
 
-                $imported++;
+            }
+            if (!$member){
+                $member = new Member();
             }
 
             $applies = Apply::where("member_id", $member->id)->get();
@@ -719,6 +735,8 @@ class GoogleSheetController extends Controller
                         if (isset($courseArray[$date])) {
                             $course = $courseArray[$date];
                         }else{
+
+
                             $course = new Course();
                             $course->date_start   = $courseDate;
                             $course->date_end     = $courseDate;
@@ -743,7 +761,7 @@ class GoogleSheetController extends Controller
                         $apply = Apply::where("course_id", $course->id)->where("member_id", $member->id)->first();
 
 
-                        if (!$apply){
+                        if (!$apply && $import == "all"){
 
                             $apply = new Apply();
                             $apply->member_id = $member->id;

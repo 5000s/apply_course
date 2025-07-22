@@ -33,28 +33,6 @@
                                 @method('PUT')
                             @endif
 
-                            <!-- Start Date -->
-                            <div class="mb-3">
-                                <label for="date_start" class="form-label">วันที่เริ่ม</label>
-                                <input type="date"
-                                       name="date_start"
-                                       id="date_start"
-                                       class="form-control"
-                                       value="{{ old('date_start') ? \Carbon\Carbon::parse(old('date_start'))->format('Y-m-d') : ($course->date_start ?? \Carbon\Carbon::now())->format('Y-m-d') }}"
-                                       required>
-                            </div>
-
-                            <!-- End Date -->
-                            <div class="mb-3">
-                                <label for="date_end" class="form-label">วันที่จบ</label>
-                                <input type="date"
-                                       name="date_end"
-                                       id="date_end"
-                                       class="form-control"
-                                       value="{{ old('date_end') ? \Carbon\Carbon::parse(old('date_end'))->format('Y-m-d') : ($course->date_end ?? \Carbon\Carbon::now())->format('Y-m-d') }}"
-                                       required>
-                            </div>
-
                             <!-- Location -->
                             <div class="mb-3">
                                 <label for="location_id" class="form-label">สถานที่</label>
@@ -82,6 +60,30 @@
                                     @endif
                                 @endforeach
                             </select>
+
+                            <!-- Start Date -->
+                            <div class="mb-3">
+                                <label for="date_start" class="form-label">วันที่เริ่ม</label>
+                                <input type="date"
+                                       name="date_start"
+                                       id="date_start"
+                                       class="form-control"
+                                       value="{{ old('date_start') ? \Carbon\Carbon::parse(old('date_start'))->format('Y-m-d') : ($course->date_start ?? \Carbon\Carbon::now())->format('Y-m-d') }}"
+                                       required>
+                            </div>
+
+                            <!-- End Date -->
+                            <div class="mb-3">
+                                <label for="date_end" class="form-label">วันที่จบ</label>
+                                <input type="date"
+                                       name="date_end"
+                                       id="date_end"
+                                       class="form-control"
+                                       value="{{ old('date_end') ? \Carbon\Carbon::parse(old('date_end'))->format('Y-m-d') : ($course->date_end ?? \Carbon\Carbon::now())->format('Y-m-d') }}"
+                                       required>
+                            </div>
+
+
 
                             <script>
                                 $(document).ready(function () {
