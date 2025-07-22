@@ -402,6 +402,9 @@ class GoogleSheetController extends Controller
 
     public function showUnsyncedApplications(Request $request, $locationId)
     {
+
+        $dateCheck = $request->input("date");
+
         $force_check = $request->input("check");
         $memberIdSet = [];
 
@@ -500,34 +503,55 @@ class GoogleSheetController extends Controller
             });
 
 
+        $courseListDates = [];
+
+
         foreach ($applications as $app) {
             $app->has_apply = false;
 
+            $courseDates = $this->extractCourseDatesFromPreference($app->course_preference);
 
+            foreach ($courseDates as $date) {
+                if (!isset($courseListDates[$date])){
+                    $courseListDates[$date] = $date;
+                }
+            }
 
             if ($app->member_id && $app->course_preference) {
-                $courseDates = $this->extractCourseDatesFromPreference($app->course_preference);
 
 //                if ($app->member_id == 217799)
 //                    dd($courseDates, $app->course_preference);
 //
-
                 foreach ($courseDates as $date) {
+
+
 
                     if (isset($courseArray[$date])) {
                         $course = $courseArray[$date];
 
 
-                        $apply = Apply::where('course_id', $course->id)
-                            ->where('member_id', $app->member_id)
-                            ->first();
-                        if ($apply) {
-
-                            $app->has_apply = true;
-                        }else{
-                            $app->has_apply = false;
-                            break;
+                        $isCheckApplyMore = true;
+                        if (!empty($dateCheck)) {
+                            if ($dateCheck != $date){
+                                $app->has_apply = true;
+                                $isCheckApplyMore = false;
+                            }
                         }
+
+                        if ($isCheckApplyMore){
+                            $apply = Apply::where('course_id', $course->id)
+                                ->where('member_id', $app->member_id)
+                                ->first();
+                            if ($apply) {
+
+                                $app->has_apply = true;
+                            }else{
+                                $app->has_apply = false;
+                                break;
+                            }
+                        }
+
+
                     }else{
                         $app->has_apply = false;
                     }
@@ -535,7 +559,14 @@ class GoogleSheetController extends Controller
             }
         }
 
-        return view('sheet.sync', compact('applications', 'location'));
+        if (!empty($dateCheck)) {
+            $applications = $applications->filter(function ($app) use ($dateCheck) {
+                $courseDates = $this->extractCourseDatesFromPreference($app->course_preference);
+                return in_array($dateCheck, $courseDates);
+            })->values(); // reset index
+        }
+
+        return view('sheet.sync', compact('applications', 'location', 'courseListDates'));
     }
 
 
@@ -556,6 +587,7 @@ class GoogleSheetController extends Controller
         set_time_limit(600);
 
         $locationId = $request->input('location_id');
+        $dateCheck = $request->input("date");
 
         $applications = Application::where('location_id', $locationId)->get();
 
@@ -577,10 +609,18 @@ class GoogleSheetController extends Controller
 
 
         $location_name = Location::find($locationId)->name;
-       $category_name = CourseCategory::find($categoryId)->name;
+        $category_name = CourseCategory::find($categoryId)->name;
+
+        if (!empty($dateCheck)) {
+            $applications = $applications->filter(function ($app) use ($dateCheck) {
+                $courseDates = $this->extractCourseDatesFromPreference($app->course_preference);
+                return in_array($dateCheck, $courseDates);
+            })->values(); // reset index
+        }
 
 
         foreach ($applications as $app) {
+
             $member = Member::find( $app->member_id);
 
             $normalizedGender = null;
@@ -641,61 +681,72 @@ class GoogleSheetController extends Controller
             $applies = Apply::where("member_id", $member->id)->get();
             $courseDateList = $this->extractCourseDatesFromPreference($app->course_preference);
 
+
             if (count($courseDateList) > 0){
 
                 foreach ($courseDateList as $date) {
-                    $courseDate = Carbon::parse($date);
 
-                    if (isset($courseArray[$date])) {
-                        $course = $courseArray[$date];
-                    }else{
-                        $course = new Course();
-                        $course->date_start   = $courseDate;
-                        $course->date_end     = $courseDate;
-                        $course->listed     = "yes";
-                        $course->listed_date     = Carbon::now();
-                        $course->location_id  = $locationId;
-                        $course->category_id  = $categoryId;
-                        $course->state        = "เปิดรับสมัคร";
-                        $course->description        =  "คอร์สสมาธิอานาปานสติ 1 วัน";
-                        $course->location = $location_name;
-                        $course->category = $category_name;
-                        $course->courseyear = $courseDate->year;
+                    $isPassDateCheck = true;
 
-                        $course->coursename =   Course::generateCourseName($courseDate, $courseDate);
-                        $course->save();
-
-                        $courseArray[$date] = $course;
-
-                        $courseImported++;
-                    }
-
-                    $apply = Apply::where("course_id", $course->id)->where("member_id", $member->id)->first();
-
-
-                    if (!$apply){
-
-                        $apply = new Apply();
-                        $apply->member_id = $member->id;
-                        $apply->course_id = $course->id;
-                        $apply->state = "ยื่นใบสมัคร";
-                        $apply->firsttime = "yes";
-                        if (count($applies) > 0) {
-                            $apply->firsttime = "no";
+                    if (!empty($dateCheck)){
+                        if ($dateCheck != $date){
+                            $isPassDateCheck = false;
                         }
-                        $apply->shelter = "ทั้วไป";
-                        $apply->confirmed = "no";
-                        $apply->van = "no";
-                        $apply->priority_id = 4;
-                        $apply->created_by = "Google Sheet";;
-                        $apply->updated_by = "Google Sheet";;
-
-                        $apply->save();
-
-
-                        $applyImported++;
                     }
 
+                    if ($isPassDateCheck){
+                        $courseDate = Carbon::parse($date);
+
+                        if (isset($courseArray[$date])) {
+                            $course = $courseArray[$date];
+                        }else{
+                            $course = new Course();
+                            $course->date_start   = $courseDate;
+                            $course->date_end     = $courseDate;
+                            $course->listed     = "yes";
+                            $course->listed_date     = Carbon::now();
+                            $course->location_id  = $locationId;
+                            $course->category_id  = $categoryId;
+                            $course->state        = "เปิดรับสมัคร";
+                            $course->description        =  "คอร์สสมาธิอานาปานสติ 1 วัน";
+                            $course->location = $location_name;
+                            $course->category = $category_name;
+                            $course->courseyear = $courseDate->year;
+
+                            $course->coursename =   Course::generateCourseName($courseDate, $courseDate);
+                            $course->save();
+
+                            $courseArray[$date] = $course;
+
+                            $courseImported++;
+                        }
+
+                        $apply = Apply::where("course_id", $course->id)->where("member_id", $member->id)->first();
+
+
+                        if (!$apply){
+
+                            $apply = new Apply();
+                            $apply->member_id = $member->id;
+                            $apply->course_id = $course->id;
+                            $apply->state = "ยื่นใบสมัคร";
+                            $apply->firsttime = "yes";
+                            if (count($applies) > 0) {
+                                $apply->firsttime = "no";
+                            }
+                            $apply->shelter = "ทั้วไป";
+                            $apply->confirmed = "no";
+                            $apply->van = "no";
+                            $apply->priority_id = 4;
+                            $apply->created_by = "Google Sheet";;
+                            $apply->updated_by = "Google Sheet";;
+
+                            $apply->save();
+
+
+                            $applyImported++;
+                        }
+                    }
                 }
             }
 

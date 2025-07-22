@@ -13,11 +13,33 @@
             $countNoApply = $applications->where('is_synced', true)->where('has_apply', false)->count();
         @endphp
 
+
+        <div class="d-flex justify-content-start mb-3">
+            <form method="GET" id="dateFilterForm" class="form-inline">
+                <label for="date" class="me-2">เลือกวันที่:</label>
+                <select name="date" id="date" class="form-select me-2">
+                    <option value="0" {{ request('date') == "0" || request('date') == "" ? 'selected' : '' }}>
+                         ทั้งหมด
+                    </option>
+                    @foreach($courseListDates as $date)
+                        <option value="{{ $date }}" {{ request('date') == $date ? 'selected' : '' }}>
+                            {{ \Carbon\Carbon::parse($date)->format('d-m-Y') }}
+                        </option>
+                    @endforeach
+                </select>
+                <button type="submit" class="btn btn-success">เลือก</button>
+            </form>
+        </div>
+
+        <hr>
+
         <form id="syncForm" method="POST" action="{{ route('admin.applications.sync.store', ['locationId' =>  $location->id]) }}">
             @csrf
             <input type="hidden" name="location_id" value="{{ $location->id }}">
+            <input type="hidden" name="date" id="hiddenDateInput" value="{{ request('date') }}">
 
-            @if($countUnsynced > 0 || $countNoApply > 0)
+
+        @if($countUnsynced > 0 || $countNoApply > 0)
                 <button type="button" id="confirmSync" class="btn btn-primary mb-3">
                     สร้าง Member ใหม่, คอร์ส และ ข้อมูลการสมัคร ที่ยังไม่มีในฐานข้อมูล
                 </button>
