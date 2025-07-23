@@ -555,7 +555,6 @@ class GoogleSheetController extends Controller
                             if ($dateCheck == $date){
                                 if ($apply){
                                     $app->has_apply = true;
-                                    dd($apply);
                                 }else{
                                     $app->has_apply = false;
                                 }
