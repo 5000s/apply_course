@@ -178,6 +178,8 @@ class CourseController extends Controller
 
         public function courseList(Request $request)
     {
+
+
         $data = [];
         $locationChoose = "";
 

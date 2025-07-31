@@ -1,64 +1,76 @@
-<!-- Bootstrap core CSS -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-<link href="{{url("plugins/datepicker/css/datepicker.css")}}" rel="stylesheet" >
-<link href="https://cdn.datatables.net/1.13.1/css/jquery.dataTables.min.css" rel="stylesheet" >
-<style>
+{{-- Bootstrap 5 core CSS --}}
+<link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+    crossorigin="anonymous"
+/>
 
-    .table-light{
+{{-- DataTables CSS --}}
+<link
+    href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css"
+    rel="stylesheet"
+/>
+
+<style>
+    /* make sure no parent container ever clips the dropdown */
+    html, body, main.container-fluid, .container-fluid, .container {
+        overflow: visible !important;
+        position: relative !important;
+        z-index: auto !important;
+    }
+
+    /* push the navbar above all page content */
+    .navbar {
+        position: relative;
+        z-index: 2000;
+    }
+
+    /* ensure dropdown menus float on top */
+    .dropdown-menu {
+        position: absolute !important;
+        z-index: 2050 !important;
+    }
+
+    /* your other utilities */
+    .table-light {
         font-weight: bold;
         text-align: center;
     }
-
-    .req-in{
-        color:red;
+    .req-in {
+        color: red;
         font-weight: lighter;
         font-size: 25px;
     }
-
     .select-form {
-        padding: 0.375rem 2.25rem 0.375rem 0.75rem;
-        -moz-padding-start: calc(0.75rem - 3px);
+        padding: .375rem 2.25rem .375rem .75rem;
         font-size: 1rem;
-        font-weight: 400;
-        line-height: 1.5;
         min-width: 120px;
         color: #212529;
         border: 1px solid #ced4da;
-        border-radius: 0.25rem;
-        transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+        border-radius: .25rem;
+        transition: border-color .15s ease, box-shadow .15s ease;
         appearance: none;
     }
-
     .select-form:disabled {
         background-color: #e9ecef;
     }
-
     .thing {
-        margin-top: 30px;
+        margin: 30px auto;
         max-width: 100vw !important;
         width: 800px;
-
         padding: 1rem;
-        box-shadow: 0 15px 30px 0 rgba(0, 0, 0, 0.11),
-        0 5px 15px 0 rgba(0, 0, 0, 0.08);
-        background-color: #ffffff;
-        border-radius: 0.5rem;
-
+        background: #fff;
+        border-radius: .5rem;
+        box-shadow:
+            0 15px 30px rgba(0,0,0,0.11),
+            0 5px 15px rgba(0,0,0,0.08);
         border-left: 0 solid #00ff99;
-        transition: border-left 300ms ease-in-out, padding-left 300ms ease-in-out;
+        transition: border-left .3s ease, padding-left .3s ease;
     }
-
     .thing:hover {
-        padding-left: 0.5rem;
-        border-left: 0.5rem solid #00ff99;
+        padding-left: .5rem;
+        border-left: .5rem solid #00ff99;
     }
-
-    .thing > :first-child {
-        margin-top: 0;
-    }
-
-    .thing > :last-child {
-        margin-bottom: 0;
-    }
-
+    .thing > :first-child { margin-top: 0 }
+    .thing > :last-child  { margin-bottom: 0 }
 </style>

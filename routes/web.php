@@ -26,6 +26,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
+use App\Http\Controllers\DashboardController;
 
 
 Auth::routes();
@@ -99,7 +100,6 @@ Route::prefix('admin')->middleware('auth', 'admin')->group(function () {
 
     // IMPORT GOOGLE SHEET
 
-    Route::get('/setCourseData', [CourseController::class, 'setCourseData'])->name('admin.course.sync');
     Route::get('/sheet', [GoogleSheetController::class, 'showSheetButtons'])->name('admin.import.sheet.buttons');
     Route::get('/sheet/{index}', [GoogleSheetController::class, 'importSheetByIndex'])->name('admin.import.sheet.direct');
     Route::get('/sheet/member/{locationId}', [GoogleSheetController::class, 'showUnsyncedApplications'])->name('admin.applications.sync');
@@ -136,6 +136,13 @@ Route::prefix('admin')->middleware('auth', 'admin')->group(function () {
         Route::delete('members/{member}/delete', [TeamController::class, 'deleteMember'])
             ->name('destroy');
     });
+
+
+
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
+    Route::get('/dashboard/data', [DashboardController::class, 'data'])->name('dashboard.data');
+    Route::get('/dashboard/course-types', [DashboardController::class, 'typesByLocation'])
+        ->name('dashboard.course-types');
 
 });
 
@@ -201,6 +208,13 @@ use App\Http\Controllers\GmailController;
 Route::get('/send-test-email', [GmailController::class, 'sendTestEmail']);
 
 
+
+
+
+
+
+
+Route::get('/setCourseData', [CourseController::class, 'setCourseData'])->name('admin.course.sync');
 
 
 

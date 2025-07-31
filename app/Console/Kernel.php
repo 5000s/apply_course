@@ -2,6 +2,7 @@
 
 namespace App\Console;
 
+use App\Http\Controllers\CourseController;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -16,6 +17,11 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         // $schedule->command('inspire')->hourly();
+
+        $schedule->call(function () {
+            // ถ้าไม่มี dependency พิเศษ ใช้แบบนี้ได้เลย
+            (new CourseController)->setCourseData();
+        })->hourly();
     }
 
     /**

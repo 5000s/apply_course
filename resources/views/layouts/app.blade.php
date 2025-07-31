@@ -81,6 +81,9 @@
                                         <a class="dropdown-item" href="{{ route('teams.index') }}">จัดการทีม</a>
                                     </li>
                                     <li>
+                                        <a class="dropdown-item" href="{{ route('dashboard.index') }}">สถิติ</a>
+                                    </li>
+                                    <li>
                                         <a class="dropdown-item" href="{{ route('admin.import.sheet.buttons') }}">นำเข้าจาก Google Sheet</a>
                                     </li>
                                 </ul>
