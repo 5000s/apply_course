@@ -87,10 +87,17 @@ class DashboardController extends Controller
         // 6) Age buckets (5-year)
         $ageRanges = [];
         foreach ($members as $m) {
-            if (! is_null($m->age)) {
-                $bucket = floor($m->age / 5) * 5;
-                $label  = "{$bucket}-" . ($bucket + 4);
-                $ageRanges[$label] = ($ageRanges[$label] ?? 0) + 1;
+            if (! empty($m->birthdate)) {
+                // calculate age as of today
+                $age = Carbon::parse($m->birthdate)->age;
+
+                // only include realistic ages
+                if ($age >= 0) {
+                    // bucket into 5-year ranges
+                    $bucket = floor($age / 5) * 5;
+                    $label  = "{$bucket}-" . ($bucket + 4);
+                    $ageRanges[$label] = ($ageRanges[$label] ?? 0) + 1;
+                }
             }
         }
 
