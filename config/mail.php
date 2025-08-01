@@ -13,7 +13,8 @@ return [
     |
     */
 
-    'default' => env('MAIL_MAILER', 'custom_gmail'),
+    'default' => env('MAIL_MAILER', 'smtp'),
+
 
     /*
     |--------------------------------------------------------------------------
@@ -43,10 +44,6 @@ return [
             'password' => env('MAIL_PASSWORD'),
             'timeout' => 30,
             'auth_mode' => null,
-        ],
-
-        'custom_gmail' => [
-            'transport' => 'custom_gmail',
         ],
 
         'ses' => [
