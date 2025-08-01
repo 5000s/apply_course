@@ -20,7 +20,10 @@ class GmailApiService
     public function __construct()
     {
         $this->client = new Client();
-        $this->client->setAuthConfig(storage_path(env('GOOGLE_APPLICATION_CREDENTIALS')));
+        $path = storage_path(env('GOOGLE_APPLICATION_CREDENTIALS'));
+        $this->client->setAuthConfig($path);
+        Log::info("Google Auth Config Path: " . $path);
+
         $this->client->setApplicationName(config('app.name'));
 
         $scopes = explode(' ', env('GOOGLE_AUTH_SCOPES'));
