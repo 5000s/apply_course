@@ -111,4 +111,11 @@ return [
     ],
 
 
+
+    'search_result' => 'Search Result',
+    'found_member'  => 'We found a record that matches your search. Please send a request to create a new password:',
+    'not_found'     => 'No records matching your search were found.',
+    'send_request'  => 'Send Request',
+
+
 ];

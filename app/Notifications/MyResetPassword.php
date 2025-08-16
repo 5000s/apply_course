@@ -6,6 +6,8 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
 use App\Services\GmailApiService;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\URL; // Needed for URL::route
 use Illuminate\Notifications\Messages\MailMessage;
@@ -31,8 +33,18 @@ class MyResetPassword extends Notification implements ShouldQueue
         // This is where the URL for the email is generated
         $resetUrl = $this->customResetUrl($notifiable); // <--- CALL YOUR CUSTOM METHOD HERE
 
-        $subject = 'Reset Your Password for ' . config('app.name');
+        $locale = $notifiable->locale
+            ?? $notifiable->language
+            ?? app()->getLocale();
+
+
+        $subject = Lang::get('mail.password_reset_subject', [], $locale);
+
+        $previousLocale = app()->getLocale();
+        App::setLocale($locale);
+
         $template = 'emails.password_reset'; // Ensure this Blade view exists
+
         $data = [
             'name' => $notifiable->name ?? $notifiable->first_name,
             'reset_url' => $resetUrl,

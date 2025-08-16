@@ -8,4 +8,22 @@ return [
     'reset_password_line_3' => 'If you did not request a password reset, no further action is required.',
     'reset_password_regards' => 'Regards,',
     'reset_password_footer' => 'Course Registration System for Vipassana Meditation',
+
+
+    'password_reset_subject' => 'Reset Your Password for Bodhidhammayan Apply Course System',
+
+    'password_reset' => [
+        'subject'   => 'Password Reset Notification',
+        'greeting'  => 'Dear :name,',
+        'intro'     => 'We have received a request to reset the password associated with your account. If you initiated this request, please use the link provided below to securely reset your password.',
+        'button'    => 'Reset Password',
+        'expire'    => 'Please note that this link will remain active for :count minutes from the time of this email.',
+        'ignore'    => 'If you did not make this request, please disregard this message. No further action is required on your part.',
+        'closing'   => 'Sincerely,',
+        'team'      => 'Bodhidhammayan Apply Course System',
+        'footer'    => 'All rights reserved.',
+        'visit'     => 'Visit Our Website',
+        'contact'   => 'Contact Support',
+    ],
+
 ];

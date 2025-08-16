@@ -3,9 +3,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Password Reset</title>
+    <title>{{ __('mail.password_reset.subject') }}</title>
     <style type="text/css">
-        /* Basic Reset & Styles (consistent with your other email templates) */
         body, html {
             margin: 0;
             padding: 0;
@@ -16,21 +15,10 @@
             line-height: 1.6;
             color: #333333;
         }
-        table {
-            border-collapse: collapse;
-            width: 100%;
-        }
-        td {
-            padding: 0;
-            vertical-align: top;
-        }
-        a {
-            color: #007bff;
-            text-decoration: none;
-        }
-        a:hover {
-            text-decoration: underline;
-        }
+        table { border-collapse: collapse; width: 100%; }
+        td { padding: 0; vertical-align: top; }
+        a { color: #007bff; text-decoration: none; }
+        a:hover { text-decoration: underline; }
         .email-container {
             max-width: 600px;
             margin: 20px auto;
@@ -50,19 +38,13 @@
             color: #343a40;
             font-size: 24px;
         }
-        .content {
-            padding: 30px;
-        }
+        .content { padding: 30px; }
         .content p {
             margin-bottom: 15px;
             font-size: 16px;
             line-height: 1.6;
         }
-        .button-container {
-            text-align: center;
-            margin-top: 25px;
-            margin-bottom: 15px;
-        }
+        .button-container { text-align: center; margin-top: 25px; margin-bottom: 15px; }
         .button {
             display: inline-block;
             padding: 12px 25px;
@@ -81,9 +63,7 @@
             color: #6c757d;
             border-top: 1px solid #e9ecef;
         }
-        .footer a {
-            color: #6c757d;
-        }
+        .footer a { color: #6c757d; }
         @media only screen and (max-width: 600px) {
             .email-container {
                 width: 100% !important;
@@ -91,9 +71,7 @@
                 border-radius: 0 !important;
                 box-shadow: none !important;
             }
-            .content {
-                padding: 20px !important;
-            }
+            .content { padding: 20px !important; }
         }
     </style>
 </head>
@@ -104,32 +82,32 @@
             <table class="email-container" width="100%" cellpadding="0" cellspacing="0" role="presentation">
                 <tr>
                     <td class="header">
-                        <h1>Password Reset Request</h1>
+                        <h1>{{ __('mail.password_reset.subject') }}</h1>
                     </td>
                 </tr>
                 <tr>
                     <td class="content">
-                        <p>Hello {{ $name ?? 'there' }},</p>
-                        <p>You are receiving this email because we received a password reset request for your account.</p>
+                        <p>{{ __('mail.password_reset.greeting', ['name' => $name ?? __('User')]) }}</p>
+                        <p>{{ __('mail.password_reset.intro') }}</p>
 
                         <div class="button-container">
-                            <a href="{{ $reset_url }}" class="button">Reset Password</a>
+                            <a href="{{ $reset_url }}" class="button">{{ __('mail.password_reset.button') }}</a>
                         </div>
 
-                        <p>This password reset link will expire in {{ config('auth.passwords.users.expire', 60) }} minutes.</p>
+                        <p>{{ __('mail.password_reset.expire', ['count' => config('auth.passwords.users.expire', 60)]) }}</p>
 
-                        <p>If you did not request a password reset, no further action is required.</p>
+                        <p>{{ __('mail.password_reset.ignore') }}</p>
 
-                        <p>Regards,</p>
-                        <p>The {{ $app_name }} Team</p>
+                        <p>{{ __('mail.password_reset.closing') }}</p>
+                        <p>{{ __('mail.password_reset.team') }}</p>
                     </td>
                 </tr>
                 <tr>
                     <td class="footer">
-                        <p>&copy; {{ date('Y') }} {{ $app_name }}. All rights reserved.</p>
+                        <p>&copy; {{ date('Y') }} {{ __('mail.password_reset.team') }}. {{ __('mail.password_reset.footer') }}</p>
                         <p>
-                            <a href="{{ url('/') }}">Our Website</a> |
-                            <a href="mailto:{{ config('mail.from.address') }}">Contact Us</a>
+                            <a href="{{ url('/') }}">{{ __('mail.password_reset.visit') }}</a> |
+                            <a href="mailto:info@bodhidhammayan.org">{{ __('mail.password_reset.contact') }}</a>
                         </p>
                     </td>
                 </tr>
