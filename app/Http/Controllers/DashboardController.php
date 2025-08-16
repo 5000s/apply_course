@@ -152,7 +152,7 @@ class DashboardController extends Controller
         $map = [
             'Thailand'        => ['thailand','thai','ไทย','ประทศไทย','thailand (british)','ไมย', 'ไท'],
             'Myanmar'         => ['myanmar','burma'],
-            'United Kingdom'  => ['united kingdom','uk','british','england','scotland','wales'],
+            'United Kingdom'  => ['united kingdom','uk','british','england','scotland','wales', 'english'],
             'United States'   => ['united state','united satate','usa', 'america' ,'อเมริกา'],
             'Australia'       => ['australia','australian','new zealander','australia' , 'ออสเตร' , 'aussie'],
             'Austria'       =>   ['austria'],
