@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Verify Your Email Address</title>
+    <title>{{ __('mail.verify.subject') }}</title>
     <style type="text/css">
         /* Basic Reset & Styles (similar to welcome.blade.php for consistency) */
         body, html {
@@ -104,32 +104,33 @@
             <table class="email-container" width="100%" cellpadding="0" cellspacing="0" role="presentation">
                 <tr>
                     <td class="header">
-                        <h1>Verify Your Email Address</h1>
+                        <h1>{{ __('mail.verify.title') }}</h1>
                     </td>
                 </tr>
                 <tr>
                     <td class="content">
-                        <p>Hello {{ $name ?? 'there' }},</p>
-                        <p>Please click the button below to verify your email address. This step ensures the security of your account and helps us to keep you updated.</p>
+                        <p>{{ __('mail.verify.greeting_formal', ['name' => $name ?? __('User')]) }}</p>
+
+                        <p>{{ __('mail.verify.intro_formal') }}</p>
 
                         <div class="button-container">
-                            <a href="{{ $verification_url }}" class="button">Verify Email Address</a>
+                            <a href="{{ $verification_url }}" class="button">{{ __('mail.verify.button') }}</a>
                         </div>
 
-                        <p>This verification link will expire in {{ config('auth.verification.expire', 60) }} minutes.</p>
+                        <p>{{ __('mail.verify.expire_formal', ['count' => (int) config('auth.verification.expire', 60)]) }}</p>
 
-                        <p>If you did not create an account, no further action is required.</p>
+                        <p>{{ __('mail.verify.ignore_formal') }}</p>
 
-                        <p>Regards,</p>
-                        <p>The {{ $app_name }} Team</p>
+                        <p>{{ __('mail.verify.closing_formal') }}</p>
+                        <p>{{ __('mail.verify.team_formal') }}</p>
                     </td>
                 </tr>
                 <tr>
                     <td class="footer">
-                        <p>&copy; {{ date('Y') }} {{ $app_name }}. All rights reserved.</p>
+                        <p>&copy; {{ date('Y') }} {{ $app_name }}. {{ __('mail.verify.footer') }}</p>
                         <p>
-                            <a href="{{ url('/') }}">Our Website</a> |
-                            <a href="mailto:{{ config('mail.from.address') }}">Contact Us</a>
+                            <a href="{{ url('/') }}">{{ __('mail.verify.visit') }}</a> |
+                            <a href="mailto:{{ config('mail.from.address') }}">{{ __('mail.verify.contact') }}</a>
                         </p>
                     </td>
                 </tr>

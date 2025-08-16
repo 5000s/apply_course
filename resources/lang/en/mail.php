@@ -26,4 +26,20 @@ return [
         'contact'   => 'Contact Support',
     ],
 
+
+    'verify' => [
+        'subject'         => 'Verify Your Email Address',
+        'title'           => 'Verify Your Email Address',
+        'greeting_formal' => 'Dear :name,',
+        'intro_formal'    => 'Please confirm your email address by selecting the button below. This verification helps protect the security of your account and ensures that you receive important communications from us.',
+        'button'          => 'Verify Email Address',
+        'expire_formal'   => 'For your security, this verification link will expire in :count minutes.',
+        'ignore_formal'   => 'If you did not create an account, please disregard this message. No further action is required.',
+        'closing_formal'  => 'Sincerely,',
+        'team_formal'     => 'Bodhidhammayan Apply Course System',
+        'footer'          => 'All rights reserved.',
+        'visit'           => 'Visit Our Website',
+        'contact'         => 'Contact Support',
+    ],
+
 ];

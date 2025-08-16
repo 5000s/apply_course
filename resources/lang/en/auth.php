@@ -41,5 +41,8 @@ return [
     'notice' => 'For users who have never logged into the system before',
 
 
+    'note_title'     => 'Note:',
+    'alumni_warning' => 'If you are a returning student or have previously attended a course, creating a new account on this page may duplicate your name and surname, which can cause the registration to fail or, if it succeeds, may result in losing your existing course history.',
+
 
 ];

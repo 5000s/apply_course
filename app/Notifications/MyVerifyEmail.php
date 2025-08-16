@@ -7,6 +7,8 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use App\Services\GmailApiService; // Your custom service
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon; // Needed for expiration
 use Illuminate\Support\Facades\URL; // Needed to create signed URL
@@ -53,9 +55,21 @@ class MyVerifyEmail extends Notification implements ShouldQueue // Make it queue
             return call_user_func(static::$toMailCallback, $notifiable, $this->verificationUrl($notifiable));
         }
 
+        $locale = $notifiable->locale
+            ?? $notifiable->language
+            ?? app()->getLocale();
+
         $verifyUrl = $this->verificationUrl($notifiable);
-        $subject = 'Verify Your Email Address for ' . config('app.name');
-        $template = 'emails.verify_email'; // You'll create this Blade view
+
+
+        $subject = Lang::get('mail.verify.subject', [] ,$locale);
+
+
+        $prevLocale = app()->getLocale();
+        App::setLocale($locale);
+
+        $template = 'emails.verify_email';
+
         $data = [
             'name' => $notifiable->name ?? $notifiable->first_name, // Use first_name if available
             'verification_url' => $verifyUrl,
