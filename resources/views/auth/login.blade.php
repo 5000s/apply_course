@@ -67,30 +67,29 @@
             {{-- 📌 เส้นคั่น + ข้อความ --}}
             <div class="col-md-12 text-center my-4">
                 <hr>
-                <h5 class="text-muted">สำหรับผู้ที่ไม่เคยเข้าระบบมาก่อน</h5>
+                <h5 class="text-muted">{{ __('auth.notice') }}</h5>
             </div>
 
             {{-- 📌 ศิษย์เก่า --}}
             <div class="col-md-6" style="padding-top: 10px">
                 <div class="card shadow-sm">
-                    <div class="card-header fw-bold text-center bg-light">ศิษย์เก่า</div>
+                    <div class="card-header fw-bold text-center bg-light">{{ __('auth.alumni.title') }}</div>
                     <div class="card-body text-center">
-                        <p class="text-muted">หากท่านเคยเข้าคอร์สปฏิบัติ หรือเคยส่งใบสมัครมาก่อน</p>
+                        <p class="text-muted">{{ __('auth.alumni.desc') }}</p>
                         <a href="{{ route('request-access') }}" class="btn btn-info text-white w-100 py-3 shadow">
-                            คลิกเพื่อตั้งรหัสผ่าน
+                            {{ __('auth.alumni.button') }}
                         </a>
                     </div>
                 </div>
             </div>
 
-            {{-- 📌 ศิษย์ใหม่ --}}
             <div class="col-md-6" style="padding-top: 10px">
                 <div class="card shadow-sm">
-                    <div class="card-header fw-bold text-center bg-light">ศิษย์ใหม่</div>
+                    <div class="card-header fw-bold text-center bg-light">{{ __('auth.new.title') }}</div>
                     <div class="card-body text-center">
-                        <p class="text-muted">หากท่านไม่เคยสมัครหรือเข้าร่วมคอร์สมาก่อน</p>
+                        <p class="text-muted">{{ __('auth.new.desc') }}</p>
                         <a href="{{ route('register') }}" class="btn btn-success w-100 py-3 shadow">
-                            คลิกเพื่อลงทะเบียนใหม่
+                            {{ __('auth.new.button') }}
                         </a>
                     </div>
                 </div>

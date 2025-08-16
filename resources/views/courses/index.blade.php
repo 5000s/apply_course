@@ -26,7 +26,9 @@
                     <a href="{{ route('courses.index', ['member_id' => $member_id, 'location' => $location->id]) }}"
                        class="btn option_course w-100 text-center py-3 shadow-sm
                               {{ $location->id == $selected_location_id ? 'btn-success text-white' : 'btn-outline-success' }}">
-                        <div class="fw-bold">{{ $location->show_name }}</div>
+                        <div class="fw-bold">
+                            {{ app()->getLocale() === 'en' ? $location->show_name_en : $location->show_name }}
+                        </div>
                     </a>
                 </div>
             @endforeach

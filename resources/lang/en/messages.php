@@ -69,7 +69,9 @@ return [
     'member_updated' => 'Member updated successfully.',
     'applicant_edit_form' => 'Edit Applicant Information',
 
-    'back' => 'Back',
+    'back'          => 'Back',
+    'total_courses' => 'Total Courses',
+    'view_courses'  => 'View Courses',
 
 
     'applicant_list' => 'Applicant List',
@@ -100,5 +102,13 @@ return [
 
     'course_application_system' => 'Techo Vipassana Course Application System',
     'please_sign_in' => 'Please sign in',
+
+    'no_courses' => 'No courses are open at :location right now.',
+
+
+    'notice' => [
+        'close_30days' => 'Registration closes',
+    ],
+
 
 ];

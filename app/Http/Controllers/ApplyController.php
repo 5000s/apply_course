@@ -60,6 +60,7 @@ class ApplyController extends Controller
                 'c.id',
                 'c.date_start',
                 'cc.show_name as name', // Get course category name
+                'cc.show_name_en as name_en', // Get course category name
                 'c.date_end',
                 'c.category',
                 'c.state'
@@ -70,6 +71,24 @@ class ApplyController extends Controller
             ->orderBy('c.date_start', 'asc')
             ->get()
             ->map(function ($course) {
+
+
+                $stateMap = [
+                    'เปิดรับสมัคร' => ['key' => 'open',      'en' => 'Open for registration'],
+                    'ปิดรับสมัคร'  => ['key' => 'closed',    'en' => 'Closed'],
+                    'ยกเลิกคอร์ส'  => ['key' => 'cancelled', 'en' => 'Cancelled'],
+                ];
+
+                $entry = $stateMap[$course->state] ?? ['key' => 'other', 'en' => (string)$course->state];
+
+                // normalized key for translations
+                $course->state_key = $entry['key'];
+
+                // direct English label (if you want to use it right away)
+                $course->state_en  = $entry['en'];
+
+
+
                 // Parse the start and end dates
                 $startDate = Carbon::parse($course->date_start)->locale('th');
                 $endDate = Carbon::parse($course->date_end)->locale('th');
@@ -85,6 +104,19 @@ class ApplyController extends Controller
                 }
 
                 $course->month_year = "{$endDate->translatedFormat('F')} $thaiYear";
+
+
+                // ---- English version ----
+                $startDateEn = Carbon::parse($course->date_start)->locale('en');
+                $endDateEn   = Carbon::parse($course->date_end)->locale('en');
+
+                if ($startDateEn->isSameDay($endDateEn)) {
+                    $course->date_range_en = $startDateEn->translatedFormat('j F Y');
+                } else {
+                    $course->date_range_en = $startDateEn->translatedFormat('j') . " – " . $endDateEn->translatedFormat('j F Y');
+                }
+
+                $course->month_year_en = $endDateEn->translatedFormat('F Y');
 
                 return $course;
             });
@@ -103,6 +135,7 @@ class ApplyController extends Controller
                 'c.id',
                 'c.date_start',
                 'cc.show_name as name', // Get course category name
+                'cc.show_name_en as name_en', // Get course category name
                 'c.date_end',
                 'c.category',
                 'c.category_id',
@@ -115,6 +148,24 @@ class ApplyController extends Controller
             ->orderBy('c.date_start', 'asc') // ✅ Order by start date (earliest first)
             ->get()
             ->map(function ($course) {
+
+
+                $stateMap = [
+                    'เปิดรับสมัคร' => ['key' => 'open',      'en' => 'Open for registration'],
+                    'ปิดรับสมัคร'  => ['key' => 'closed',    'en' => 'Closed'],
+                    'ยกเลิกคอร์ส'  => ['key' => 'cancelled', 'en' => 'Cancelled'],
+                ];
+
+                $entry = $stateMap[$course->state] ?? ['key' => 'other', 'en' => (string)$course->state];
+
+                // normalized key for translations
+                $course->state_key = $entry['key'];
+
+                // direct English label (if you want to use it right away)
+                $course->state_en  = $entry['en'];
+
+
+
                 // Parse the start and end dates
                 $startDate = Carbon::parse($course->date_start)->locale('th');
                 $endDate = Carbon::parse($course->date_end)->locale('th');
@@ -131,10 +182,80 @@ class ApplyController extends Controller
 
                 $course->month_year = "{$endDate->translatedFormat('F')} $thaiYear";
 
+
+                // ---- English version ----
+                $startDateEn = Carbon::parse($course->date_start)->locale('en');
+                $endDateEn   = Carbon::parse($course->date_end)->locale('en');
+
+                if ($startDateEn->isSameDay($endDateEn)) {
+                    $course->date_range_en = $startDateEn->translatedFormat('j F Y');
+                } else {
+                    $course->date_range_en = $startDateEn->translatedFormat('j') . " – " . $endDateEn->translatedFormat('j F Y');
+                }
+
+                $course->month_year_en = $endDateEn->translatedFormat('F Y');
+
                 return $course;
             });
+
     }
 
+    public static function getCourse(int $course_id)
+    {
+        $course = DB::table('courses as c')
+            ->join('course_categories as cc', 'c.category_id', '=', 'cc.id')
+            ->where('c.id', $course_id)
+            ->select(
+                'c.id',
+                'c.date_start',
+                'c.date_end',
+                'c.category',
+                'c.category_id',
+                'c.state',
+                'cc.show_name as name',
+                'cc.show_name_en as name_en',
+                'c.location_id as location_id'
+            )
+            ->first();
+
+        if (! $course) {
+            return null;
+        }
+
+        // ---- State mapping (TH -> key + EN) ----
+        $stateMap = [
+            'เปิดรับสมัคร' => ['key' => 'open',      'en' => 'Open for registration'],
+            'เต็มแล้ว'     => ['key' => 'full',      'en' => 'Full'],
+            'ปิดรับสมัคร'  => ['key' => 'closed',    'en' => 'Closed'],
+            'ยกเลิกคอร์ส'  => ['key' => 'cancelled', 'en' => 'Cancelled'],
+        ];
+        $entry = $stateMap[$course->state] ?? ['key' => 'other', 'en' => (string) $course->state];
+        $course->state_key = $entry['key'];
+        $course->state_en  = $entry['en'];
+
+        // ---- TH (B.E.) date range ----
+        $startTh = Carbon::parse($course->date_start)->locale('th');
+        $endTh   = Carbon::parse($course->date_end)->locale('th');
+        $thaiYear = $endTh->year + 543;
+
+        $course->date_range = $startTh->isSameDay($endTh)
+            ? "{$startTh->translatedFormat('j F')} {$thaiYear}"
+            : "{$startTh->translatedFormat('j')} – {$endTh->translatedFormat('j F')} {$thaiYear}";
+
+        $course->month_year = "{$endTh->translatedFormat('F')} {$thaiYear}";
+
+        // ---- EN (Gregorian) date range ----
+        $startEn = Carbon::parse($course->date_start)->locale('en');
+        $endEn   = Carbon::parse($course->date_end)->locale('en');
+
+        $course->date_range_en = $startEn->isSameDay($endEn)
+            ? $startEn->translatedFormat('j F Y')
+            : $startEn->translatedFormat('j') . ' – ' . $endEn->translatedFormat('j F Y');
+
+        $course->month_year_en = $endEn->translatedFormat('F Y');
+
+        return $course;
+    }
 
 
     public function index(Request $request, $member_id)
@@ -194,6 +315,8 @@ class ApplyController extends Controller
                 'a.id as apply_id',
                 'a.created_at as apply_date',
                 'a.state as state',
+                'cc.show_name as course_name', // Get course category name
+                'cc.show_name_en as course_name_en', // Get course category name
                 'c.id as course_id',
                 'a.cancel as cancel',
                 'c.coursename',
@@ -201,13 +324,35 @@ class ApplyController extends Controller
                 'c.location',
                 'c.date_start',
                 'c.date_end',
+                'l.show_name as location_name',
+                'l.show_name_en as location_name_en',
                 DB::raw('DATEDIFF(c.date_start, NOW()) as days_until_start')
             )
             ->join('courses as c', 'c.id', '=', 'a.course_id')
+            ->join('course_categories as cc', 'c.category_id', '=', 'cc.id') // Join course categories
+            ->join('locations as l', 'c.location_id', '=', 'l.id') // Join course categories
+
             ->where('a.member_id', $member_id)
             ->orderBy('a.created_at', 'desc')
             ->get()
             ->map(function ($course) {
+
+                $stateMap = [
+                    'เปิดรับสมัคร' => ['key' => 'open',      'en' => 'Open for registration'],
+                    'ปิดรับสมัคร'  => ['key' => 'closed',    'en' => 'Closed'],
+                    'ยกเลิกคอร์ส'  => ['key' => 'cancelled', 'en' => 'Cancelled'],
+                ];
+
+                $entry = $stateMap[$course->state] ?? ['key' => 'other', 'en' => (string)$course->state];
+
+                // normalized key for translations
+                $course->state_key = $entry['key'];
+
+                // direct English label (if you want to use it right away)
+                $course->state_en  = $entry['en'];
+
+
+
                 // Parse the start and end dates
                 $startDate = Carbon::parse($course->date_start)->locale('th');
                 $endDate = Carbon::parse($course->date_end)->locale('th');
@@ -219,10 +364,23 @@ class ApplyController extends Controller
                 if ($startDate->isSameDay($endDate)) {
                     $course->date_range = "{$startDate->translatedFormat('j F')} $thaiYear";
                 } else {
-                    $course->date_range = "{$startDate->translatedFormat('j')}–{$endDate->translatedFormat('j F')} $thaiYear";
+                    $course->date_range = "{$startDate->translatedFormat('j')} – {$endDate->translatedFormat('j F')} $thaiYear";
                 }
 
                 $course->month_year = "{$endDate->translatedFormat('F')} $thaiYear";
+
+
+                // ---- English version ----
+                $startDateEn = Carbon::parse($course->date_start)->locale('en');
+                $endDateEn   = Carbon::parse($course->date_end)->locale('en');
+
+                if ($startDateEn->isSameDay($endDateEn)) {
+                    $course->date_range_en = $startDateEn->translatedFormat('j F Y');
+                } else {
+                    $course->date_range_en = $startDateEn->translatedFormat('j') . " – " . $endDateEn->translatedFormat('j F Y');
+                }
+
+                $course->month_year_en = $endDateEn->translatedFormat('F Y');
 
                 return $course;
             });
@@ -257,7 +415,10 @@ class ApplyController extends Controller
            return redirect()->route('profile')->withErrors('The Member is not found.');
        }
 
-        $course = Course::findOrFail($course_id); // Find the course or fail
+        $course = self::getCourse($course_id);
+
+       $location = Location::find($course->location_id);
+
         // Ensure the course status is 'open', otherwise show an error or redirect
         $apply = Apply::where('course_id', $course_id)
             ->where('member_id', $member_id)
@@ -282,7 +443,7 @@ class ApplyController extends Controller
         if ($course->state != 'เปิดรับสมัคร') {
             return redirect()->route('courses.index', $member_id)->withErrors('Course is not open for application.');
         }
-        return view('courses.show', compact('course','member_id', 'apply' , 'member' )); // Return the view with the course details
+        return view('courses.show', compact('course', 'location','member_id', 'apply' , 'member' )); // Return the view with the course details
     }
 
     public function save(Request $request, $member_id)

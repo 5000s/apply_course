@@ -9,10 +9,26 @@ return [
     'Please check your junk folder as well if you do not find the email in your inbox.' => 'โปรดตรวจสอบโฟลเดอร์ขยะของคุณด้วย หากคุณไม่พบอีเมลในกล่องขาเข้า',
     'Send Password Reset Link' => 'ส่งลิงก์รีเซ็ตรหัสผ่าน',
     'Reset Password' => 'รีเซ็ตรหัสผ่าน',
+    'Email Address' => 'อีเมล',
 
     'Login' => 'เข้าสู่ระบบ',
-    'Email Address' => 'ที่อยู่อีเมล',
     'Password' => 'รหัสผ่าน',
     'Remember Me' => 'จดจำฉัน',
     'Forgot Your Password?' => 'ลืมรหัสผ่าน?',
+
+
+    'alumni' => [
+        'title' => 'ศิษย์เก่า',
+        'desc'  => 'หากท่านเคยเข้าคอร์สปฏิบัติ หรือเคยส่งใบสมัครมาก่อน',
+        'button'=> 'คลิกเพื่อตั้งรหัสผ่าน',
+    ],
+
+    'new' => [
+        'title' => 'ศิษย์ใหม่',
+        'desc'  => 'หากท่านไม่เคยสมัครหรือเข้าร่วมคอร์สมาก่อน',
+        'button'=> 'คลิกเพื่อลงทะเบียนใหม่',
+    ],
+
+    'notice' => 'สำหรับผู้ที่ไม่เคยเข้าระบบมาก่อน',
+
 ];

@@ -71,7 +71,9 @@ return [
 
     'applicant_edit_form' => 'แก้ไขข้อมูลผู้สมัคร',
 
-    'back' => 'กลับ',
+    'back'          => 'ย้อนกลับ',
+    'total_courses' => 'จำนวนคอร์สทั้งหมด',
+    'view_courses'  => 'ดูคอร์ส',
 
 
     'applicant_list' => 'รายการผู้สมัคร',
@@ -103,4 +105,9 @@ return [
     'please_sign_in' => 'โปรดลงชื่อเข้าใช้งาน',
 
 
+    'no_courses' => 'ไม่มีคอร์สเปิดที่ :location ในขณะนี้',
+
+    'notice' => [
+        'close_30days' => 'ปิดรับสมัคร',
+    ],
 ];

@@ -5,7 +5,9 @@
 
 <div class="container">
     <div class="text-center my-4">
-        <h3 class="fw-bold text-primary">{{ $location->show_name }}</h3>
+        <h3 class="fw-bold text-primary">
+            {{ app()->getLocale() === 'en' ? $location->show_name_en : $location->show_name }}
+        </h3>
     </div>
 
     @if ($courses->isEmpty())
@@ -13,18 +15,18 @@
             <i class="fas fa-exclamation-circle"></i> ไม่มีคอร์สเปิดที่ {{ $location->show_name }} ในขณะนี้
         </div>
     @else
-        <div class="card shadow-sm p-3 border-0">
+        <div class="card shadow-sm p-3 border-0" >
             <div class="table-responsive">
                 <table class="table table-hover">
                     <thead class="table-light">
                     <tr class="text-center">
-                        <th style="width: 30%;">{{ __('messages.course_date') }}</th>
-                        <th style="width: 30%;">{{ __('messages.course_name') }}</th>
-                        <th style="width: 15%;">{{ __('messages.status') }}</th>
-                        <th style="width: 10%;">{{ __('messages.register') }}</th>
+                        <th style="width:230px;">{{ __('messages.course_date') }}</th>
+                        <th style="width:400px; ">{{ __('messages.course_name') }}</th>
+                        <th style="max-width: 150px">{{ __('messages.status') }}</th>
+                        <th style="width: 100px;">{{ __('messages.register') }}</th>
                         @if($user->admin == 1)
-                            <th style="width: 10%;"> Admin สมัคร </th>
-                            <th style="width: 10%;"> Admin รายการ</th>
+                            <th style="width: 100px;"> Admin สมัคร </th>
+                            <th style="width: 100px;">  Admin รายการ</th>
                         @endif
                     </tr>
                     </thead>
@@ -36,28 +38,32 @@
                             $isEarlyClose = $start->gt($now) && $daysToStart <= 30;
                         @endphp
                         <tr class="align-middle text-center">
-                            <td>{{ $course->date_range }}</td>
-                            <td>{{ $course->name }}</td>
+                            <td>{{ app()->getLocale() === 'en' ? $course->date_range_en : $course->date_range }}</td>
+                            <td>{{ app()->getLocale() === 'en' ? $course->name_en : $course->name }}</td>
                             <td>
+
+                                @php
+                                        $state = app()->getLocale() === 'en' ? $course->state_en : $course->state
+                                @endphp
                                 @if($isEarlyClose)
                                     <span class="badge bg-secondary">
                                         <i class="fas fa-lock"></i>
-                                        ปิดรับสมัครก่อนเปิดคอร์ส 30 วัน
+                                        {{ __('messages.notice.close_30days') }}
                                     </span>
                                 @elseif($course->state === 'เปิดรับสมัคร')
                                     <span class="badge bg-success">
                                         <i class="fas fa-check-circle"></i>
-                                        {{ $course->state }}
+                                        {{ $state }}
                                     </span>
                                 @elseif($course->state === 'ปิดรับสมัคร')
                                     <span class="badge bg-danger">
                                         <i class="fas fa-times-circle"></i>
-                                        {{ $course->state }}
+                                        {{ $state }}
                                     </span>
                                 @else
                                     <span class="badge bg-secondary">
                                         <i class="fas fa-clock"></i>
-                                        {{ $course->state }}
+                                        {{ $state }}
                                     </span>
                                 @endif
                             </td>

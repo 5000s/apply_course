@@ -6,7 +6,9 @@
 
     <div class="container">
         <div class="d-flex justify-content-between align-items-center my-4">
-            <h4 class="text-left my-4">{{ __('messages.course_history') }}: {{$user->name}} {{$user->surname}}</h4>
+            <h4 class="text-left my-4">
+                {{ __('messages.course_history') }}: {{$user->name}} {{$user->surname}}
+            </h4>
 
             @if($user->admin == 1)
                 <a href="javascript:history.back()" id="back-button" class="btn btn-secondary">{{ __('messages.back') }}</a>
@@ -15,6 +17,7 @@
             @endif
         </div>
 
+        @php $isEn = app()->getLocale() === 'en'; @endphp
 
         <div class="card shadow-sm p-3">
             <div class="table-responsive">
@@ -24,34 +27,53 @@
                         <th class="text-center">{{ __('messages.location') }}</th>
                         <th class="text-center">{{ __('messages.course_name') }}</th>
                         <th class="text-center">{{ __('messages.course_date') }}</th>
-{{--                        <th class="text-center">{{ __('messages.apply_date') }}</th>--}}
                         <th class="text-center">{{ __('messages.application') }}</th>
                         <th class="text-center">{{ __('messages.status') }}</th>
                     </tr>
                     </thead>
                     <tbody>
                     @foreach($applies as $apply)
+                        @php
+                            // Map Thai states from DB → normalized keys (for translation + color)
+                            $stateMap = [
+                                'ผ่านการอบรม' => 'passed',
+                                'ยื่นใบสมัคร' => 'submitted',
+                                'ยุติกลางคัน' => 'abandoned',
+                                'ยกเลิกการสมัคร' => 'cancelled', // sometimes you use this text explicitly
+                            ];
+                            // If cancelled flag set in DB, override
+                            $stateKey = ($apply->cancel == 1)
+                                ? 'cancelled'
+                                : ($stateMap[$apply->state] ?? 'other');
+
+                            // badge styles per normalized key
+                            $badge = [
+                                'passed'    => ['class' => 'bg-success',    'icon' => 'fas fa-check-circle'],
+                                'submitted' => ['class' => 'bg-info',       'icon' => 'fas fa-file-upload'],
+                                'abandoned' => ['class' => 'bg-danger',     'icon' => 'fas fa-times-circle'],
+                                'cancelled' => ['class' => 'bg-secondary',  'icon' => 'fas fa-ban'],
+                                'other'     => ['class' => 'bg-warning text-dark', 'icon' => 'fas fa-clock'],
+                            ][$stateKey];
+                        @endphp
                         <tr>
-                            <td class="text-center">{{ $apply->location }}</td>
-                            <td class="text-center">{{ $apply->category }}</td>
-                            <td class="text-center">{{ $apply->date_range }}</td>
-{{--                            <td class="text-center">{{ \Carbon\Carbon::parse($apply->apply_date)->format('d/m/Y') }}</td>--}}
+                            {{-- If you have location_en/category_en/date_range_en in $apply, use them; otherwise fallback --}}
                             <td class="text-center">
-                                @if( $apply->cancel != 1)
-                                    <span class="badge
-                                        @if($apply->state === 'ผ่านการอบรม') bg-success
-                                        @elseif($apply->state === 'ยื่นใบสมัคร' ) bg-info
-                                        @elseif($apply->state === 'ยุติกลางคัน') bg-danger
-                                        @else bg-secondary
-                                        @endif">
-                                        {{ $apply->state }}
-                                    </span>
-                                @else
-                                    <span class="badge bg-secondary">
-                                        ยกเลิกการสมัคร
-                                    </span>
-                                @endif
+                                {{ $isEn ? $apply->location_name_en : $apply->location_name }}
                             </td>
+                            <td class="text-center">
+                                {{ $isEn ? $apply->course_name_en : $apply->course_name }}
+                            </td>
+                            <td class="text-center">
+                                {{ $isEn ? ($apply->date_range_en ?? $apply->date_range) : $apply->date_range }}
+                            </td>
+
+                            <td class="text-center">
+                                <span class="badge {{ $badge['class'] }}">
+                                    <i class="{{ $badge['icon'] }}"></i>
+                                    {{ __('apply_history.state.' . $stateKey) }}
+                                </span>
+                            </td>
+
                             <td class="text-center">
                                 @if($apply->state === 'เปิดรับสมัคร' && $apply->days_until_start > 0)
                                     <a href="{{ route('courses.show', [$member_id, $apply->id]) }}" class="btn btn-primary btn-sm">
@@ -69,39 +91,35 @@
         </div>
     </div>
 
-
+    {{-- DataTables language: use Laravel translations --}}
     <script>
         $(document).ready(function() {
-            var table = $('#coursesTable').DataTable({
-                "paging": true,
-                "ordering": true,
-                "info": true,
-                "language": {
-                    "search": "ค้นหา:",
-                    "lengthMenu": "แสดง _MENU_ รายการ",
-                    "zeroRecords": "ไม่พบข้อมูลที่ค้นหา",
-                    "info": "แสดง _START_ - _END_ จาก _TOTAL_ รายการ",
-                    "infoEmpty": "ไม่มีข้อมูล",
-                    "infoFiltered": "(กรองจากทั้งหมด _MAX_ รายการ)",
-                    "paginate": {
-                        "first": "หน้าแรก",
-                        "last": "หน้าสุดท้าย",
-                        "next": "ถัดไป",
-                        "previous": "ก่อนหน้า"
-                    }
+            const dtLang = {
+                search: @json(__('datatable.search')),
+                lengthMenu: @json(__('datatable.lengthMenu')),
+                zeroRecords: @json(__('datatable.zeroRecords')),
+                info: @json(__('datatable.info')),
+                infoEmpty: @json(__('datatable.infoEmpty')),
+                infoFiltered: @json(__('datatable.infoFiltered')),
+                paginate: {
+                    first: @json(__('datatable.paginate.first')),
+                    last: @json(__('datatable.paginate.last')),
+                    next: @json(__('datatable.paginate.next')),
+                    previous: @json(__('datatable.paginate.previous')),
                 }
+            };
+
+            var table = $('#coursesTable').DataTable({
+                paging: true,
+                ordering: true,
+                info: true,
+                language: dtLang,
             });
 
-            // 📌 กรองข้อมูลตามสถานะที่เลือก
             $('#statusFilter').on('change', function () {
                 var selectedStatus = $(this).val();
                 table.column(4).search(selectedStatus).draw();
             });
         });
     </script>
-
-
-{{--    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">--}}
-
-
 @endsection

@@ -5,7 +5,17 @@
 
     <div class="container">
         {{--        <h1 class="text-center mt-4 mb-3">{{ $course->category }}, {{ $course->location }}</h1>--}}
-        <h4 class="text-center mb-4">{{ $course->coursename }}, {{ $course->location }}</h4>
+
+        <h4 class="text-center mb-4">
+            @if(app()->getLocale() === 'en')
+                {{ $course->name_en }}, {{ $course->date_range_en }} <br>
+                {{ $location->show_name_en }}
+            @else
+                {{ $course->name }}, {{ $course->date_range }} <br>
+                {{ $location->show_name }}
+            @endif
+
+        </h4>
 
         {{-- Alert Message --}}
         @if(session('success'))
@@ -27,12 +37,15 @@
             <div class="card-body py-4 px-4">
 
                 {{-- 📌 ข้อมูลผู้สมัคร --}}
-                <h4 class="text-primary fw-bold mb-3">การสมัครสำหรับคุณ: {{ $member->name }} {{ $member->surname }}</h4>
+                <h4 class="text-primary fw-bold mb-3">
+                    {{ __('apply.title', ['name' => $member->name . ' ' . $member->surname]) }}
+
+                </h4>
 
                 {{-- 📌 ใบสมัครแต่ละประเภท --}}
                 @if(in_array($course->category_id, [1, 2, 3, 4, 6, 8, 9, 10, 12]))
                     <div class="d-inline-flex flex-wrap align-items-center gap-3 mb-4">
-                        <strong class="me-2">ท่านสามารถรับใบสมัครได้ที่นี่:</strong>
+                        <strong class="me-2">{{ __('apply.download') }}</strong>
                         @php
                             $isEnglish = preg_match('/[a-zA-Z]/', $member->name);
                         @endphp
@@ -52,7 +65,7 @@
                     </div>
                 @elseif(in_array($course->category_id, [5, 9, 11, 13, 14]))
                     <div class="d-inline-flex flex-wrap align-items-center gap-3 mb-4">
-                        <strong class="me-2">ท่านสามารถรับใบสมัครได้ที่นี่:</strong>
+                        <strong class="me-2">{{ __('apply.download') }}</strong>
                         @php
                             $isEnglish = preg_match('/[a-zA-Z]/', $member->name);
                         @endphp
@@ -86,30 +99,30 @@
 
                         {{-- 📌 การเดินทาง (เลือกอย่างใดอย่างหนึ่ง) --}}
                         <div class="mb-4">
-                            <label class="form-label fw-bold d-block">การเดินทาง</label>
+                            <label class="form-label fw-bold d-block">{{ __('apply.travel') }}</label>
                             @php $currentVan = old('van', $apply->van ?? 'no'); @endphp
                             <div class="form-check form-check-inline">
                                 <input class="form-check-input" type="radio" id="travel_self" name="van" value="no" {{ $currentVan === 'no' ? 'checked' : '' }}>
-                                <label class="form-check-label" for="travel_self">เดินทางด้วยตนเอง</label>
+                                <label class="form-check-label" for="travel_self">{{ __('apply.travel_self') }}</label>
                             </div>
                             <div class="form-check form-check-inline">
                                 <input class="form-check-input" type="radio" id="travel_van" name="van" value="yes" {{ $currentVan === 'yes' ? 'checked' : '' }}>
-                                <label class="form-check-label" for="travel_van">เดินทางด้วยรถตู้</label>
+                                <label class="form-check-label" for="travel_van">{{ __('apply.travel_van') }}</label>
                             </div>
                         </div>
 
                         {{-- ===== ที่พัก (เฉพาะสมาชิกที่มีสิทธิ์) ===== --}}
                         @if($member->shelter_number >= 1)
                             <div class="mb-4">
-                                <label class="form-label fw-bold d-block">ที่พัก</label>
+                                <label class="form-label fw-bold d-block">{{ __('apply.shelter') }}</label>
                                 @php $curShelter = old('shelter', $apply->shelter ?? 'ทั่วไป'); @endphp
                                 <div class="form-check form-check-inline">
                                     <input class="form-check-input" type="radio" id="shelter_general" name="shelter" value="ทั่วไป" {{ $curShelter==='ทั่วไป'?'checked':'' }}>
-                                    <label class="form-check-label" for="shelter_general">ทั่วไป</label>
+                                    <label class="form-check-label" for="shelter_general">{{ __('apply.shelter_general') }}</label>
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <input class="form-check-input" type="radio" id="shelter_special" name="shelter" value="กุฏิพิเศษ" {{ $curShelter==='กุฏิพิเศษ'?'checked':'' }}>
-                                    <label class="form-check-label" for="shelter_special">กุฏิพิเศษ</label>
+                                    <label class="form-check-label" for="shelter_special">{{ __('apply.shelter_special') }}</label>
                                 </div>
                             </div>
                         @endif
@@ -119,7 +132,9 @@
                     {{-- 📌 อัปโหลดไฟล์ ใบสมัคร --}}
                     @if(empty($apply->application) && $apply->id == null )
                         <div class="mb-4">
-                            <label for="registration_form" class="form-label">กรุณาอัปโหลดแบบฟอร์มการสมัคร (PNG, JPG, JPEG, PDF)</label>
+                            <label for="registration_form" class="form-label">
+                                {{ __('apply.upload_label') }}
+                            </label>
                             <input type="file" class="form-control" name="registration_form" required onchange="previewFile()" accept="image/png, image/jpeg, application/pdf">
                         </div>
                     @endif
@@ -137,8 +152,9 @@
                     </div>
 
                     <div class="text-end mt-4">
-                        <button id="apply_button" type="submit" class="btn btn-primary btn-lg" {{ empty($apply->application) &&  $apply->id == null ? 'disabled' : '' }}>
-                            {{ $apply->id == null  ? 'สมัคร' : 'แก้ไขใบสมัคร' }}
+                        <button id="apply_button" type="submit" class="btn btn-primary btn-lg"
+                            {{ empty($apply->application) &&  $apply->id == null ? 'disabled' : '' }}>
+                            {{ $apply->id == null ? __('apply.submit') : __('apply.edit') }}
                         </button>
                     </div>
                 </form>
@@ -149,7 +165,9 @@
                         @csrf
                         <input type="hidden" name="course_id" value="{{ $course->id }}">
                         <input type="hidden" name="cancel" value="cancel">
-                        <button id="cancel_button" type="submit" class="btn btn-danger btn-lg">ยกเลิกการสมัคร</button>
+                        <button id="cancel_button" type="submit" class="btn btn-danger btn-lg">
+                            {{ __('apply.cancel') }}
+                        </button>
                     </form>
                 @endif
             </div>
@@ -168,7 +186,7 @@
             if (file) {
                 const fileSizeMB = file.size / (1024 * 1024);
                 if (fileSizeMB > 2) {
-                    alert("ไฟล์ที่อัปโหลดต้องมีขนาดไม่เกิน 2MB");
+                    alert(@json(__('apply.upload_error_size')));
                     fileInput.value = "";
                     preview.innerHTML = "";
                     applyBtn.disabled = true;
@@ -204,11 +222,11 @@
             e.preventDefault();
             const isEdit = {{ empty($apply->application) ? 'false' : 'true' }};
             Swal.fire({
-                title: isEdit ? 'ยืนยันแก้ไขใบสมัคร?' : 'ยืนยันส่งใบสมัคร?',
+                title: isEdit ? @json(__('apply.confirm_edit')) : @json(__('apply.confirm_submit')),
                 icon: 'question',
                 showCancelButton: true,
-                confirmButtonText: 'ยืนยัน',
-                cancelButtonText: 'ยกเลิก',
+                confirmButtonText: @json(__('apply.confirm')),
+                cancelButtonText: @json(__('apply.back')),
                 reverseButtons: true
             }).then(result => { if (result.isConfirmed) e.target.submit(); });
         });
@@ -219,12 +237,12 @@
             cancelForm.addEventListener('submit', function (e) {
                 e.preventDefault();
                 Swal.fire({
-                    title: 'ยืนยันยกเลิกการสมัคร?',
-                    text: 'ขั้นตอนนี้จะลบใบสมัครของคุณ',
+                    title: @json(__('apply.confirm_cancel')),
+                    text: @json(__('apply.confirm_cancel_text')),
                     icon: 'warning',
                     showCancelButton: true,
-                    confirmButtonText: 'ยืนยัน',
-                    cancelButtonText: 'กลับ',
+                    confirmButtonText: @json(__('apply.confirm')),
+                    cancelButtonText: @json(__('apply.back')),
                     reverseButtons: true
                 }).then(result => { if (result.isConfirmed) e.target.submit(); });
             });

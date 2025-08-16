@@ -20,10 +20,26 @@ return [
     'Reset Password' => 'Reset Password',
 
     'Login' => 'Login',
-    'Email Address' => 'Email Address',
+    'Email Address' => 'Email',
     'Password' => 'Password',
     'Remember Me' => 'Remember Me',
     'Forgot Your Password?' => 'Forgot Your Password?',
+
+
+    'alumni' => [
+        'title' => 'Returning Student',
+        'desc'  => 'If you have attended a course or submitted an application before.',
+        'button'=> 'Click to set a password',
+    ],
+
+    'new' => [
+        'title' => 'New Student',
+        'desc'  => 'If you have never registered or joined a course before.',
+        'button'=> 'Click to register',
+    ],
+
+    'notice' => 'For users who have never logged into the system before',
+
 
 
 ];

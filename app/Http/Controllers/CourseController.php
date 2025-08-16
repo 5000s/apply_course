@@ -179,7 +179,6 @@ class CourseController extends Controller
         public function courseList(Request $request)
     {
 
-
         $data = [];
         $locationChoose = "";
 
@@ -204,10 +203,12 @@ class CourseController extends Controller
                 'c.category',
                 'c.date_start',
                 'c.date_end',
-                DB::raw('COUNT(DISTINCT CASE WHEN a.cancel IS NULL OR a.cancel = 0 THEN a.member_id END) as apply_all_count'),
-                DB::raw('SUM(CASE WHEN a.cancel = 0 THEN 1 ELSE 0 END) as apply_count'),
-                DB::raw('SUM(CASE WHEN a.confirmed = "yes" THEN 1 ELSE 0 END) as confirm_count'),
-                DB::raw('SUM(CASE WHEN a.state = "ผ่านการอบรม" THEN 1 ELSE 0 END) as pass_count')
+                DB::raw('SUM(CASE WHEN a.state != "ยกเลิกสมัคร" AND (a.cancel IS NULL  OR a.cancel = 0 ) THEN 1 ELSE 0 END) as total_count'),
+                DB::raw('SUM(CASE WHEN a.state = "ยื่นใบสมัคร" THEN 1 ELSE 0 END)  as apply_count'),
+                DB::raw('SUM(CASE WHEN a.state = "ยืนยันแล้ว" THEN 1 ELSE 0 END)  as confirm_count'),
+                DB::raw('SUM(CASE WHEN a.state = "ผ่านการอบรม" THEN 1 ELSE 0 END)  as pass_count'),
+                DB::raw('SUM(CASE WHEN a.state = "ยุติกลางคัน" THEN 1 ELSE 0 END) as failed_count'),
+                DB::raw('SUM(CASE WHEN a.state = "ยกเลิกสมัคร" or a.cancel = 0 THEN 1 ELSE 0 END) as cancel_count')
             )
             ->leftJoin('applies as a', 'c.id', '=', 'a.course_id');
 
@@ -241,6 +242,7 @@ class CourseController extends Controller
             $query->whereYear('c.date_start', $year)
                 ->orWhereYear('c.date_end', $year);
         });
+
 
         // Group by and get results
         $courses = $courses->groupBy( 'c.state', 'c.location', 'c.id', 'c.category', 'c.date_start', 'c.date_end', 'cc.show_name')
