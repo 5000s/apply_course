@@ -170,7 +170,7 @@ class DashboardController extends Controller
             'Indonesia'       => ['indonesia','indonesian'],
             'Poland'          => ['poland','polish'],
             'Italy'           => ['italy','italian','italy','อิตาลี่ ดัช'],
-            'Netherlands'     => ['netherlands','nederland','dutch'],
+            'Netherlands'     => ['netherlands','nederland','dutch', 'duch'],
             'Spain'           => ['spain','spanish'],
             'Turkey'          => ['turkey','turkish'],
             'Mexico'          => ['mexico','mexican'],
