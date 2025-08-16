@@ -150,11 +150,12 @@ class DashboardController extends Controller
         $val      = mb_strtolower($original);
 
         $map = [
-            'Thailand'        => ['thailand','thai','ไทย','ประทศไทย','thailand (british)','ไมย'],
+            'Thailand'        => ['thailand','thai','ไทย','ประทศไทย','thailand (british)','ไมย', 'ไท'],
             'Myanmar'         => ['myanmar','burma'],
             'United Kingdom'  => ['united kingdom','uk','british','england','scotland','wales'],
             'United States'   => ['united state','united satate','usa', 'america' ,'อเมริกา'],
-            'Australia'       => ['australia','australian','new zealander','australia' , 'ออสเตร'],
+            'Australia'       => ['australia','australian','new zealander','australia' , 'ออสเตร' , 'aussie'],
+            'Austria'       =>   ['austria'],
             'France'          => ['france','french','ฝรั่งเศส','français','french'],
             'Germany'         => ['germany','german','gemany','เยอ'],
             'India'           => ['india','indian','india (hindu)','indian (uae)'],
@@ -163,6 +164,7 @@ class DashboardController extends Controller
             'Russia'          => ['russia','russian','rus'],
             'Canada'          => ['canada','canadian','แคนนาดา'],
             'Singapore'       => ['singapore','singaporean'],
+            'Switzerland'     => ['switzerland','สวิส','swedish'],
             'Malaysia'        => ['malaysia','malaysian','มาเล'],
             'Vietnam'         => ['vietnam','vietnamese'],
             'Indonesia'       => ['indonesia','indonesian'],
