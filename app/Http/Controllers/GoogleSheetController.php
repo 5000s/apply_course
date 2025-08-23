@@ -9,15 +9,14 @@ use App\Models\CourseCategory;
 use App\Models\Location;
 use App\Models\Member;
 use Carbon\Carbon;
-use Google\Service\AdMob\App;
 use Illuminate\Http\Request;
-use Google_Client;
 use Google_Service_Sheets;
+use Illuminate\Support\Str;
 
 class GoogleSheetController extends Controller
 {
 
-    private array $sheetTitleKeywords = [
+    private  $sheetTitleKeywords = [
         'อานาฯ แก่งคอย',
         'อานาฯ ภูเก็ต',
         '1 อานาฯ แสงธรรม',
@@ -496,7 +495,10 @@ class GoogleSheetController extends Controller
                     })
                     ->first();
 
-                $app->member_id = $matchedMember?->id;
+                if ($matchedMember){
+                    $app->member_id = $matchedMember->id;
+                }
+
                 if ($app->is_synced != ($matchedMember !== null)){
                     $app->is_synced = $matchedMember !== null;
                     $app->save();
@@ -536,15 +538,14 @@ class GoogleSheetController extends Controller
 
             if ($app->member_id && $app->course_preference) {
 
-//                if ($app->member_id == 217799)
-//                    dd($courseDates, $app->course_preference);
+//                if ($app->member_id == 12323 && $app->id == 3759)
+//                    dd($courseDates, $app->course_preference, $app->id);
 //
                 foreach ($courseDates as $date) {
 
-
-
                     if (isset($courseArray[$date])) {
                         $course = $courseArray[$date];
+
 
                         $apply = Apply::where('course_id', $course->id)
                             ->where('member_id', $app->member_id)
@@ -577,6 +578,10 @@ class GoogleSheetController extends Controller
                                 }
                             }
                         }
+
+
+//                        if ($app->member_id == 12323 && $app->id == 3759 && $course->id == 684)
+//                            dd($courseDates, $app->course_preference, $app->id, $course, $app->has_apply, $apply,  $app->member_id);
 
 
                     }else{
@@ -855,5 +860,96 @@ class GoogleSheetController extends Controller
             ->first();
     }
 
+
+
+
+    public function similar(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $first = trim((string)$request->query('first'));
+        $last  = trim((string)$request->query('last'));
+        $email = trim((string)$request->query('email'));
+        $phone = $this->normalizePhoneForMatch((string)$request->query('phone'));
+
+        // Build "any of" matcher
+        $members = Member::query()
+            ->where(function ($q) use ($first, $last, $email, $phone) {
+                if ($first !== '') {
+                    $q->orWhere('name', 'LIKE', $first.'%');
+                }
+                if ($last !== '') {
+                    $q->orWhere('surname', 'LIKE', $last.'%');
+                }
+                if ($email !== '') {
+                    $q->orWhere('email', 'LIKE', '%'.$email.'%');
+                }
+                if ($phone !== '') {
+                    // normalize phone in SQL compare: strip non-digits
+                    $q->orWhereRaw("
+                        REGEXP_REPLACE(
+                            REGEXP_REPLACE(
+                                REGEXP_REPLACE(COALESCE(phone,''), '[^0-9]', ''),
+                            '^(66)', '0'),
+                        '^(0{2,})', '0') LIKE ?
+                    ", ['%'.$phone.'%']);
+                }
+            })
+            ->orderByDesc('updated_at')
+            ->limit(30)
+            ->get()
+            ->map(function ($m) {
+                return [
+                    'id'      => $m->id,
+                    'name'    => trim($m->name.' '.$m->surname),
+                    'gender'  => $m->gender,
+                    'age'     => $m->birthdate ? Carbon::parse($m->birthdate)->age : null,
+                    'phone'   => $m->phone,
+                    'email'   => $m->email,
+                    'profile' => route('member.edit', $m->id),      // adjust to your route
+                    'history' => route('courses.history', $m->id),  // existing route in your page
+                ];
+            });
+
+        return response()->json([
+            'ok' => true,
+            'count' => $members->count(),
+            'data' => $members,
+        ]);
+    }
+
+    private function normalizePhoneForMatch(string $p): string
+    {
+        // keep digits only
+        $digits = preg_replace('/\D+/', '', $p ?? '');
+        if ($digits === null) return '';
+        // convert leading 66 to 0 for Thai pattern equivalence
+        if (Str::startsWith($digits, '66')) {
+            $digits = '0'.substr($digits, 2);
+        }
+        // collapse multiple leading zeros to single 0
+        $digits = preg_replace('/^0+/', '0', $digits);
+        return $digits ?? '';
+    }
+
+    public function linkMember(Request $request,  $application_id): \Illuminate\Http\JsonResponse
+    {
+        $validated = $request->validate([
+            'member_id' => ['required','integer','exists:members,id'],
+        ]);
+
+        $application = Application::find($application_id);
+        if (!$application) {
+            return response()->json([]);
+        }
+
+        $application->member_id = $validated['member_id'];
+        $application->is_synced = true;        // ถ้าใช้ flag นี้ในระบบ
+        $application->save();
+
+        return response()->json([
+            'ok' => true,
+            'application_id' => $application->id,
+            'member_id' => $application->member_id,
+        ]);
+    }
 
 }

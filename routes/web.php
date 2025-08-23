@@ -189,7 +189,11 @@ Route::middleware(['verified'])->group(function () {
 
 
 
+Route::get('/admin/members/similar', [GoogleSheetController::class, 'similar'])
+    ->name('admin.members.similar');
 
+Route::post('/admin/applications/{application}/link-member', [GoogleSheetController::class, 'linkMember'])
+    ->name('admin.applications.linkMember');
 
 Route::get('/send-test-email', [EmailTestController::class, 'sendTestEmail'] );
 
