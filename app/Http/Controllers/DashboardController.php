@@ -60,6 +60,9 @@ class DashboardController extends Controller
         // 2) Load Applies for those courses
         $apps = Apply::with(['member','course'])
             ->when(count($courseIds), fn($q) => $q->whereIn('course_id', $courseIds))
+            ->whereNotNull('member_id')
+            ->whereNotNull('course_id')
+            ->whereHas('course')              // << ต้องมี course จริง
             ->get();
 
         // 3) Distinct members
@@ -106,11 +109,15 @@ class DashboardController extends Controller
         $firstMonths = $apps
             ->groupBy('member_id')
             ->map(function($group) {
-                // get the minimum date_start string
-                $minDate = $group->min(fn($a) => $a->course->date_start);
-                // format it as “YYYY-MM”
-                return Carbon::parse($minDate)->format('Y-m');
-            });
+                // ดึงวันที่เริ่มคอร์สที่มีจริงเท่านั้น
+                $dates = $group->pluck('course.date_start')->filter();  // << กัน null
+                if ($dates->isEmpty()) {
+                    return null; // ไม่มีวันที่ให้คำนวณ
+                }
+                // หา earliest แล้วฟอร์แมตเป็น YYYY-MM
+                return Carbon::parse($dates->min())->format('Y-m');
+            })
+            ->filter(); // ตัด null ออก
 
 // 8) Count how many distinct members start in each month, then sort
         $monthlyCounts = $firstMonths
