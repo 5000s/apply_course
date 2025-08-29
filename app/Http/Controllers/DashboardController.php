@@ -9,6 +9,7 @@ use App\Models\Application;
 use App\Models\CourseCategory;
 use App\Models\Location;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class DashboardController extends Controller
@@ -127,12 +128,80 @@ class DashboardController extends Controller
         }
 
 
+
+        // ===== 1) ดึงสรุปจาก SQL ตรง ๆ =====
+        $rows = DB::table('applies as a')
+            ->join('courses as c', 'a.course_id', '=', 'c.id')
+            ->join('members as m', 'a.member_id', '=', 'm.id')
+            ->join('course_categories as cc', 'cc.id', '=', 'c.category_id')
+            ->selectRaw("
+            c.location,
+            DATE_FORMAT(c.date_start, '%b-%y')   as month_label,
+            cc.show_name                         as course_category,
+
+            SUM(CASE WHEN m.gender = 'ชาย' AND (m.nationality = 'ไทย' OR (m.nationality IS NULL AND m.country = 'Thailand')) THEN 1 ELSE 0 END) as male_th,
+            SUM(CASE WHEN m.gender = 'หญิง' AND (m.nationality = 'ไทย' OR (m.nationality IS NULL AND m.country = 'Thailand')) THEN 1 ELSE 0 END) as female_th,
+
+            SUM(CASE WHEN m.gender = 'ชาย' AND ((m.nationality IS NOT NULL AND m.nationality <> 'ไทย') OR (m.nationality IS NULL AND (m.country IS NULL OR m.country <> 'Thailand'))) THEN 1 ELSE 0 END) as male_for,
+            SUM(CASE WHEN m.gender = 'หญิง' AND ((m.nationality IS NOT NULL AND m.nationality <> 'ไทย') OR (m.nationality IS NULL AND (m.country IS NULL OR m.country <> 'Thailand'))) THEN 1 ELSE 0 END) as female_for
+        ")
+            ->where('a.state', 'ผ่านการอบรม')
+            ->whereBetween('c.date_start', [$start, $end])
+            ->when(count($typeIds), fn($q) => $q->whereIn('c.category_id', $typeIds))
+            ->when(count($locIds),  fn($q) => $q->whereIn('c.location_id', $locIds))
+            ->groupByRaw("c.location, DATE_FORMAT(c.date_start, '%b-%y'), cc.show_name")
+            ->orderBy('c.location')
+            ->orderByRaw("MIN(c.date_start)")
+            ->get();
+
+        // ===== 2) สร้าง months & summary สำหรับตาราง =====
+        $months = collect($rows)->pluck('month_label')->unique()->values()->all();
+
+        // summary[location][course_category][month_label] = {ชายไทย,หญิงไทย,ชายต่างชาติ,หญิงต่างชาติ}
+        $summary = [];
+        foreach ($rows as $r) {
+            $loc = $r->location ?? 'ไม่ระบุสถานที่';
+            $cat = $r->course_category ?? 'ไม่ระบุประเภท';
+            $mon = $r->month_label;
+
+            $summary[$loc]              = $summary[$loc] ?? [];
+            $summary[$loc][$cat]        = $summary[$loc][$cat] ?? [];
+            $summary[$loc][$cat][$mon]  = [
+                'ชายไทย'     => (int)$r->male_th,
+                'หญิงไทย'    => (int)$r->female_th,
+                'ชายต่างชาติ' => (int)$r->male_for,
+                'หญิงต่างชาติ'=> (int)$r->female_for,
+            ];
+        }
+
+        // เติมเดือนที่หายให้เป็น 0 และเรียงตาม $months
+        foreach ($summary as $loc => $cats) {
+            foreach ($cats as $cat => $monMap) {
+                foreach ($months as $ml) {
+                    if (!isset($summary[$loc][$cat][$ml])) {
+                        $summary[$loc][$cat][$ml] = [
+                            'ชายไทย' => 0, 'หญิงไทย' => 0, 'ชายต่างชาติ' => 0, 'หญิงต่างชาติ' => 0,
+                        ];
+                    }
+                }
+                // sort key เดือนตามลำดับใน $months
+                $summary[$loc][$cat] = collect($summary[$loc][$cat])
+                    ->sortBy(fn($v, $k) => array_search($k, $months))
+                    ->all();
+            }
+        }
+
+
+
         // 10) JSON response
         return response()->json([
             'nationality' => $nationality,
             'gender'      => $gender,
             'ageRanges'   => $ageRanges,
             'monthly'     => $cumulative,
+
+            'months'      => $months,
+            'summary'     => $summary,
         ]);
     }
 
