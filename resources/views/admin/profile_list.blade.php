@@ -17,7 +17,8 @@
                 <th> อายุ </th>
                 <th > ปีเข้า </th>
                 <th> เบอร์ติดต่อ </th>
-                <th> จังหวัด </th>
+                <th> email </th>
+{{--                <th> จังหวัด </th>--}}
                 <th style="display: none"> phone </th>
                 <th  style="text-align: center">{{ __('messages.edit_info') }}</th>
                 <th  style="text-align: center">{{ __('messages.register_course') }}</th>
@@ -35,7 +36,8 @@
                     <td>{{ $member->birthdate?->age ?? 'ไม่ทราบ' }}</td>
                     <td>{{ $member->techo_year }}</td>
                     <td>{{ $member->phone }}</td>
-                    <td>{{ $member->province }}</td>
+                    <td>{{ $member->email }}</td>
+{{--                    <td>{{ $member->province }}</td>--}}
                     <td style="display: none"> {{ str_replace(' ', '', $member->phone) }} </td>
 
                     <td style="text-align: center">
