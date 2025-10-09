@@ -79,6 +79,9 @@
                                         <a class="dropdown-item" href="{{ route('admin.members') }}">จัดการสมาชิก</a>
                                     </li>
                                     <li>
+                                        <a class="dropdown-item" href="{{ route('admin.members') }}">รายการสมาชิก</a>
+                                    </li>
+                                    <li>
                                         <a class="dropdown-item" href="{{ route('teams.index') }}">จัดการทีม</a>
                                     </li>
                                     <li>
