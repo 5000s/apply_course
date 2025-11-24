@@ -402,11 +402,10 @@ class CourseApplyController extends Controller
     // public function directConfirm(Request $request, $course_id, $member_id)
     public function directConfirm(Request $request, $course_id, $member_id)
     {
-        $van = $request->input('van', 0);
+        $van = $request->input('van', "no");
         $shelter = "ทั่วไป";
         $course = Course::find($course_id);
         $location = Location::find($course->location_id);
-
 
 
         $courseCategory = CourseCategory::find($course->category_id);
