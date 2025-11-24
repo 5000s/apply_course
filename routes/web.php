@@ -90,6 +90,7 @@ Route::prefix('admin')->middleware('auth', 'admin')->group(function () {
 
 
     Route::get('member', [AdminMemberController::class, 'profile'])->name("admin.members");
+    Route::get('member/type', [AdminMemberController::class, 'getMemberType'])->name("admin.membersType");
     Route::get('member/course', [AdminMemberController::class, 'adminMemberCourse']);
 
 
