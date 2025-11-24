@@ -14,11 +14,13 @@
 use App\Http\Controllers\AdminMemberController;
 use App\Http\Controllers\ApplyController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CourseApplyController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\GoogleSheetController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MemberController;
 use App\Http\Controllers\PagesController;
+use App\Http\Controllers\SmsController;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\EmailTestController;
@@ -106,16 +108,16 @@ Route::prefix('admin')->middleware('auth', 'admin')->group(function () {
     Route::post('/sheet/member/{locationId}/sync', [GoogleSheetController::class, 'syncToMembers'])->name('admin.applications.sync.store');
 
 
-##### LOGIN DO BY SRA
-    Route::get('login', [UserController::class, 'login'] )->name("adminLogin");
+    ##### LOGIN DO BY SRA
+    Route::get('login', [UserController::class, 'login'])->name("adminLogin");
     Route::post('login', [UserController::class, 'login']);
-    Route::get('logout', [UserController::class, 'logout'] );
+    Route::get('logout', [UserController::class, 'logout']);
 
 
 
     Route::resource('teams', TeamController::class);
 
-// Team-Member CRUD (all in TeamController)
+    // Team-Member CRUD (all in TeamController)
     Route::prefix('teams/{team}')->name('teammembers.')->group(function () {
         // List members
         Route::get('members', [TeamController::class, 'indexMember'])
@@ -143,7 +145,6 @@ Route::prefix('admin')->middleware('auth', 'admin')->group(function () {
     Route::get('/dashboard/data', [DashboardController::class, 'data'])->name('dashboard.data');
     Route::get('/dashboard/course-types', [DashboardController::class, 'typesByLocation'])
         ->name('dashboard.course-types');
-
 });
 
 
@@ -158,17 +159,17 @@ Route::middleware(['verified'])->group(function () {
     Route::get('/home', [HomeController::class, 'index'])->name('home');
     Route::get('/profile', [HomeController::class, 'profile'])->name('profile');
 
-// Route to show form for creating a new member
+    // Route to show form for creating a new member
     Route::get('/member/create', [MemberController::class, 'create'])->name('member.create');
 
-// Route to store a new member
+    // Route to store a new member
     Route::post('/member', [MemberController::class, 'store'])->name('member.store');
     Route::post('/memberadmin', [MemberController::class, 'storeAdmin'])->name('member.store.admin');
 
-// Route to show form for editing an existing member
+    // Route to show form for editing an existing member
     Route::get('/member/{member}/edit', [MemberController::class, 'edit'])->name('member.edit');
 
-// Route to update an existing member
+    // Route to update an existing member
     Route::put('/member/update', [MemberController::class, 'update'])->name('member.update');
     Route::put('/member/updateadmin', [MemberController::class, 'updateAdmin'])->name('member.update.admin');
 
@@ -178,13 +179,12 @@ Route::middleware(['verified'])->group(function () {
 
 
     Route::get('apply/{member_id}/courses/{course_id}', [ApplyController::class, 'show'])->name('courses.show');
-    Route::post('apply/{member_id}/courses', [ApplyController::class, 'save'] )->name('courses.save');
-    Route::post('apply/{member_id}/courses/{apply}', [ApplyController::class, 'update'] )->name('courses.update');
+    Route::post('apply/{member_id}/courses', [ApplyController::class, 'save'])->name('courses.save');
+    Route::post('apply/{member_id}/courses/{apply}', [ApplyController::class, 'update'])->name('courses.update');
 
-    Route::post('apply/{member_id}/courses/{apply}/cancel', [ApplyController::class, 'cancel'] )->name('courses.cancel');
+    Route::post('apply/{member_id}/courses/{apply}/cancel', [ApplyController::class, 'cancel'])->name('courses.cancel');
 
-    Route::get('apply/{member_id}/courses/edit/{course_id}', [ApplyController::class, 'edit'] )->name('courses.edit');
-
+    Route::get('apply/{member_id}/courses/edit/{course_id}', [ApplyController::class, 'edit'])->name('courses.edit');
 });
 
 
@@ -195,7 +195,7 @@ Route::get('/admin/members/similar', [GoogleSheetController::class, 'similar'])
 Route::post('/admin/applications/{application}/link-member', [GoogleSheetController::class, 'linkMember'])
     ->name('admin.applications.linkMember');
 
-Route::get('/send-test-email', [EmailTestController::class, 'sendTestEmail'] );
+Route::get('/send-test-email', [EmailTestController::class, 'sendTestEmail']);
 
 
 
@@ -215,5 +215,14 @@ Route::get('/setCourseData', [CourseController::class, 'setCourseData'])->name('
 
 
 
+Route::get('/sms/send', [SmsController::class, 'form'])->name('sms.form');
+Route::post('/sms/send', [SmsController::class, 'send'])->name('sms.send');
 
 
+
+Route::get('/apply/direct', [CourseApplyController::class, 'directApply'])->name('apply.direct');
+Route::post('/apply/direct/request-otp', [CourseApplyController::class, 'directRequestOtp'])->name('apply.direct.requestOtp');
+
+Route::post('/apply/direct/apply', [CourseApplyController::class, 'applyCourse'])->name('apply.direct.apply');
+
+Route::PUT('/apply/direct/confirm/{course_id}/{member_id}', [CourseApplyController::class, 'directConfirm'])->name('apply.form.confirm');

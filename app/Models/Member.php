@@ -69,4 +69,125 @@ class Member extends Model
         $values = explode(',', $matches[1]);
         return array_map(fn($value) => trim($value, "'"), $values);
     }
+
+
+
+    public function setPhoneAttribute($value)
+    {
+        $this->attributes['phone'] = $value;
+        $this->attributes['phone_clean'] = self::normalizeThaiPhone($value);
+    }
+
+
+    // --- Accessor: เบอร์แบบสวย ๆ ---
+    public function getPhonePrettyAttribute()
+    {
+        $clean = $this->phone_clean ?: self::normalizeThaiPhone($this->phone);
+
+        if (!$clean) return null;
+
+        // mobile 10 หลัก ขึ้นต้น 06/08/09 → 081 234 5678
+        if (preg_match('/^(06|08|09)\d{8}$/', $clean)) {
+            return substr($clean,0,3).' '.substr($clean,3,3).' '.substr($clean,6,4);
+        }
+
+        // เบอร์บ้าน กทม. 02-xxx-xxxx → 02 123 4567
+        if (preg_match('/^02\d{7}$/', $clean)) {
+            return substr($clean,0,2).' '.substr($clean,2,3).' '.substr($clean,5,4);
+        }
+
+        // เบอร์บ้านต่างจังหวัด 0x-xxxx-xxxx (รวม 9–10 หลัก)
+        if (preg_match('/^0[3-9]\d{7,8}$/', $clean)) {
+            // 0AA BBB BBBB / 0A BBB BBBB ตามความยาว
+            if (strlen($clean) === 9) {
+                return substr($clean,0,2).' '.substr($clean,2,3).' '.substr($clean,5,4);
+            }
+            if (strlen($clean) === 10) {
+                return substr($clean,0,3).' '.substr($clean,3,3).' '.substr($clean,6,4);
+            }
+        }
+
+        return $clean; // fallback
+    }
+
+    // --- Helper: แปลงเป็นเลขไทยมาตรฐาน 0xxxxxxxxx ---
+    public static function normalizeThaiPhone(?string $raw): ?string
+    {
+        if (!$raw) return null;
+        $digits = preg_replace('/\D+/', '', $raw);  // เอาเฉพาะตัวเลข
+
+        if ($digits === '') return null;
+
+        // แปลง +66 / 66xxxxx → 0xxxxx
+        if (str_starts_with($digits, '66')) {
+            $digits = '0'.substr($digits, 2);
+        }
+
+        // บางกรณีเป็น 660… จาก copy เบอร์สากล
+        if (str_starts_with($digits, '660')) {
+            $digits = '0'.substr($digits, 3);
+        }
+
+        // ถ้าเริ่มไม่ใช่ 0 แต่ยาวพอ ให้คงไว้ (กรณีเบอร์ตปท) — แต่ระบบนี้โฟกัสไทย
+        // ตัดความยาวเกิน 10–11 เผื่อมีต่อเบอร์
+        if (strlen($digits) > 11) {
+            // เก็บเฉพาะ 11 ตัวแรก (กรณี 02xxxxxxxx) หรือ 10 ตัวแรก (mobile)
+            // ใช้ heuristic ง่าย ๆ
+            $digits = preg_match('/^02/', $digits) ? substr($digits, 0, 9) : substr($digits, 0, 10);
+        }
+
+        return $digits;
+    }
+
+    public static function findCandidate($gender, $firstname, $lastname, $birthDate)
+    {
+        $candidate = self::whereDate('birthdate', $birthDate)
+            ->where('gender', $gender)
+            ->where('name', $firstname)
+            ->where('surname', $lastname)
+            ->first();
+
+        if ($candidate) {
+            return $candidate;
+        }
+
+        // 1) คัดกรองจากวันเกิดก่อน (ลดจำนวนแถว)
+        $candidates = self::query()
+            ->whereDate('birthdate', $birthDate)
+            ->where('gender', $gender)
+            ->get();
+
+        if ($candidates->isEmpty()) {
+            return null;
+        }
+
+        // helper: normalize ชื่อให้เทียบได้ (รองรับไทย)
+        $norm = function (string $s) {
+            $s = mb_strtolower($s, 'UTF-8');
+            $s = preg_replace('/[^[:alnum:]\p{Thai}]+/u', '', $s);
+            return $s;
+        };
+
+        // ตัด 3 ตัวแรกจากอินพุต
+        $inFirst3 = mb_substr($norm((string) $firstname), 0, 3, 'UTF-8');
+        $inLast3  = mb_substr($norm((string) $lastname),  0, 3, 'UTF-8');
+
+        if ($inFirst3 === '' || $inLast3 === '') {
+            return null;
+        }
+
+        // 2) กรองชื่อ: ต้องตรงกันทั้งชื่อและนามสกุล (3 ตัวแรก) แล้วคืนตัวแรก
+        $match = $candidates->first(function ($m) use ($norm, $inFirst3, $inLast3) {
+            $first = $m->first_name ?? $m->name ?? '';
+            $last  = $m->last_name  ?? $m->surname ?? '';
+
+            $candFirst3 = mb_substr($norm($first), 0, 3, 'UTF-8');
+            $candLast3  = mb_substr($norm($last),  0, 3, 'UTF-8');
+
+            return ($candFirst3 === $inFirst3) && ($candLast3 === $inLast3);
+        });
+
+        return $match ?: null;
+    }
+
 }

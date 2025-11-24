@@ -14,6 +14,17 @@ return [
     |
     */
 
+    'recaptcha' => [
+        'site_key'   => env('RECAPTCHA_SITE_KEY'),
+        'secret_key' => env('RECAPTCHA_SECRET_KEY'),
+    ],
+
+    'smskub' => [
+        'url'    => env('SMSKUB_API_URL', 'https://console.sms-kub.com/api/messages'),
+        'key'    => env('SMSKUB_API_KEY'),
+        'sender' => env('SMSKUB_SENDER', 'KBO staff'),
+    ],
+
     'mailgun' => [
         'domain' => env('MAILGUN_DOMAIN'),
         'secret' => env('MAILGUN_SECRET'),

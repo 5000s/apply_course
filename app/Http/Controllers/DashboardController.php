@@ -226,7 +226,7 @@ class DashboardController extends Controller
         $val      = mb_strtolower($original);
 
         $map = [
-            'Thailand'        => ['thailand','thai','ไทย','ประทศไทย','thailand (british)','ไมย', 'ไท'],
+            'Thailand'        => ['thailand','thai','ไทย','ประทศไทย','thailand (british)','ไมย', 'ไท', 'พุทธ' ,'สงขลา' ,'ทย'],
             'Myanmar'         => ['myanmar','burma'],
             'United Kingdom'  => ['united kingdom','uk','british','england','scotland','wales', 'english'],
             'United States'   => ['united state','united satate','usa', 'america' ,'อเมริกา'],
@@ -245,8 +245,8 @@ class DashboardController extends Controller
             'Vietnam'         => ['vietnam','vietnamese'],
             'Indonesia'       => ['indonesia','indonesian'],
             'Poland'          => ['poland','polish'],
-            'Italy'           => ['italy','italian','italy','อิตาลี่ ดัช'],
-            'Netherlands'     => ['netherlands','nederland','dutch', 'duch'],
+            'Italy'           => ['italy','italian','italy','อิตา' ],
+            'Netherlands'     => ['netherlands','nederland','dutch', 'duch', 'ดัช'],
             'Spain'           => ['spain','spanish'],
             'Turkey'          => ['turkey','turkish'],
             'Mexico'          => ['mexico','mexican'],

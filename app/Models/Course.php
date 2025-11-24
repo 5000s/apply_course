@@ -75,7 +75,6 @@ class Course extends Model
     }
 
 
-
     public static function generateCourseName($start_date, $end_date) {
         Carbon::setLocale('th');
 
