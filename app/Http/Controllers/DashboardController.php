@@ -278,7 +278,7 @@ class DashboardController extends Controller
             'Iran'            => ['iran', 'iranian'],
             'Bhutan'          => ['bhutan', 'bhutanese'],
             'Armenia'         => ['armenia', 'armenian'],
-            'Unknown'         => ['unknown', 'na'],
+            'Unknown'         => ['unknown', 'na',  '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'ไม่ระบุ'],
         ];
 
         foreach ($map as $canonical => $aliases) {
