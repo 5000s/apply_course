@@ -58,7 +58,7 @@ class DashboardController extends Controller
         $courseIds = $courseQ->pluck('id')->all();
 
         // 2) Load Applies for those courses
-        $apps = Apply::with(['member','course'])
+        $apps = Apply::with(['member', 'course'])
             ->when(count($courseIds), fn($q) => $q->whereIn('course_id', $courseIds))
             ->whereNotNull('member_id')
             ->whereNotNull('course_id')
@@ -108,7 +108,7 @@ class DashboardController extends Controller
         // 7) First‐course month per member (using the earliest date_start)
         $firstMonths = $apps
             ->groupBy('member_id')
-            ->map(function($group) {
+            ->map(function ($group) {
                 // ดึงวันที่เริ่มคอร์สที่มีจริงเท่านั้น
                 $dates = $group->pluck('course.date_start')->filter();  // << กัน null
                 if ($dates->isEmpty()) {
@@ -119,14 +119,14 @@ class DashboardController extends Controller
             })
             ->filter(); // ตัด null ออก
 
-// 8) Count how many distinct members start in each month, then sort
+        // 8) Count how many distinct members start in each month, then sort
         $monthlyCounts = $firstMonths
             ->countBy()
             ->sortKeys();
 
 
 
-// 9) Build the cumulative series (only one count per member)
+        // 9) Build the cumulative series (only one count per member)
         $running    = 0;
         $cumulative = [];
         foreach ($monthlyCounts as $month => $count) {
@@ -177,7 +177,7 @@ class DashboardController extends Controller
                 'ชายไทย'     => (int)$r->male_th,
                 'หญิงไทย'    => (int)$r->female_th,
                 'ชายต่างชาติ' => (int)$r->male_for,
-                'หญิงต่างชาติ'=> (int)$r->female_for,
+                'หญิงต่างชาติ' => (int)$r->female_for,
             ];
         }
 
@@ -187,7 +187,10 @@ class DashboardController extends Controller
                 foreach ($months as $ml) {
                     if (!isset($summary[$loc][$cat][$ml])) {
                         $summary[$loc][$cat][$ml] = [
-                            'ชายไทย' => 0, 'หญิงไทย' => 0, 'ชายต่างชาติ' => 0, 'หญิงต่างชาติ' => 0,
+                            'ชายไทย' => 0,
+                            'หญิงไทย' => 0,
+                            'ชายต่างชาติ' => 0,
+                            'หญิงต่างชาติ' => 0,
                         ];
                     }
                 }
@@ -226,44 +229,44 @@ class DashboardController extends Controller
         $val      = mb_strtolower($original);
 
         $map = [
-            'Thailand'        => ['thailand','thai','ไทย','ประทศไทย','thailand (british)','ไมย', 'ไท', 'พุทธ' ,'สงขลา' ,'ทย'],
-            'Myanmar'         => ['myanmar','burma'],
-            'United Kingdom'  => ['united kingdom','uk','british','england','scotland','wales', 'english'],
-            'United States'   => ['united state','united satate','usa', 'america' ,'อเมริกา'],
-            'Australia'       => ['australia','australian','new zealander','australia' , 'ออสเตร' , 'aussie'],
+            'Thailand'        => ['thailand', 'thai', 'ไทย', 'ไมย', 'ไท', 'พุทธ', 'สงขลา', 'ทย'],
+            'Myanmar'         => ['myanmar', 'burma', 'พม่า'],
+            'United Kingdom'  => ['united kingdom', 'uk', 'british', 'england', 'scotland', 'wales', 'english'],
+            'United States'   => ['united state', 'united satate', 'usa', 'america', 'อเมริกา'],
+            'Australia'       => ['australia', 'australian', 'new zealander', 'australia', 'ออสเตร', 'aussie'],
             'Austria'       =>   ['austria'],
-            'France'          => ['france','french','ฝรั่งเศส','français','french'],
-            'Germany'         => ['germany','german','gemany','เยอ'],
-            'India'           => ['india','indian','india (hindu)','indian (uae)'],
-            'China'           => ['china','chinese','chaina'],
-            'Japan'           => ['japan','japanese','nippon' ,'ญี่ปุ่น'],
-            'Russia'          => ['russia','russian','rus'],
-            'Canada'          => ['canada','canadian','แคนนาดา'],
-            'Singapore'       => ['singapore','singaporean'],
-            'Switzerland'     => ['switzerland','สวิส','swedish'],
-            'Malaysia'        => ['malaysia','malaysian','มาเล'],
-            'Vietnam'         => ['vietnam','vietnamese'],
-            'Indonesia'       => ['indonesia','indonesian'],
-            'Poland'          => ['poland','polish'],
-            'Italy'           => ['italy','italian','italy','อิตา' ],
-            'Netherlands'     => ['netherlands','nederland','dutch', 'duch', 'ดัช'],
-            'Spain'           => ['spain','spanish'],
-            'Turkey'          => ['turkey','turkish'],
-            'Mexico'          => ['mexico','mexican'],
-            'Norway'          => ['norway','norwegian'],
-            'South Korea'     => ['south korea','korea','south korean','korean'],
-            'Taiwan'          => ['taiwan','taiwanese'],
-            'Ireland'         => ['ireland','irish'],
-            'Philippines'     => ['philippines','filipino','filipino'],
-            'Slovakia'        => ['slovakia','slovak','slovakai'],
-            'Hong Kong'       => ['hong kong','hongkong','hong kong'],
-            'Colombia'        => ['colombia','colombian'],
-            'Latvia'          => ['latvia','latvian'],
-            'Lithuania'       => ['lithuania','lithuanian'],
-            'Peru'            => ['peru','peruvian'],
-            'Brazil'          => ['brazil','brazilian'],
-            'Israel'          => ['israel','israeli'],
-            'Laos'          => ['lao','ลาว'],
+            'France'          => ['france', 'french', 'ฝรั่งเศส', 'français', 'french'],
+            'Germany'         => ['germany', 'german', 'gemany', 'เยอ'],
+            'India'           => ['india', 'indian', 'india (hindu)', 'indian (uae)'],
+            'China'           => ['china', 'chinese', 'chaina', 'จีน'],
+            'Japan'           => ['japan', 'japanese', 'nippon', 'ญี่ปุ่น'],
+            'Russia'          => ['russia', 'russian', 'rus'],
+            'Canada'          => ['canada', 'canadian', 'แคนนาดา'],
+            'Singapore'       => ['singapore', 'singaporean'],
+            'Switzerland'     => ['switzerland', 'สวิส', 'swedish'],
+            'Malaysia'        => ['malaysia', 'malaysian', 'มาเล'],
+            'Vietnam'         => ['vietnam', 'vietnamese'],
+            'Indonesia'       => ['indonesia', 'indonesian'],
+            'Poland'          => ['poland', 'polish'],
+            'Italy'           => ['italy', 'italian', 'italy', 'อิตา'],
+            'Netherlands'     => ['netherlands', 'nederland', 'dutch', 'duch', 'ดัช'],
+            'Spain'           => ['spain', 'spanish'],
+            'Turkey'          => ['turkey', 'turkish'],
+            'Mexico'          => ['mexico', 'mexican'],
+            'Norway'          => ['norway', 'norwegian'],
+            'South Korea'     => ['south korea', 'korea', 'south korean', 'korean'],
+            'Taiwan'          => ['taiwan', 'taiwanese'],
+            'Ireland'         => ['ireland', 'irish'],
+            'Philippines'     => ['philippines', 'filipino', 'filipino'],
+            'Slovakia'        => ['slovakia', 'slovak', 'slovakai'],
+            'Hong Kong'       => ['hong kong', 'hongkong', 'hong kong'],
+            'Colombia'        => ['colombia', 'colombian'],
+            'Latvia'          => ['latvia', 'latvian'],
+            'Lithuania'       => ['lithuania', 'lithuanian'],
+            'Peru'            => ['peru', 'peruvian'],
+            'Brazil'          => ['brazil', 'brazilian'],
+            'Israel'          => ['israel', 'israeli'],
+            'Laos'          => ['lao', 'ลาว'],
             'Unknown'         => ['unknown'],
         ];
 
@@ -301,9 +304,8 @@ class DashboardController extends Controller
         // Load those categories:
         $categories = \App\Models\CourseCategory::whereIn('id', $catIds)
             ->orderBy('name')
-            ->get(['id','name']);
+            ->get(['id', 'name']);
 
         return response()->json($categories);
     }
-
 }
