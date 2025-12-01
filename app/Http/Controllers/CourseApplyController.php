@@ -22,6 +22,17 @@ use function Symfony\Component\String\b;
 
 class CourseApplyController extends Controller
 {
+
+    public function courseTableWordpress(Request $request, $type, $lang)
+    {
+
+        $courses = Course::where('category_id', $type)->whereYear('date_start', '>=', now()->year)->get();
+        $category = CourseCategory::where('id', $type)->first();
+
+
+        return view('apply.course_table', compact('courses', 'category', 'lang'));
+    }
+
     public function directApply(Request $request)
     {
         $courseId = $request->input('course_id');

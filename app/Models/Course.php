@@ -10,17 +10,19 @@ use Illuminate\Database\Eloquent\Model;
 class Course extends Model
 {
     //
-    protected $dates = ['date_start','date_end', 'listed_date'];
+    protected $dates = ['date_start', 'date_end', 'listed_date'];
 
-    public function getCourseLocationAttribute(){
+    public function getCourseLocationAttribute()
+    {
 
-        $location = Location::where("id",$this->location_id)->first();
+        $location = Location::where("id", $this->location_id)->first();
 
         return $location;
     }
 
 
-    public function getCourseNameAttribute(){
+    public function getCourseNameAttribute()
+    {
 
         $courseName =  $this->category;
         $coursedate =  $this->courseDateTxt;
@@ -29,7 +31,8 @@ class Course extends Model
         return $courseName;
     }
 
-    public function getCourseDateTxtAttribute(){
+    public function getCourseDateTxtAttribute()
+    {
 
         $courseDate = "";
 
@@ -44,38 +47,108 @@ class Course extends Model
         $monthEnd = $end->month;
         $miniMonthENd = ThaiLocal::miniMonth($monthEnd);
 
-        if ($month == $monthEnd){
-            if ($day == $dayEnd){
+        if ($month == $monthEnd) {
+            if ($day == $dayEnd) {
                 $courseDate = "$day $miniMonth  $year";
-            }else{
+            } else {
                 $courseDate = "$day - $dayEnd  $miniMonth  $year";
             }
-        }else{
+        } else {
             $courseDate = " $day $miniMonth - $dayEnd $miniMonthENd  $year";
         }
 
         return $courseDate;
     }
 
-    public function getStartEnAttribute(){
+    public function getCourseLongDateTxtAttribute()
+    {
+        $thai_days = [
+            'Sunday' => 'อา.',
+            'Monday' => 'จ.',
+            'Tuesday' => 'อ.',
+            'Wednesday' => 'พ.',
+            'Thursday' => 'พฤ.',
+            'Friday' => 'ศ.',
+            'Saturday' => 'ส.'
+        ];
+
+        $thai_months = ThaiLocal::month();
+
+        $start = $this->date_start;
+        $end = $this->date_end;
+
+        $startDayAbbr = $thai_days[$start->format('l')];
+        $startDay = $start->day;
+        $startMonth = $thai_months[$start->month - 1];
+        $startYear = $start->year + 543;
+
+        $endDayAbbr = $thai_days[$end->format('l')];
+        $endDay = $end->day;
+        $endMonth = $thai_months[$end->month - 1];
+        $endYear = $end->year + 543;
+
+        if ($start->month == $end->month && $start->year == $end->year) {
+            if ($start->day == $end->day) {
+                return "$startDayAbbr $startDay $startMonth $startYear";
+            } else {
+                return "$startDayAbbr $startDay – $endDayAbbr $endDay $startMonth $startYear";
+            }
+        } else {
+            return "$startDayAbbr $startDay $startMonth – $endDayAbbr $endDay $endMonth $endYear";
+        }
+    }
+
+    public function getCourseLongDateTxtEnAttribute()
+    {
+        $start = $this->date_start;
+        $end = $this->date_end;
+
+        $startDayAbbr = $start->format('D.'); // Sun.
+        $startDay = $start->day;
+        $startMonth = $start->format('F'); // August
+        $startYear = $start->year;
+
+        $endDayAbbr = $end->format('D.');
+        $endDay = $end->day;
+        $endMonth = $end->format('F');
+        $endYear = $end->year;
+
+        if ($start->month == $end->month && $start->year == $end->year) {
+            if ($start->day == $end->day) {
+                return "$startDayAbbr $startDay $startMonth $startYear";
+            } else {
+                return "$startDayAbbr $startDay – $endDayAbbr $endDay $startMonth $startYear";
+            }
+        } elseif ($start->year == $end->year) {
+            return "$startDayAbbr $startDay $startMonth – $endDayAbbr $endDay $endMonth $endYear";
+        } else {
+            return "$startDayAbbr $startDay $startMonth $startYear – $endDayAbbr $endDay $endMonth $endYear";
+        }
+    }
+
+    public function getStartEnAttribute()
+    {
         return $this->date_start->format("Y-m-d");
     }
 
-    public function getStartAttribute(){
+    public function getStartAttribute()
+    {
         return ThaiDate::thaiFormat($this->date_start);
     }
 
-    public function getEndAttribute(){
+    public function getEndAttribute()
+    {
         return ThaiDate::thaiFormat($this->date_end);
     }
 
     public function location(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo(Location::class,"location_id","id");
+        return $this->belongsTo(Location::class, "location_id", "id");
     }
 
 
-    public static function generateCourseName($start_date, $end_date) {
+    public static function generateCourseName($start_date, $end_date)
+    {
         Carbon::setLocale('th');
 
         $start = Carbon::parse($start_date);

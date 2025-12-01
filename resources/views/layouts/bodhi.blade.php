@@ -147,13 +147,13 @@
 
 <body>
     {{-- Navbar --}}
-    <nav class="navbar navbar-expand-lg bodhi-navbar py-2">
-        <div class="container">
+    {{-- <nav class="navbar navbar-expand-lg bodhi-navbar py-2"> --}}
+    {{-- <div class="container">
             <a class="navbar-brand bodhi-brand" href="{{ url('/') }}">โพธิธรรมญาณสถาน</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain">
                 <span class="navbar-toggler-icon"></span>
-            </button>
-            {{-- <div id="navMain" class="collapse navbar-collapse">
+            </button> --}}
+    {{-- <div id="navMain" class="collapse navbar-collapse">
             <ul class="navbar-nav ms-auto bodhi-nav">
                 <li class="nav-item"><a class="nav-link" href="{{ url('/courses') }}">ตารางคอร์ส</a></li>
                 <li class="nav-item"><a class="nav-link" href="{{ url('/stories') }}">ประสบการณ์</a></li>
@@ -163,8 +163,8 @@
                 </li>
             </ul>
         </div> --}}
-        </div>
-    </nav>
+    {{-- </div> --}}
+    {{-- </nav> --}}
 
     {{-- Content --}}
     <main class="py-4">
@@ -172,11 +172,11 @@
     </main>
 
     {{-- Footer --}}
-    <footer class="py-4 mt-5">
+    {{-- <footer class="py-4 mt-5">
         <div class="container text-center bodhi-footer">
             © {{ date('Y') }} โพธิธรรมญาณสถาน
         </div>
-    </footer>
+    </footer> --}}
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     @stack('scripts')
