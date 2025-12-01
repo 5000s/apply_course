@@ -221,9 +221,15 @@ Route::post('/sms/send', [SmsController::class, 'send'])->name('sms.send');
 
 
 
-Route::get('/apply/direct', [CourseApplyController::class, 'directApply'])->name('apply.direct');
-Route::post('/apply/direct/request-otp', [CourseApplyController::class, 'directRequestOtp'])->name('apply.direct.requestOtp');
 
-Route::post('/apply/direct/apply', [CourseApplyController::class, 'applyCourse'])->name('apply.direct.apply');
 
-Route::PUT('/apply/direct/confirm/{course_id}/{member_id}', [CourseApplyController::class, 'directConfirm'])->name('apply.form.confirm');
+
+Route::middleware(['allow.iframe'])->group(function () {
+
+    Route::get('/apply/direct', [CourseApplyController::class, 'directApply'])->name('apply.direct');
+    Route::post('/apply/direct/request-otp', [CourseApplyController::class, 'directRequestOtp'])->name('apply.direct.requestOtp');
+
+    Route::post('/apply/direct/apply', [CourseApplyController::class, 'applyCourse'])->name('apply.direct.apply');
+
+    Route::PUT('/apply/direct/confirm/{course_id}/{member_id}', [CourseApplyController::class, 'directConfirm'])->name('apply.form.confirm');
+});
