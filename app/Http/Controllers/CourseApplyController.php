@@ -25,8 +25,15 @@ class CourseApplyController extends Controller
 
     public function courseTableWordpress(Request $request, $type, $lang)
     {
+        $month_backward = 5;
+        if ($request->input('m')) {
+            $month_backward = $request->input('m');
+        }
 
-        $courses = Course::where('category_id', $type)->whereYear('date_start', '>=', now()->year)->get();
+        $courses = Course::where('category_id', $type)
+            ->where('date_start', '>=', now()->subMonths($month_backward))
+            ->orderBy('date_start', 'asc')
+            ->get();
         $category = CourseCategory::where('id', $type)->first();
 
 

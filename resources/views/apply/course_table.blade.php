@@ -33,12 +33,14 @@
             align-items: center;
             justify-content: center;
             gap: 10px;
+            line-height: 1;
         }
 
         .course-list {
             list-style: none;
             padding: 0;
             margin: 0;
+            border-spacing: 0
         }
 
         .course-item {
@@ -46,7 +48,10 @@
             text-align: center;
             border-bottom: 1px solid #ddd;
             color: #333;
-            font-size: 1rem;
+            font-size: .9em;
+            border-spacing: 0;
+            line-height: 1;
+
         }
 
         .course-item:nth-child(odd) {
