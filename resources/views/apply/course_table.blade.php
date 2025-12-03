@@ -103,6 +103,20 @@
         </ul>
     </div>
 
+    <script>
+        function sendHeight() {
+            var height = document.body.scrollHeight;
+            // เปลี่ยน URL ตรงนี้เป็นโดเมนหน้า parent ของคุณ
+            window.parent.postMessage({
+                type: 'setHeight',
+                height: height
+            }, );
+        }
+
+        window.addEventListener('load', sendHeight);
+        window.addEventListener('resize', sendHeight);
+    </script>
+
 </body>
 
 </html>
