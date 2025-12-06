@@ -38,11 +38,13 @@ class CourseApplyController extends Controller
         if ($type == 1) {
             $courses = Course::whereIn('category_id', [1, 3])
                 ->where('date_start', '>=', now()->subMonths($month_backward))
+                ->where("state", "เปิดรับสมัคร")
                 ->orderBy('date_start', 'asc')
                 ->get();
         } else {
             $courses = Course::where('category_id', $type)
                 ->where('date_start', '>=', now()->subMonths($month_backward))
+                ->where("state", "เปิดรับสมัคร")
                 ->orderBy('date_start', 'asc')
                 ->get();
         }
