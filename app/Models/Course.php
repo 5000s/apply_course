@@ -87,14 +87,20 @@ class Course extends Model
         $endMonth = $thai_months[$end->month - 1];
         $endYear = $end->year + 543;
 
+        $courseDesc = "";
+        // Check if category exists and contains "ศิษย์เก่า"
+        if (isset($this->category) && str_contains($this->category, "ศิษย์เก่า")) {
+            $courseDesc = " (ศิษย์เก่า)";
+        }
+
         if ($start->month == $end->month && $start->year == $end->year) {
             if ($start->day == $end->day) {
-                return "$startDayAbbr $startDay $startMonth $startYear";
+                return "$startDayAbbr $startDay $startMonth $startYear" . $courseDesc;
             } else {
-                return "$startDayAbbr $startDay – $endDayAbbr $endDay $startMonth $startYear";
+                return "$startDayAbbr $startDay – $endDayAbbr $endDay $startMonth $startYear" . $courseDesc;
             }
         } else {
-            return "$startDayAbbr $startDay $startMonth – $endDayAbbr $endDay $endMonth $endYear";
+            return "$startDayAbbr $startDay $startMonth – $endDayAbbr $endDay $endMonth $endYear" . $courseDesc;
         }
     }
 
