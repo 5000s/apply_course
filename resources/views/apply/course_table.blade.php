@@ -106,6 +106,7 @@
     <script>
         function sendHeight() {
             var height = document.body.scrollHeight;
+            console.log('[Iframe Debug] Sending height:', height, 'for elementId:', @json($id));
             // เปลี่ยน URL ตรงนี้เป็นโดเมนหน้า parent ของคุณ
             window.parent.postMessage({
                     type: 'setHeight',
