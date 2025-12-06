@@ -23,7 +23,7 @@ use function Symfony\Component\String\b;
 class CourseApplyController extends Controller
 {
 
-    public function courseTableWordpress(Request $request, $type, $lang)
+    public function courseTableWordpress(Request $request, $location, $type, $lang)
     {
         $month_backward = 5;
         if ($request->input('m')) {
@@ -37,12 +37,14 @@ class CourseApplyController extends Controller
 
         if ($type == 1) {
             $courses = Course::whereIn('category_id', [1, 3])
+                ->where('location_id', $location)
                 ->where('date_start', '>=', now()->subMonths($month_backward))
                 ->where("state", "เปิดรับสมัคร")
                 ->orderBy('date_start', 'asc')
                 ->get();
         } else {
             $courses = Course::where('category_id', $type)
+                ->where('location_id', $location)
                 ->where('date_start', '>=', now()->subMonths($month_backward))
                 ->where("state", "เปิดรับสมัคร")
                 ->orderBy('date_start', 'asc')
