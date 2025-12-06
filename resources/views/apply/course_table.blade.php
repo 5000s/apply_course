@@ -109,7 +109,8 @@
             // เปลี่ยน URL ตรงนี้เป็นโดเมนหน้า parent ของคุณ
             window.parent.postMessage({
                     type: 'setHeight',
-                    height: height
+                    height: height,
+                    elementId: @json($id)
                 },
                 '*'
             );

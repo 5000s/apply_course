@@ -30,6 +30,11 @@ class CourseApplyController extends Controller
             $month_backward = $request->input('m');
         }
 
+        $id = "area_" . rand(10000, 99999);
+        if ($request->input('id')) {
+            $id = $request->input('id');
+        }
+
         $courses = Course::where('category_id', $type)
             ->where('date_start', '>=', now()->subMonths($month_backward))
             ->orderBy('date_start', 'asc')
@@ -37,7 +42,8 @@ class CourseApplyController extends Controller
         $category = CourseCategory::where('id', $type)->first();
 
 
-        return view('apply.course_table', compact('courses', 'category', 'lang'));
+
+        return view('apply.course_table', compact('courses', 'category', 'lang', 'id'));
     }
 
     public function directApply(Request $request)
