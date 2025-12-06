@@ -226,7 +226,7 @@ Route::post('/sms/send', [SmsController::class, 'send'])->name('sms.send');
 
 Route::middleware(['allow.iframe'])->group(function () {
 
-    Route::get('/apply/table/{location}/{type}/{lang}', [CourseApplyController::class, 'courseTableWordpress'])->name('course.table');
+    Route::get('/apply/table/{type}/{lang}', [CourseApplyController::class, 'courseTableWordpress'])->name('course.table');
 
     Route::get('/apply/direct', [CourseApplyController::class, 'directApply'])->name('apply.direct');
     Route::post('/apply/direct/request-otp', [CourseApplyController::class, 'directRequestOtp'])->name('apply.direct.requestOtp');
