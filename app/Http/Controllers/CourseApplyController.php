@@ -23,7 +23,7 @@ use function Symfony\Component\String\b;
 class CourseApplyController extends Controller
 {
 
-    public function courseTableWordpress(Request $request, $location, $type, $lang)
+    public function courseTableWordpress(Request $request, $type, $lang)
     {
         $month_backward = 5;
         if ($request->input('m')) {
@@ -33,6 +33,11 @@ class CourseApplyController extends Controller
         $id = "area_" . rand(10000, 99999);
         if ($request->input('id')) {
             $id = $request->input('id');
+        }
+
+        $location = 1;
+        if ($request->input('location')) {
+            $location = $request->input('location');
         }
 
         if ($type == 1) {
