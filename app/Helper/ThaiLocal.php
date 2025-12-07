@@ -24,24 +24,30 @@ class ThaiLocal
         ];
     }
 
-    public static function miniMonth($month): string
+    public static function miniMonths(): array
     {
         $thai_months = [
-            1 => 'ม.ค.',
-            2 => 'ก.พ.',
-            3 => 'มี.ค.',
-            4 => 'เม.ย.',
-            5 => 'พ.ค.',
-            6 => 'มิ.ย.',
-            7 => 'ก.ค.',
-            8 => 'ส.ค.',
-            9 => 'ก.ย.',
-            10 => 'ต.ค.',
-            11 => 'พ.ย.',
-            12 => 'ธ.ค.',
+            'ม.ค.',
+            'ก.พ.',
+            'มี.ค.',
+            'เม.ย.',
+            'พ.ค.',
+            'มิ.ย.',
+            'ก.ค.',
+            'ส.ค.',
+            'ก.ย.',
+            'ต.ค.',
+            'พ.ย.',
+            'ธ.ค.',
         ];
+
+        return $thai_months;
+    }
+
+    public static function miniMonth($month): string
+    {
+        $thai_months = self::miniMonths();
 
         return $thai_months[$month];
     }
-
 }

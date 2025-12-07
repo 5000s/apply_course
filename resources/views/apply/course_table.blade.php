@@ -89,6 +89,24 @@
         .btn-register:hover {
             background-color: #218838;
         }
+
+        .desktop-text {
+            display: block;
+        }
+
+        .mobile-text {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .desktop-text {
+                display: none;
+            }
+
+            .mobile-text {
+                display: block;
+            }
+        }
     </style>
 </head>
 
@@ -112,13 +130,22 @@
         <ul class="course-list">
             @forelse($courses as $course)
                 <li class="course-item">
-                    @if ($lang == 'th')
-                        {{ $course->course_long_date_txt }}
-                    @else
-                        {{ $course->course_long_date_txt_en }}
-                    @endif
+                    <span class="desktop-text">
+                        @if ($lang == 'th')
+                            {{ $course->getCourseLongDateTxtAttribute(true) }}
+                        @else
+                            {{ $course->getCourseLongDateTxtEnAttribute(true) }}
+                        @endif
+                    </span>
+                    <span class="mobile-text">
+                        @if ($lang == 'th')
+                            {{ $course->getCourseLongDateTxtAttribute(false) }}
+                        @else
+                            {{ $course->getCourseLongDateTxtEnAttribute(false) }}
+                        @endif
+                    </span>
 
-                    @if (isset($regis) && $regis == 1)
+                    @if (isset($regis) && $regis == 1 && $course->date_start >= date('Y-m-d'))
                         <a href="{{ route('apply.direct', ['course_id' => $course->id]) }}" target="_blank"
                             class="btn-register">
                             @if ($lang == 'th')

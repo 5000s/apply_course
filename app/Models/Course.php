@@ -60,7 +60,7 @@ class Course extends Model
         return $courseDate;
     }
 
-    public function getCourseLongDateTxtAttribute()
+    public function getCourseLongDateTxtAttribute($miniMonth = false)
     {
         $thai_days = [
             'Sunday' => 'อา.',
@@ -73,6 +73,9 @@ class Course extends Model
         ];
 
         $thai_months = ThaiLocal::month();
+        if ($miniMonth == true) {
+            $thai_months = ThaiLocal::miniMonths();
+        }
 
         $start = $this->date_start;
         $end = $this->date_end;
@@ -104,7 +107,7 @@ class Course extends Model
         }
     }
 
-    public function getCourseLongDateTxtEnAttribute()
+    public function getCourseLongDateTxtEnAttribute($miniMonth = false)
     {
         $start = $this->date_start;
         $end = $this->date_end;
@@ -112,23 +115,38 @@ class Course extends Model
         $startDayAbbr = $start->format('D.'); // Sun.
         $startDay = $start->day;
         $startMonth = $start->format('F'); // August
+
+        if ($miniMonth == true) {
+            $startMonth = $start->format('M');
+        }
         $startYear = $start->year;
 
         $endDayAbbr = $end->format('D.');
         $endDay = $end->day;
         $endMonth = $end->format('F');
+
+        if ($miniMonth == true) {
+            $endMonth = $end->format('M');
+        }
+
         $endYear = $end->year;
+
+        $courseDesc = "";
+        // Check if category exists and contains "ศิษย์เก่า"
+        if (isset($this->category) && str_contains($this->category, "Alumni")) {
+            $courseDesc = " (Alumni)";
+        }
 
         if ($start->month == $end->month && $start->year == $end->year) {
             if ($start->day == $end->day) {
-                return "$startDayAbbr $startDay $startMonth $startYear";
+                return "$startDayAbbr $startDay $startMonth $startYear" . $courseDesc;
             } else {
-                return "$startDayAbbr $startDay – $endDayAbbr $endDay $startMonth $startYear";
+                return "$startDayAbbr $startDay – $endDayAbbr $endDay $startMonth $startYear" . $courseDesc;
             }
         } elseif ($start->year == $end->year) {
-            return "$startDayAbbr $startDay $startMonth – $endDayAbbr $endDay $endMonth $endYear";
+            return "$startDayAbbr $startDay $startMonth – $endDayAbbr $endDay $endMonth $endYear" . $courseDesc;
         } else {
-            return "$startDayAbbr $startDay $startMonth $startYear – $endDayAbbr $endDay $endMonth $endYear";
+            return "$startDayAbbr $startDay $startMonth $startYear – $endDayAbbr $endDay $endMonth $endYear" . $courseDesc;
         }
     }
 
