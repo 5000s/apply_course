@@ -132,16 +132,16 @@
                 <li class="course-item">
                     <span class="desktop-text">
                         @if ($lang == 'th')
-                            {{ $course->getCourseLongDateTxtAttribute(true) }}
+                            {{ $course->getCourseLongDateTxtAttribute(false) }}
                         @else
-                            {{ $course->getCourseLongDateTxtEnAttribute(true) }}
+                            {{ $course->getCourseLongDateTxtEnAttribute(false) }}
                         @endif
                     </span>
                     <span class="mobile-text">
                         @if ($lang == 'th')
-                            {{ $course->getCourseLongDateTxtAttribute(false) }}
+                            {{ $course->getCourseLongDateTxtAttribute(true) }}
                         @else
-                            {{ $course->getCourseLongDateTxtEnAttribute(false) }}
+                            {{ $course->getCourseLongDateTxtEnAttribute(true) }}
                         @endif
                     </span>
 
