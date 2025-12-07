@@ -130,26 +130,28 @@
                                 <div class="col-md-6">
                                     <label class="form-label">ชื่อ</label>
                                     <input type="text" name="name" class="form-control"
+                                        @if ($member_new == false) readonly @endif
                                         value="{{ old('name', $member->name) }}">
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label">นามสกุล</label>
                                     <input type="text" name="surname" class="form-control"
+                                        @if ($member_new == false) readonly @endif
                                         value="{{ old('surname', $member->surname) }}">
                                 </div>
 
-                                <div class="col-md-6">
+                                <div class="col-md-6" @if ($member_new == false) hidden @endif>
                                     <label class="form-label">โทรศัพท์</label>
                                     <input type="text" name="phone" class="form-control"
                                         value="{{ old('phone', $member->phone) }}">
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-6" @if ($member_new == false) hidden @endif>
                                     <label class="form-label">โทรศัพท์ที่ 2</label>
                                     <input type="text" name="phone_2" class="form-control"
                                         value="{{ old('phone_2', $member->phone_2) }}">
                                 </div>
 
-                                <div class="col-md-6">
+                                <div class="col-md-6" @if ($member_new == false) hidden @endif>
                                     <label class="form-label">เพศ</label>
                                     <select name="gender" class="form-select">
                                         <option value="หญิง"
@@ -159,13 +161,13 @@
                                     </select>
                                 </div>
 
-                                <div class="col-md-6">
+                                <div class="col-md-6" @if ($member_new == false) hidden @endif>
                                     <label class="form-label">ไลน์</label>
                                     <input type="text" name="line" class="form-control"
                                         value="{{ old('line', $member->line) }}">
                                 </div>
 
-                                <div class="col-md-6">
+                                <div class="col-md-6" @if ($member_new == false) hidden @endif>
                                     @php
                                         $old = old('birthdate', optional($member->birthdate)->format('Y-m-d'));
                                         if ($old && preg_match('/^\d{4}-\d{2}-\d{2}$/', $old)) {
@@ -230,7 +232,7 @@
                                         value="{{ sprintf('%04d-%02d-%02d', $defY, $defM, $defD) }}">
                                 </div>
 
-                                <div class="col-md-6">
+                                <div class="col-md-6" @if ($member_new == false) hidden @endif>
                                     <label class="form-label">สัญชาติ</label>
                                     <select name="nationality" class="form-select">
                                         <option value="">-- เลือกสัญชาติ --</option>
@@ -244,7 +246,7 @@
                                     {{ $member->nationality }}
                                 </div>
 
-                                <div class="col-md-6">
+                                <div class="col-md-6" @if ($member_new == false) hidden @endif>
                                     <label class="form-label">จังหวัดที่อยู่ในไทย {{ $member->province }}</label>
                                     <select name="province" class="form-select">
                                         <option value="">-- เลือกจังหวัด --</option>
@@ -259,13 +261,13 @@
 
                                 </div>
 
-                                <div class="col-md-6">
+                                <div class="col-md-6" @if ($member_new == false) hidden @endif>
                                     <label class="form-label">ประเทศ</label>
                                     <input type="text" name="country" class="form-control"
                                         value="{{ old('country', $member->country ?? 'Thailand') }}">
                                 </div>
 
-                                <div class="col-md-12">
+                                <div class="col-md-12" @if ($member_new == false) hidden @endif>
                                     <label class="form-label">โรคประจำตัว / ภาวะสุขภาพที่ควรแจ้ง</label>
                                     <textarea name="disease" class="form-control" rows="2">{{ old('disease', $member->blacklist_remark) }}</textarea>
                                     {{-- ถ้าคุณใช้ column อื่นสำหรับโรคประจำตัว ให้ปรับตรงนี้ --}}
@@ -275,7 +277,7 @@
                     </div>
 
                     {{-- การศึกษา และ อาชีพ --}}
-                    <div class="card mb-4">
+                    <div class="card mb-4" @if ($member_new == false) hidden @endif>
                         <div class="card-header bg-white">
                             <h5 class="mb-0">การศึกษา และ อาชีพ</h5>
                         </div>
@@ -307,7 +309,7 @@
                     </div>
 
                     {{-- ผู้ติดต่อฉุกเฉิน --}}
-                    <div class="card mb-4">
+                    <div class="card mb-4" @if ($member_new == false) hidden @endif>
                         <div class="card-header bg-white">
                             <h5 class="mb-0">ผู้ติดต่อฉุกเฉิน</h5>
                         </div>

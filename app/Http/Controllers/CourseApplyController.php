@@ -203,10 +203,13 @@ class CourseApplyController extends Controller
         $email = "";
 
 
+        $course  = Course::findOrFail($data['course_id']);
         $member = Member::findCandidate($gender, $firstname, $lastname, $birth_date);
 
         if (!$member) {
             $member = $this->createMember($gender, $firstname, $lastname, $birth_date, $phone, $email, $code);
+            $member->save();
+            $member_new = true;
         } else {
             // update เบา ๆ เผื่อข้อมูลใหม่กว่า
             $member->phone     = $data['phone'];
@@ -214,15 +217,11 @@ class CourseApplyController extends Controller
                 $member->email = $data['email'];
             }
             $member->updated_by = 'web-direct';
+            $member->save();
+            $member_new = false;
         }
 
-        $member->save();
-
-        $course  = Course::findOrFail($data['course_id']);
-
         $apply = $this->newApply($member->id, $course->id, 0, "ทั่วไป");
-
-
 
         // 4) Prepare View Model (Same as directApply)
         $courseCat = CourseCategory::findOrFail($course->category_id);
@@ -294,6 +293,7 @@ class CourseApplyController extends Controller
         $data  = [];
         $data['course'] = $course;
         $data['member'] = $member;
+        $data['member_new'] = $member_new;
         $data['apply'] = $apply;
         $data['course_cat'] = $courseCat;
         $data['vm'] = $vm;
@@ -306,119 +306,128 @@ class CourseApplyController extends Controller
 
     public function newApply($member_id, $course_id, $van, $shelter)
     {
+        $apply = Apply::where('member_id', $member_id)
+            ->where('course_id', $course_id)
+            ->where('cancel', "!=", 1)
+            ->first();
+
+        if ($apply) {
+            return $apply;
+        }
+
         $apply = new Apply();
         $apply->member_id = $member_id;
         $apply->course_id = $course_id;
         $apply->van = $van;
         $apply->shelter = $shelter;
-        $apply->cancel = 0;
+        $apply->cancel = null;
         $apply->state = "ยื่นใบสมัคร";
         $apply->created_by = "USER";
+
         return $apply;
     }
 
 
     // Send OTP to phone OR email
-    public function directRequestOtp(Request $request)
-    {
-        $data = $request->validate([
-            'course_id'  => ['required', Rule::exists('courses', 'id')],
-            'gender' => ['required', 'string', 'max:100'],
-            'first_name' => ['required', 'string', 'max:100'],
-            'last_name'  => ['required', 'string', 'max:100'],
-            'channel'    => ['required', Rule::in(['phone', 'email'])],
-            'phone'      => ['nullable', 'string', 'max:30', 'required_if:channel,phone'],
-            'email'      => ['nullable', 'email', 'max:190', 'required_if:channel,email'],
-            'birth_date' => ['required', 'date', 'before_or_equal:today'],
-            'member_id'  => ['nullable', 'integer'],
-        ], [
-            'phone.required_if' => 'กรุณากรอกเบอร์โทรศัพท์',
-            'email.required_if' => 'กรุณากรอกอีเมล',
-        ]);
+    // public function directRequestOtp(Request $request)
+    // {
+    //     $data = $request->validate([
+    //         'course_id'  => ['required', Rule::exists('courses', 'id')],
+    //         'gender' => ['required', 'string', 'max:100'],
+    //         'first_name' => ['required', 'string', 'max:100'],
+    //         'last_name'  => ['required', 'string', 'max:100'],
+    //         'channel'    => ['required', Rule::in(['phone', 'email'])],
+    //         'phone'      => ['nullable', 'string', 'max:30', 'required_if:channel,phone'],
+    //         'email'      => ['nullable', 'email', 'max:190', 'required_if:channel,email'],
+    //         'birth_date' => ['required', 'date', 'before_or_equal:today'],
+    //         'member_id'  => ['nullable', 'integer'],
+    //     ], [
+    //         'phone.required_if' => 'กรุณากรอกเบอร์โทรศัพท์',
+    //         'email.required_if' => 'กรุณากรอกอีเมล',
+    //     ]);
 
-        // --- normalize recipient
-        $recipient = $data['channel'] === 'phone'
-            ? $this->normalizePhone($data['phone'])
-            : strtolower(trim($data['email']));
+    //     // --- normalize recipient
+    //     $recipient = $data['channel'] === 'phone'
+    //         ? $this->normalizePhone($data['phone'])
+    //         : strtolower(trim($data['email']));
 
-        $firstname = $data['first_name'];
-        $lastname = $data['last_name'];
-        $gender = $data['gender'];
-        $phone = "";
-        $email = "";
-        if ($data['channel'] === 'phone') {
-            $phone = $this->normalizePhone($data['phone']);
-        } else {
-            $email = strtolower(trim($data['email']));
-        }
+    //     $firstname = $data['first_name'];
+    //     $lastname = $data['last_name'];
+    //     $gender = $data['gender'];
+    //     $phone = "";
+    //     $email = "";
+    //     if ($data['channel'] === 'phone') {
+    //         $phone = $this->normalizePhone($data['phone']);
+    //     } else {
+    //         $email = strtolower(trim($data['email']));
+    //     }
 
-        if ($data['channel'] === 'phone' && !$recipient) {
-            return response()->json(['ok' => false, 'message' => 'รูปแบบเบอร์โทรศัพท์ไม่ถูกต้อง'], 422);
-        }
+    //     if ($data['channel'] === 'phone' && !$recipient) {
+    //         return response()->json(['ok' => false, 'message' => 'รูปแบบเบอร์โทรศัพท์ไม่ถูกต้อง'], 422);
+    //     }
 
-        //        $key = "otp:{$data['channel']}:{$recipient}";
-        //        if (! RateLimiter::attempt($key, $perMinute = 1, fn() => true, $decay = 60)) {
-        //            return response()->json(['ok'=>false,'message'=>'โปรดรอสักครู่ก่อนขอรหัสใหม่'], 429);
-        //        }
-
-
-        $birthDate = $data['birth_date'];
-        $code = null;
-
-        $memberSearch = Member::findCandidate($gender, $firstname, $lastname, $birthDate);
-        if ($memberSearch) {
-            $existing = OtpCode::where('member_id', $memberSearch->id)->first();
-            if (!$existing) {
-                $code = $this->getApplyCode();
-            }
-            $memberSearch->applycode = $code;
-            $memberSearch->save();
-        } else {
-
-            $code = $this->getApplyCode();
-            $expiresAt = now()->addYear(30);
-
-            $memberSearch = $this->createMember($gender, $firstname, $lastname, $birthDate, $phone, $email, $code);
-
-            OtpCode::create([
-                'member_id'  => $memberSearch->id,
-                'channel'    => $data['channel'],
-                'recipient'  => $recipient,
-                'code'       => $code,
-                'expires_at' => $expiresAt,
-                'attempts'   => 0,
-            ]);
-        }
+    //     //        $key = "otp:{$data['channel']}:{$recipient}";
+    //     //        if (! RateLimiter::attempt($key, $perMinute = 1, fn() => true, $decay = 60)) {
+    //     //            return response()->json(['ok'=>false,'message'=>'โปรดรอสักครู่ก่อนขอรหัสใหม่'], 429);
+    //     //        }
 
 
+    //     $birthDate = $data['birth_date'];
+    //     $code = null;
 
-        // --- send
-        try {
-            if ($data['channel'] === 'email') {
-                // Mail::to($recipient)->send(new OtpMail($code));
-                Log::info("OTP Email to {$recipient}: {$code}");
-            } else {
-                // SmsService::send($recipient, "รหัส OTP: {$code} (หมดอายุใน 5 นาที)");
+    //     $memberSearch = Member::findCandidate($gender, $firstname, $lastname, $birthDate);
+    //     if ($memberSearch) {
+    //         $existing = OtpCode::where('member_id', $memberSearch->id)->first();
+    //         if (!$existing) {
+    //             $code = $this->getApplyCode();
+    //         }
+    //         $memberSearch->applycode = $code;
+    //         $memberSearch->save();
+    //     } else {
 
-                $this->sendSMS($recipient, $code, $firstname, $lastname);
-                Log::info("OTP SMS to {$recipient}: {$code}");
-            }
-        } catch (\Throwable $e) {
-            Log::error($e);
-            return response()->json(['ok' => false, 'message' => 'ส่งรหัสไม่สำเร็จ โปรดลองอีกครั้ง'], 500);
-        }
+    //         $code = $this->getApplyCode();
+    //         $expiresAt = now()->addYear(30);
 
-        return response()->json([
-            'ok'        => true,
-            'message'   => 'ส่งรหัส OTP แล้ว (มีอายุ 5 นาที)',
-            'channel'   => $data['channel'],
-            'recipient' => $this->maskRecipient($data['channel'], $recipient),
-            // ถ้าหน้าคุณต้องใช้ค่าตัวเต็มในการยืนยัน ให้ส่ง recipient ตัวเต็ม (ไม่ mask) ด้วยอีกฟิลด์
-            // แต่อย่า render ออกหน้าจอ
-            'recipient_raw' => $recipient,
-        ]);
-    }
+    //         $memberSearch = $this->createMember($gender, $firstname, $lastname, $birthDate, $phone, $email, $code);
 
+    //         OtpCode::create([
+    //             'member_id'  => $memberSearch->id,
+    //             'channel'    => $data['channel'],
+    //             'recipient'  => $recipient,
+    //             'code'       => $code,
+    //             'expires_at' => $expiresAt,
+    //             'attempts'   => 0,
+    //         ]);
+    //     }
+
+
+
+    //     // --- send
+    //     try {
+    //         if ($data['channel'] === 'email') {
+    //             // Mail::to($recipient)->send(new OtpMail($code));
+    //             Log::info("OTP Email to {$recipient}: {$code}");
+    //         } else {
+    //             // SmsService::send($recipient, "รหัส OTP: {$code} (หมดอายุใน 5 นาที)");
+
+    //             $this->sendSMS($recipient, $code, $firstname, $lastname);
+    //             Log::info("OTP SMS to {$recipient}: {$code}");
+    //         }
+    //     } catch (\Throwable $e) {
+    //         Log::error($e);
+    //         return response()->json(['ok' => false, 'message' => 'ส่งรหัสไม่สำเร็จ โปรดลองอีกครั้ง'], 500);
+    //     }
+
+    //     return response()->json([
+    //         'ok'        => true,
+    //         'message'   => 'ส่งรหัส OTP แล้ว (มีอายุ 5 นาที)',
+    //         'channel'   => $data['channel'],
+    //         'recipient' => $this->maskRecipient($data['channel'], $recipient),
+    //         // ถ้าหน้าคุณต้องใช้ค่าตัวเต็มในการยืนยัน ให้ส่ง recipient ตัวเต็ม (ไม่ mask) ด้วยอีกฟิลด์
+    //         // แต่อย่า render ออกหน้าจอ
+    //         'recipient_raw' => $recipient,
+    //     ]);
+    // }
     public function getApplyCode()
     {
         $code = str_pad((string)random_int(1000, 9999), 4, '0', STR_PAD_LEFT);
@@ -459,6 +468,7 @@ class CourseApplyController extends Controller
 
         $apply = Apply::where('course_id', $course_id)
             ->where('member_id', $member_id)
+            ->where('cancel', "!=", 1)
             ->first();
 
         if (!$apply) {

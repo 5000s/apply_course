@@ -115,7 +115,8 @@
                         <div class="text-center mt-5">
                             <p class="mb-1">ด้วยความนับถือ</p>
                             <p class="fw-bold">ทีมงาน</p>
-                            <a href="/" class="btn btn-outline-secondary mt-3">กลับสู่หน้าหลัก</a>
+                            <a href="https://bodhidhammayan.org/" target="_self"
+                                class="btn btn-outline-secondary mt-3">กลับสู่หน้าหลัก</a>
                         </div>
 
                     </div>
