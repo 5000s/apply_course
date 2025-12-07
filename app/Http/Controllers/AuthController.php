@@ -12,23 +12,25 @@ use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
-    public function index(Request $request){
+    public function index(Request $request)
+    {
         return view('login');
     }
 
-    public function login(Request $request){
+    public function login(Request $request)
+    {
 
         $name = $request->name;
         $lastname = $request->lastname;
         $phone = $request->phone;
         $phone = self::getPhoneSlug($phone);
 
-        $member = Member::where("name",$name)->where("surname",$lastname)->where("phone_slug",$phone)->first();
+        $member = Member::where("name", $name)->where("surname", $lastname)->where("phone_slug", $phone)->first();
 
-        if ($member){
+        if ($member) {
             dd($member);
-        }else{
-            dd($name,$lastname,$phone);
+        } else {
+            dd($name, $lastname, $phone);
         }
 
         return view('login');
@@ -44,7 +46,8 @@ class AuthController extends Controller
         return view('members.request-access');
     }
 
-    public function checkEmail(Request $request) {
+    public function checkEmail(Request $request)
+    {
         $first_name = $request->first_name;
         $last_name = $request->last_name;
         $birthYear = $request->birth_year;
@@ -64,7 +67,15 @@ class AuthController extends Controller
             $average_similarity = ($percent_firstname + $percent_lastname) / 2;
 
             if ($average_similarity >= $threshold) {
-                $masked_email = $this->maskEmail($member->email);
+
+
+                if (isset($member->email) && str_contains($member->email, "@")) {
+                    $masked_email = $this->maskEmail($member->email);
+                } else {
+                    $masked_email = "ไม่พบอีเมล";
+                }
+
+
                 $matched_members[] = [
                     'id' => $member->id,
                     'email' => $masked_email,
@@ -74,28 +85,35 @@ class AuthController extends Controller
         }
 
         // Sort matched members by similarity in descending order
-        usort($matched_members, function($a, $b) {
+        usort($matched_members, function ($a, $b) {
             return $b['similarity'] <=> $a['similarity'];
         });
 
         // Get the most matched member
         $most_matched_member = $matched_members[0] ?? null;
 
+
         if ($most_matched_member) {
+            if ($most_matched_member['email'] == "ไม่พบอีเมล") {
+                return redirect()->back()->with('error', 'ไม่พบอีเมลบันทึกในระบบ กรุณาติดต่อผู้ดูแลระบบ');
+            }
+
             return view('members.display-emails', ['most_matched_member' => $most_matched_member]);
         } else {
             return redirect()->back()->with('error', 'ไม่พบข้อมูลที่ตรงกับการค้นหาของคุณ กรุณาตรวจสอบให้ถูกต้อง');
         }
     }
 
-    private function maskEmail($email) {
+    private function maskEmail($email)
+    {
         $email_parts = explode("@", $email);
         $local = substr($email_parts[0], 0, 2) . str_repeat("*", strlen($email_parts[0]) - 2);
         return $local . "@" . $email_parts[1];
     }
 
 
-    public function requestPasswordReset(Request $request) {
+    public function requestPasswordReset(Request $request)
+    {
         $member = Member::find($request->member_id);
 
         if ($member) {
@@ -128,11 +146,12 @@ class AuthController extends Controller
 
 
 
-    public function updatePhone(){
+    public function updatePhone()
+    {
 
         $members = Member::get();
 
-        foreach ($members as $member){
+        foreach ($members as $member) {
             $phone = $member->phone;
             $member->phone_slug = self::getPhoneSlug($phone);
             $member->save();
@@ -141,10 +160,11 @@ class AuthController extends Controller
 
 
 
-    public static function getPhoneSlug($phone){
+    public static function getPhoneSlug($phone)
+    {
 
-        $phone = str_replace('|',",",$phone);
-        $phoneList = explode("," , $phone);
+        $phone = str_replace('|', ",", $phone);
+        $phoneList = explode(",", $phone);
         $phone = $phoneList[0];
 
         $divider = '';
@@ -168,13 +188,10 @@ class AuthController extends Controller
 
             // lowercase
             $text = strtolower($text);
-
-
-        }catch (\Exception $exception){
-
+        } catch (\Exception $exception) {
         }
 
-        if (strlen($text) > 30){
+        if (strlen($text) > 30) {
             dd($text);
         }
 

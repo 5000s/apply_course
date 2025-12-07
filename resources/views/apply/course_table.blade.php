@@ -51,7 +51,11 @@
             font-size: .9em;
             border-spacing: 0;
             line-height: 1;
-
+            position: relative;
+            /* Added for absolute positioning of the button */
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         .course-item:nth-child(odd) {
@@ -67,6 +71,23 @@
             padding: 20px;
             text-align: center;
             color: #666;
+        }
+
+        .btn-register {
+            position: absolute;
+            right: 15px;
+            background-color: #28a745;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9em;
+            transition: background-color 0.3s;
+        }
+
+        .btn-register:hover {
+            background-color: #218838;
         }
     </style>
 </head>
@@ -95,6 +116,17 @@
                         {{ $course->course_long_date_txt }}
                     @else
                         {{ $course->course_long_date_txt_en }}
+                    @endif
+
+                    @if (isset($regis) && $regis == 1)
+                        <a href="{{ route('apply.direct', ['course_id' => $course->id]) }}" target="_blank"
+                            class="btn-register">
+                            @if ($lang == 'th')
+                                สมัคร
+                            @else
+                                Register
+                            @endif
+                        </a>
                     @endif
                 </li>
             @empty

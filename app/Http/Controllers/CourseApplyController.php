@@ -40,6 +40,11 @@ class CourseApplyController extends Controller
             $location = $request->input('location');
         }
 
+        $regis = false;
+        if ($request->input('regis') && $request->input('regis') == 1) {
+            $regis = true;
+        }
+
         if ($type == 1) {
             $courses = Course::whereIn('category_id', [1, 3])
                 ->where('location_id', $location)
@@ -61,7 +66,7 @@ class CourseApplyController extends Controller
 
 
 
-        return view('apply.course_table', compact('courses', 'category', 'lang', 'id'));
+        return view('apply.course_table', compact('courses', 'category', 'lang', 'id', 'regis'));
     }
 
     public function directApply(Request $request)
