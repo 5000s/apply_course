@@ -488,17 +488,8 @@
                             // Auto-confirm for new user
                             if (window.setMemberChecked) window.setMemberChecked(true);
 
-                        } else if (res.count === 1) {
-                            let m = res.members[0];
-                            html = `<div class="alert alert-info">
-                                        <h5><i class="bi bi-info-circle-fill"></i> ท่านเป็นศิษย์เก่า</h5>
-                                        <p class="mb-2">ระบบพบข้อมูล: <strong>${m.name} ${m.surname}</strong> (รหัส: ${m.id})</p>
-                                        <button type="button" class="btn btn-primary" onclick="selectMember(${m.id}, '${m.name}')">
-                                            ใช้ข้อมูลนี้สมัคร
-                                        </button>
-                                    </div>`;
-
                         } else {
+                            // count >= 1 (Found 1 or more)
                             html = `<div class="card border-info">
                                         <div class="card-header bg-info text-white">
                                             พบข้อมูลที่อาจเป็นท่าน ${res.count} รายการ
@@ -508,10 +499,9 @@
                             res.members.forEach(m => {
                                 html += `<button type="button" class="list-group-item list-group-item-action" onclick="selectMember(${m.id}, '${m.name}')">
                                             <div class="d-flex w-100 justify-content-between">
-                                                <h5 class="mb-1">${m.name} ${m.surname}</h5>
+                                                <h5 class="mb-1">${m.name} ${m.surname} (อายุ ${m.age_years} ปี)</h5>
                                                 <small>${m.status}</small>
                                             </div>
-                                            <p class="mb-1">เบอร์โทร: ${m.phone || '-'}</p>
                                          </button>`;
                             });
 
@@ -541,7 +531,7 @@
             // Visual feedback
             $('#search-result-area').html(`<div class="alert alert-success">
                                             <i class="bi bi-check-circle-fill"></i> เลือกข้อมูล: <strong>${name}</strong> เรียบร้อยแล้ว <br>
-                                            กรุณากรอกข้อมูลส่วนอื่นให้ครบถ้วนแล้วกดปุ่ม "ส่งคำขอสมัครคอร์ส"
+                                            กรุณากดยืนยันว่าไม่ใช้หุ่นยนต์แล้วกดปุ่ม "ส่งคำขอสมัครคอร์ส"
                                            </div>`);
             if (window.setMemberChecked) window.setMemberChecked(true);
         }
@@ -550,7 +540,7 @@
             $('#member_id').val('');
             $('#search-result-area').html(`<div class="alert alert-success">
                                             <i class="bi bi-check-circle-fill"></i> เลือก: <strong>ผู้สมัครใหม่</strong> เรียบร้อยแล้ว <br>
-                                            กรุณากรอกข้อมูลส่วนอื่นให้ครบถ้วนแล้วกดปุ่ม "ส่งคำขอสมัครคอร์ส"
+                                             กรุณากดยืนยันว่าไม่ใช้หุ่นยนต์แล้วกดปุ่ม "ส่งคำขอสมัครคอร์ส"
                                            </div>`);
             if (window.setMemberChecked) window.setMemberChecked(true);
         }

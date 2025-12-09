@@ -220,10 +220,7 @@ class CourseApplyController extends Controller
             $member_new = true;
         } else {
             // update เบา ๆ เผื่อข้อมูลใหม่กว่า
-            $member->phone     = $data['phone'];
-            if (!empty($data['email'])) {
-                $member->email = $data['email'];
-            }
+            $member->phone_new     = $data['phone'];
             $member->updated_by = 'web-direct';
             $member->save();
             $member_new = false;
@@ -650,6 +647,12 @@ class CourseApplyController extends Controller
 
         // ค้นหา
         $members = Member::findMatchingMember($gender, $firstname, $lastname, $birthDate);
+
+        // Calculate age for display
+        $members->transform(function ($member) {
+            $member->age_years = $member->birthdate ? \Carbon\Carbon::parse($member->birthdate)->age : '-';
+            return $member;
+        });
 
 
         return response()->json([

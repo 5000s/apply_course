@@ -233,6 +233,10 @@ class Member extends Model
 
     public static function findMatchingMember($gender, $firstname, $lastname, $birthDate)
     {
+        if (trim($firstname) === '' || trim($lastname) === '') {
+            return collect();
+        }
+
         // Strip Thai honorifics
         $first = preg_replace('/^(แม่ชี|พระ|สามเณร|นาง|นาย)/u', '', trim($firstname));
         $last = trim($lastname);
@@ -249,24 +253,56 @@ class Member extends Model
             }
         }
 
-        // Build query with OR conditions
-        return self::where('gender', $gender)
-            ->where(function ($q) use ($first, $last, $day, $month) {
-                // 1) Name + Surname (Partial / Loose Match)
-                $q->where(function ($q1) use ($first, $last) {
-                    $q1->where('name', 'LIKE', "%{$first}%")
-                        ->where('surname', 'LIKE', "%{$last}%");
-                });
-
-                // 2) OR Name + Birth Day+Month
+        // Broad query to get candidates
+        // We filter strictly in PHP to handle the "80% similarity" requirement
+        $candidates = self::where('gender', $gender)
+            ->where(function ($q) use ($first, $day, $month) {
+                // Optimization: Match records with same birth day/month
                 if ($day && $month) {
-                    $q->orWhere(function ($q3) use ($first, $day, $month) {
-                        $q3->where('name', 'LIKE', "%{$first}%")
-                            ->whereMonth('birthdate', $month)
+                    $q->where(function ($q2) use ($day, $month) {
+                        $q2->whereMonth('birthdate', $month)
                             ->whereDay('birthdate', $day);
                     });
                 }
+
+                // OR Name starts with the same first character (Heuristic for performance)
+                // If name is short, valid matches usually share the first char.
+                if (mb_strlen($first) > 0) {
+                    $c1 = mb_substr($first, 0, 1);
+                    $q->orWhere('name', 'LIKE', "$c1%");
+                }
             })
             ->get();
+
+        return $candidates->filter(function ($m) use ($first, $last, $day, $month) {
+            // Helper to calc percent
+            $simName = 0;
+            similar_text($m->name, $first, $simName);
+
+            // 1) Name + Surname (Partial / Loose Match ~ 80%)
+            $simSur = 0;
+            $surname = $m->surname ?? ''; // Handle null surname
+            similar_text($surname, $last, $simSur);
+
+            if ($simName >= 75 && $simSur >= 75) {
+                return true;
+            }
+
+            // 2) OR Name + Birth Day+Month
+            if ($day && $month && $m->birthdate) {
+                try {
+                    $mDt = \Carbon\Carbon::parse($m->birthdate);
+                    if ($mDt->month == $month && $mDt->day == $day) {
+                        // Check name similarity (e.g. > 80%)
+                        if ($simName >= 75) {
+                            return true;
+                        }
+                    }
+                } catch (\Exception $e) {
+                }
+            }
+
+            return false;
+        })->values();
     }
 }
