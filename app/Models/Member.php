@@ -9,50 +9,50 @@ class Member extends Model
 {
 
     protected $fillable = [
-    'gender',
-    'name',
-    'surname',
-    'nickname',
-    'age',
-    'birthdate',
-    'buddhism',
-    'status',
-    'phone',
-    'phone_desc',
-    'phone_2',
-    'phone_2_desc',
-    'phone_slug',
-    'blacklist',
-    'email',
-    'province',
-    'country',
-    'facebook',
-    'organization',
-    'expertise',
-    'degree',
-    'career',
-    'techo_year',
-    'techo_courses',
-    'blacklist_release',
-    'blacklist_remark',
-    'pseudo',
-    'url_apply',
-    'url_history',
-    'url_image',
-    'created_by',
-    'updated_by',
-    'created_at',
-    'updated_at',
-    'line',
-    'nationality',
-    'name_emergency',
-    'surname_emergency',
-    'phone_emergency',
-    'relation_emergency',
-    'dharma_ex',
-    'dharma_ex_desc',
-    'know_source',
-    'shelter_number',
+        'gender',
+        'name',
+        'surname',
+        'nickname',
+        'age',
+        'birthdate',
+        'buddhism',
+        'status',
+        'phone',
+        'phone_desc',
+        'phone_2',
+        'phone_2_desc',
+        'phone_slug',
+        'blacklist',
+        'email',
+        'province',
+        'country',
+        'facebook',
+        'organization',
+        'expertise',
+        'degree',
+        'career',
+        'techo_year',
+        'techo_courses',
+        'blacklist_release',
+        'blacklist_remark',
+        'pseudo',
+        'url_apply',
+        'url_history',
+        'url_image',
+        'created_by',
+        'updated_by',
+        'created_at',
+        'updated_at',
+        'line',
+        'nationality',
+        'name_emergency',
+        'surname_emergency',
+        'phone_emergency',
+        'relation_emergency',
+        'dharma_ex',
+        'dharma_ex_desc',
+        'know_source',
+        'shelter_number',
         'medical_condition'
     ];
 
@@ -88,22 +88,22 @@ class Member extends Model
 
         // mobile 10 หลัก ขึ้นต้น 06/08/09 → 081 234 5678
         if (preg_match('/^(06|08|09)\d{8}$/', $clean)) {
-            return substr($clean,0,3).' '.substr($clean,3,3).' '.substr($clean,6,4);
+            return substr($clean, 0, 3) . ' ' . substr($clean, 3, 3) . ' ' . substr($clean, 6, 4);
         }
 
         // เบอร์บ้าน กทม. 02-xxx-xxxx → 02 123 4567
         if (preg_match('/^02\d{7}$/', $clean)) {
-            return substr($clean,0,2).' '.substr($clean,2,3).' '.substr($clean,5,4);
+            return substr($clean, 0, 2) . ' ' . substr($clean, 2, 3) . ' ' . substr($clean, 5, 4);
         }
 
         // เบอร์บ้านต่างจังหวัด 0x-xxxx-xxxx (รวม 9–10 หลัก)
         if (preg_match('/^0[3-9]\d{7,8}$/', $clean)) {
             // 0AA BBB BBBB / 0A BBB BBBB ตามความยาว
             if (strlen($clean) === 9) {
-                return substr($clean,0,2).' '.substr($clean,2,3).' '.substr($clean,5,4);
+                return substr($clean, 0, 2) . ' ' . substr($clean, 2, 3) . ' ' . substr($clean, 5, 4);
             }
             if (strlen($clean) === 10) {
-                return substr($clean,0,3).' '.substr($clean,3,3).' '.substr($clean,6,4);
+                return substr($clean, 0, 3) . ' ' . substr($clean, 3, 3) . ' ' . substr($clean, 6, 4);
             }
         }
 
@@ -120,12 +120,12 @@ class Member extends Model
 
         // แปลง +66 / 66xxxxx → 0xxxxx
         if (str_starts_with($digits, '66')) {
-            $digits = '0'.substr($digits, 2);
+            $digits = '0' . substr($digits, 2);
         }
 
         // บางกรณีเป็น 660… จาก copy เบอร์สากล
         if (str_starts_with($digits, '660')) {
-            $digits = '0'.substr($digits, 3);
+            $digits = '0' . substr($digits, 3);
         }
 
         // ถ้าเริ่มไม่ใช่ 0 แต่ยาวพอ ให้คงไว้ (กรณีเบอร์ตปท) — แต่ระบบนี้โฟกัสไทย
@@ -190,4 +190,83 @@ class Member extends Model
         return $match ?: null;
     }
 
+    public static function findPossibleMatches($gender, $firstname, $lastname, $birthDate)
+    {
+        // 1) คัดกรองจากวันเกิดและเพศ (ลดจำนวนแถว)
+        $candidates = self::query()
+            ->whereDate('birthdate', $birthDate)
+            ->where('gender', $gender)
+            ->get();
+
+        if ($candidates->isEmpty()) {
+            return collect();
+        }
+
+        // helper: normalize ชื่อให้เทียบได้ (รองรับไทย)
+        $norm = function (string $s) {
+            $s = mb_strtolower($s, 'UTF-8');
+            $s = preg_replace('/[^[:alnum:]\p{Thai}]+/u', '', $s);
+            return $s;
+        };
+
+        // ตัด 3 ตัวแรกจากอินพุต
+        $inFirst3 = mb_substr($norm((string) $firstname), 0, 3, 'UTF-8');
+        $inLast3  = mb_substr($norm((string) $lastname),  0, 3, 'UTF-8');
+
+        if ($inFirst3 === '' || $inLast3 === '') {
+            return collect();
+        }
+
+        // 2) กรองชื่อ: ต้องตรงกันทั้งชื่อและนามสกุล (3 ตัวแรก)
+        $matches = $candidates->filter(function ($m) use ($norm, $inFirst3, $inLast3) {
+            $first = $m->first_name ?? $m->name ?? '';
+            $last  = $m->last_name  ?? $m->surname ?? '';
+
+            $candFirst3 = mb_substr($norm($first), 0, 3, 'UTF-8');
+            $candLast3  = mb_substr($norm($last),  0, 3, 'UTF-8');
+
+            return ($candFirst3 === $inFirst3) && ($candLast3 === $inLast3);
+        });
+
+        return $matches->values();
+    }
+
+    public static function findMatchingMember($gender, $firstname, $lastname, $birthDate)
+    {
+        // Strip Thai honorifics
+        $first = preg_replace('/^(แม่ชี|พระ|สามเณร|นาง|นาย)/u', '', trim($firstname));
+        $last = trim($lastname);
+
+        // Extract day and month if birthDate is provided
+        $day = $month = null;
+        if ($birthDate) {
+            try {
+                $dt = \Carbon\Carbon::parse($birthDate);
+                $day = $dt->day;
+                $month = $dt->month;
+            } catch (\Exception $e) {
+                // ignore
+            }
+        }
+
+        // Build query with OR conditions
+        return self::where('gender', $gender)
+            ->where(function ($q) use ($first, $last, $day, $month) {
+                // 1) Name + Surname (Partial / Loose Match)
+                $q->where(function ($q1) use ($first, $last) {
+                    $q1->where('name', 'LIKE', "%{$first}%")
+                        ->where('surname', 'LIKE', "%{$last}%");
+                });
+
+                // 2) OR Name + Birth Day+Month
+                if ($day && $month) {
+                    $q->orWhere(function ($q3) use ($first, $day, $month) {
+                        $q3->where('name', 'LIKE', "%{$first}%")
+                            ->whereMonth('birthdate', $month)
+                            ->whereDay('birthdate', $day);
+                    });
+                }
+            })
+            ->get();
+    }
 }

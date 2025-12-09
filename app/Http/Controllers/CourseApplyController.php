@@ -159,6 +159,7 @@ class CourseApplyController extends Controller
 
     public function applyCourse(Request $request)
     {
+
         // 1) validate ฟอร์มหน้าแรก
         $data = $request->validate([
             'course_id'  => ['required', 'integer', 'exists:courses,id'],
@@ -194,6 +195,8 @@ class CourseApplyController extends Controller
             }
         }
 
+        $member_id = $request->input('member_id');
+
         $firstname = $data['first_name'];
         $lastname = $data['last_name'];
         $gender = $data['gender'];
@@ -204,7 +207,12 @@ class CourseApplyController extends Controller
 
 
         $course  = Course::findOrFail($data['course_id']);
-        $member = Member::findCandidate($gender, $firstname, $lastname, $birth_date);
+
+        if ($member_id) {
+            $member = Member::findOrFail($member_id);
+        } else {
+            $member = Member::findCandidate($gender, $firstname, $lastname, $birth_date);
+        }
 
         if (!$member) {
             $member = $this->createMember($gender, $firstname, $lastname, $birth_date, $phone, $email, $code);
@@ -624,5 +632,29 @@ class CourseApplyController extends Controller
         ]);
 
         return true;
+    }
+
+
+    public function searchMember(Request $request)
+    {
+        // รับค่าจาก ajax
+        $gender = $request->input('gender');
+        $firstname = $request->input('first_name'); // form name="first_name"
+        $lastname = $request->input('last_name');   // form name="last_name"
+        $birthDate = $request->input('birth_date'); // form name="birth_date" (Y-m-d)
+
+        // ถ้าส่งมาเป็น camelCase ก็เผื่อไว้
+        if (!$firstname) $firstname = $request->input('firstname');
+        if (!$lastname) $lastname = $request->input('lastname');
+        if (!$birthDate) $birthDate = $request->input('birthDate');
+
+        // ค้นหา
+        $members = Member::findMatchingMember($gender, $firstname, $lastname, $birthDate);
+
+
+        return response()->json([
+            'count' => $members->count(),
+            'members' => $members
+        ]);
     }
 }

@@ -137,6 +137,8 @@
                                 <input type="hidden" name="course_id" value="{{ $course->id }}">
                                 @auth
                                     <input type="hidden" name="member_id" value="{{ auth()->id() }}">
+                                @else
+                                    <input type="hidden" name="member_id" id="member_id" value="">
                                 @endauth
 
                                 <div class="col-md-2">
@@ -259,8 +261,24 @@
                                     <hr>
                                 </div>
 
-                                {{-- Captcha --}}
+                                {{-- ส่วนตรวจสอบสมาชิก --}}
                                 <div class="col-12">
+                                    <label class="form-label fs-5">ตรวจสอบข้อมูลสมาชิก</label>
+                                    <div class="d-grid gap-2 d-md-block">
+                                        <button type="button" id="btnCheckMember"
+                                            class="btn btn-info text-white btn-lg px-4">
+                                            ตรวจสอบข้อมูล
+                                        </button>
+                                    </div>
+                                    <div id="search-result-area" class="mt-3"></div>
+                                </div>
+
+                                <div class="col-12">
+                                    <hr>
+                                </div>
+
+                                {{-- Captcha --}}
+                                <div class="col-12 d-none" id="recaptcha-section">
                                     <label class="form-label fs-5 d-block mb-2">ยืนยันว่าไม่ใช้หุ่นยนต์</label>
 
                                     @if (config('services.recaptcha.site_key'))
@@ -281,7 +299,7 @@
                                     @enderror
                                 </div>
 
-                                <div class="col-12">
+                                <div class="col-12 d-none" id="submit-section">
                                     <button type="submit" id="submitBtn" class="btn btn-bodhi btn-lg px-4" disabled>
                                         ส่งคำขอสมัครคอร์ส
                                     </button>
@@ -356,14 +374,185 @@
     </script>
 
     <script>
+        var isCaptchaValid = false;
+        // Check if captcha is actually present on page. If not, we don't block on it.
+        // PHP check: {{ config('services.recaptcha.site_key') ? 'true' : 'false' }} 
+        // But better to check runtime if the widget container exists? 
+        // Let's use the config value as source of truth for "Requiredness".
+        var captchaRequired = {{ config('services.recaptcha.site_key') ? 'true' : 'false' }};
+
+        // If not required, we initialize as true.
+        if (!captchaRequired) {
+            isCaptchaValid = true;
+        }
+
+        var isMemberChecked = false;
+
+        function updateSubmitButton() {
+            var btn = document.getElementById('submitBtn');
+            if (btn) {
+                // Enabled only if both are satisfied
+                if (isCaptchaValid && isMemberChecked) {
+                    btn.disabled = false;
+                } else {
+                    btn.disabled = true;
+                }
+            }
+        }
+
         function enableSubmit() {
-            document.getElementById('submitBtn').disabled = false;
+            isCaptchaValid = true;
+            updateSubmitButton();
         }
 
         function disableSubmit() {
-            document.getElementById('submitBtn').disabled = true;
+            isCaptchaValid = false;
+            updateSubmitButton();
         }
+
+        window.setMemberChecked = function(status) {
+            isMemberChecked = status;
+
+            // Toggle ReCaptcha visibility
+            var recap = document.getElementById('recaptcha-section');
+            if (recap) {
+                if (status) {
+                    recap.classList.remove('d-none');
+                } else {
+                    recap.classList.add('d-none');
+                }
+            }
+
+            // Toggle Submit Section visibility
+            var subSec = document.getElementById('submit-section');
+            if (subSec) {
+                if (status) {
+                    subSec.classList.remove('d-none');
+                } else {
+                    subSec.classList.add('d-none');
+                }
+            }
+
+            updateSubmitButton();
+        };
     </script>
     {{-- Google reCAPTCHA --}}
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Initial button state check
+            if (typeof updateSubmitButton === 'function') {
+                updateSubmitButton();
+            }
+
+            $('#btnCheckMember').click(function() {
+                let gender = $('#gender').val();
+                let firstName = $('input[name="first_name"]').val();
+                let lastName = $('input[name="last_name"]').val();
+                let birthDate = $('#birth_date').val();
+
+                if (!firstName || !lastName || !birthDate) {
+                    alert('กรุณากรอกข้อมูล ชื่อ นามสกุล และ วันเกิด ให้ครบถ้วน');
+                    return;
+                }
+
+                $('#search-result-area').html(
+                    '<div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>'
+                );
+
+                // Reset status while searching
+                if (window.setMemberChecked) window.setMemberChecked(false);
+
+                $.ajax({
+                    url: "{{ route('search.member') }}",
+                    method: 'GET',
+                    data: {
+                        gender: gender,
+                        first_name: firstName,
+                        last_name: lastName,
+                        birth_date: birthDate
+                    },
+                    success: function(res) {
+                        let html = '';
+                        if (res.count === 0) {
+                            html = `<div class="alert alert-success d-flex align-items-center">
+                                        <i class="bi bi-person-check-fill fs-3 me-3"></i>
+                                        <div>
+                                            <strong>ไม่พบข้อมูลเดิม</strong><br>
+                                            ท่านเป็นสมาชิกใหม่ สามารถกดสมัครได้ทันที
+                                        </div>
+                                    </div>`;
+                            $('#member_id').val('');
+                            // Auto-confirm for new user
+                            if (window.setMemberChecked) window.setMemberChecked(true);
+
+                        } else if (res.count === 1) {
+                            let m = res.members[0];
+                            html = `<div class="alert alert-info">
+                                        <h5><i class="bi bi-info-circle-fill"></i> ท่านเป็นศิษย์เก่า</h5>
+                                        <p class="mb-2">ระบบพบข้อมูล: <strong>${m.name} ${m.surname}</strong> (รหัส: ${m.id})</p>
+                                        <button type="button" class="btn btn-primary" onclick="selectMember(${m.id}, '${m.name}')">
+                                            ใช้ข้อมูลนี้สมัคร
+                                        </button>
+                                    </div>`;
+
+                        } else {
+                            html = `<div class="card border-info">
+                                        <div class="card-header bg-info text-white">
+                                            พบข้อมูลที่อาจเป็นท่าน ${res.count} รายการ
+                                        </div>
+                                        <div class="list-group list-group-flush">`;
+
+                            res.members.forEach(m => {
+                                html += `<button type="button" class="list-group-item list-group-item-action" onclick="selectMember(${m.id}, '${m.name}')">
+                                            <div class="d-flex w-100 justify-content-between">
+                                                <h5 class="mb-1">${m.name} ${m.surname}</h5>
+                                                <small>${m.status}</small>
+                                            </div>
+                                            <p class="mb-1">เบอร์โทร: ${m.phone || '-'}</p>
+                                         </button>`;
+                            });
+
+                            html += `<button type="button" class="list-group-item list-group-item-action list-group-item-light fw-bold text-primary" onclick="selectNewMember()">
+                                        <i class="bi bi-plus-circle"></i> ฉันเป็นผู้สมัครใหม่
+                                     </button>`;
+
+                            html += `</div></div>`;
+                            html +=
+                                `<div class="mt-2 text-muted small">โปรดเลือกชื่อของท่าน หรือเลือก "ฉันผู้สมัครใหม่" แล้วกดปุ่มยืนยันด้านล่าง</div>`;
+                        }
+
+                        $('#search-result-area').html(html);
+                    },
+                    error: function(err) {
+                        console.error(err);
+                        $('#search-result-area').html(
+                            '<div class="alert alert-danger">เกิดข้อผิดพลาดในการตรวจสอบข้อมูล</div>'
+                        );
+                    }
+                });
+            });
+        });
+
+        function selectMember(id, name) {
+            $('#member_id').val(id);
+            // Visual feedback
+            $('#search-result-area').html(`<div class="alert alert-success">
+                                            <i class="bi bi-check-circle-fill"></i> เลือกข้อมูล: <strong>${name}</strong> เรียบร้อยแล้ว <br>
+                                            กรุณากรอกข้อมูลส่วนอื่นให้ครบถ้วนแล้วกดปุ่ม "ส่งคำขอสมัครคอร์ส"
+                                           </div>`);
+            if (window.setMemberChecked) window.setMemberChecked(true);
+        }
+
+        function selectNewMember() {
+            $('#member_id').val('');
+            $('#search-result-area').html(`<div class="alert alert-success">
+                                            <i class="bi bi-check-circle-fill"></i> เลือก: <strong>ผู้สมัครใหม่</strong> เรียบร้อยแล้ว <br>
+                                            กรุณากรอกข้อมูลส่วนอื่นให้ครบถ้วนแล้วกดปุ่ม "ส่งคำขอสมัครคอร์ส"
+                                           </div>`);
+            if (window.setMemberChecked) window.setMemberChecked(true);
+        }
+    </script>
 @endpush

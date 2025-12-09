@@ -234,3 +234,5 @@ Route::middleware(['allow.iframe'])->group(function () {
     Route::post('/apply/direct/apply', [CourseApplyController::class, 'applyCourse'])->name('apply.direct.apply');
     Route::PUT('/apply/direct/confirm/{course_id}/{member_id}', [CourseApplyController::class, 'directConfirm'])->name('apply.form.confirm');
 });
+
+Route::get('/search/member', [CourseApplyController::class, 'searchMember'])->name('search.member');
