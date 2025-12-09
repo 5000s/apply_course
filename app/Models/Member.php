@@ -284,7 +284,7 @@ class Member extends Model
             $surname = $m->surname ?? ''; // Handle null surname
             similar_text($surname, $last, $simSur);
 
-            if ($simName >= 75 && $simSur >= 75) {
+            if ($simName >= 80 && $simSur >= 80) {
                 return true;
             }
 
@@ -293,8 +293,16 @@ class Member extends Model
                 try {
                     $mDt = \Carbon\Carbon::parse($m->birthdate);
                     if ($mDt->month == $month && $mDt->day == $day) {
-                        // Check name similarity (e.g. > 80%)
-                        if ($simName >= 75) {
+                        // Check name similarity (e.g. > 75%)
+                        if ($simName >= 70 && $simSur >= 70) {
+                            return true;
+                        }
+
+                        if ($simName >= 90 && $simSur >= 60) {
+                            return true;
+                        }
+
+                        if ($simName >= 60 && $simSur >= 90) {
                             return true;
                         }
                     }
