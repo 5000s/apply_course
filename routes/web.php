@@ -236,3 +236,6 @@ Route::middleware(['allow.iframe'])->group(function () {
 });
 
 Route::get('/search/member', [CourseApplyController::class, 'searchMember'])->name('search.member');
+
+
+Route::post('/search/member/report', [CourseApplyController::class, 'reportMemberNotFound'])->name('report.member');

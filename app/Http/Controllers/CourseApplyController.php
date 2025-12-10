@@ -18,7 +18,7 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Http;
 use function Symfony\Component\String\b;
-
+use App\Models\ReportCase;
 
 class CourseApplyController extends Controller
 {
@@ -658,6 +658,44 @@ class CourseApplyController extends Controller
         return response()->json([
             'count' => $members->count(),
             'members' => $members
+        ]);
+    }
+
+    public function reportMemberNotFound(Request $request)
+    {
+        // รับค่าจาก ajax
+        $gender = $request->input('gender');
+        $firstname = $request->input('first_name'); // form name="first_name"
+        $lastname = $request->input('last_name');   // form name="last_name"
+        $birthDate = $request->input('birth_date'); // form name="birth_date" (Y-m-d)
+        $phone = $request->input('phone'); // form name="phone" (0898889999)
+        $email = $request->input('email'); // form name="email" (0898889999)
+
+
+        $ip = $request->ip();
+        $ipv4 = filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) ? $ip : null;
+        $ipv6 = filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) ? $ip : null;
+
+        $reportCase = ReportCase::create([
+            'gender' => $gender,
+            'name' => $firstname,
+            'surname' => $lastname,
+            'birthdate' => $birthDate,
+            'phone' => $phone,
+            'email' => $email,
+            'ipv4' => $ipv4,
+            'ipv6' => $ipv6,
+            'city' => $request->input('city'),
+            'province' => $request->input('province'),
+            'country' => $request->input('country'),
+            'latitude' => $request->input('latitude'),
+            'longitude' => $request->input('longitude'),
+        ]);
+
+        return response()->json([
+            'ok' => true,
+            'message' => 'Report case created successfully.',
+            'report_case_id' => $reportCase->id
         ]);
     }
 }

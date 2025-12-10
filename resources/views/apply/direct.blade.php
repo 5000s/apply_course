@@ -317,6 +317,54 @@
             </div>
         </div>
     </div>
+
+
+    {{-- Modal แจ้งไม่พบข้อมูล --}}
+    <div class="modal fade" id="notFoundModal" tabindex="-1" aria-labelledby="notFoundModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title" id="notFoundModalLabel">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i> แจ้งปัญหาไม่พบข้อมูล
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-3">
+                        ระบบจะทำการส่งเรื่องแจ้งไปยังเจ้าหน้าที่ <br>
+                        โปรดตรวจสอบข้อมูลของท่านเพื่อให้ทางเจ้าหน้าที่ติดต่อกลับ
+                    </p>
+
+                    <div class="alert alert-light border mb-3">
+                        <strong>ข้อมูลที่ค้นหา:</strong>
+                        <ul class="mb-0 mt-1 small text-muted">
+                            <li>ชื่อ-นามสกุล: <span id="modal-name"></span></li>
+                            <li>เพศ: <span id="modal-gender"></span></li>
+                            <li>วันเกิด: <span id="modal-dob"></span></li>
+                        </ul>
+                    </div>
+
+                    <form id="notFoundForm">
+                        <div class="mb-3">
+                            <label for="modal-phone" class="form-label">เบอร์โทรศัพท์ <span
+                                    class="text-danger">*</span></label>
+                            <input type="tel" class="form-control" id="modal-phone" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="modal-email" class="form-label">อีเมล (ไม่จำเป็น)</label>
+                            <input type="email" class="form-control" id="modal-email" placeholder="name@example.com">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer" id="notFoundModalFooter">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                    <button type="button" class="btn btn-primary" onclick="submitNotFoundReport()">
+                        ยืนยันการแจ้งปัญหา
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @push('scripts')
@@ -484,7 +532,8 @@
                                         <div>
                                             <strong>ไม่พบข้อมูลเดิม</strong><br>
                                            <u> หากท่านเป็นสมาชิกใหม่ </u> สามารถกดสมัครได้ทันที
-                                           <br><u> หากท่านเป็นศิษย์เก่า </u> แต่หาข้อมูลไม่พบ กรุณาติดต่อผู้ดูแลระบบ ได้ที่ email: admin@bodhidhammayan.com
+                                           <br><u> หากท่านเป็นศิษย์เก่า </u> แต่หาข้อมูลไม่พบ กรุณากดปุ่ม 
+                                           <button type="button" class="btn btn-primary" onclick="showNotFoundModal()">แจ้งไม่พบข้อมูล</button>
 
                                         </div>
                                     </div>`;
@@ -547,6 +596,98 @@
                                              กรุณากดยืนยันว่าไม่ใช้หุ่นยนต์แล้วกดปุ่ม "ส่งคำขอสมัครคอร์ส"
                                            </div>`);
             if (window.setMemberChecked) window.setMemberChecked(true);
+        }
+
+        function showNotFoundModal() {
+            // Reset Footer
+            $('#notFoundModalFooter').html(`
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                <button type="button" class="btn btn-primary" onclick="submitNotFoundReport()">
+                    ยืนยันการแจ้งปัญหา
+                </button>
+            `);
+
+            // ดึงค่าจากฟอร์มหลัก
+            let gender = $('#gender').val();
+            let firstName = $('input[name="first_name"]').val();
+            let lastName = $('input[name="last_name"]').val();
+            let birthDate = $('#birth_date').val();
+            let phone = $('#phone').val();
+
+            // แสดงใน Modal
+            $('#modal-name').text(firstName + ' ' + lastName);
+            $('#modal-gender').text(gender);
+            $('#modal-dob').text(birthDate);
+            $('#modal-phone').val(phone); // Pre-fill phone
+
+            $('#notFoundModal').modal('show');
+        }
+
+        function submitNotFoundReport() {
+            let phone = $('#modal-phone').val();
+            let email = $('#modal-email').val();
+
+            if (!phone) {
+                alert('กรุณาระบุเบอร์โทรศัพท์');
+                return;
+            }
+
+            // Disable button
+            let btn = $('#notFoundModal .btn-primary');
+            let oldText = btn.text();
+            btn.prop('disabled', true).text('กำลังส่งข้อมูล...');
+            let data = {
+                _token: "{{ csrf_token() }}",
+                gender: $('#gender').val(),
+                first_name: $('input[name="first_name"]').val(),
+                last_name: $('input[name="last_name"]').val(),
+                birth_date: $('#birth_date').val(),
+                phone: phone,
+                email: email,
+            };
+
+            // Fetch location data
+            $.get('https://ipapi.co/json/')
+                .done(function(locationData) {
+                    // Update data with location info
+                    data.city = locationData.city;
+                    data.province = locationData.region;
+                    data.country = locationData.country_name;
+                    data.latitude = locationData.latitude;
+                    data.longitude = locationData.longitude;
+
+                    // Send report with location
+                    sendReport(data, btn, oldText);
+                })
+                .fail(function() {
+                    // Fallback: Send report without location
+                    console.warn('Failed to fetch location data');
+                    sendReport(data, btn, oldText);
+                });
+        }
+
+        function sendReport(data, btn, oldText) {
+            $.ajax({
+                url: "{{ route('report.member') }}",
+                method: 'POST',
+                data: data,
+                success: function(res) {
+                    $('#notFoundModalFooter').html(`
+                        <div class="d-flex flex-column align-items-center w-100">
+                            <span class="text-success fw-bold mb-2">
+                                <i class="bi bi-check-circle-fill me-1"></i> ระบบได้รับข้อมูลเรียบร้อยแล้ว
+                            </span>
+                            <small class="text-muted mb-3">เจ้าหน้าที่จะติดต่อกลับโดยเร็วที่สุด</small>
+                            <button type="button" class="btn btn-secondary w-100" data-bs-dismiss="modal">ปิดหน้าต่างนี้</button>
+                        </div>
+                    `);
+                },
+                error: function(err) {
+                    console.error(err);
+                    alert('เกิดข้อผิดพลาดในการส่งข้อมูล กรุณาลองใหม่อีกครั้ง');
+                    btn.prop('disabled', false).text(oldText);
+                }
+            });
         }
     </script>
 @endpush
