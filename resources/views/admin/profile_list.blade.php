@@ -3,7 +3,7 @@
 @section('content')
     <div  class="container-lg px-0" >
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h1>{{ __('messages.applicant_list') }}</h1>
+            <h1>{{ $title ?? __('messages.applicant_list') }}</h1>
             <a href="{{ route('member.create') }}" class="btn btn-primary">{{ __('messages.add_applicant') }}</a>
         </div>
         <table class="table" id="member_table">

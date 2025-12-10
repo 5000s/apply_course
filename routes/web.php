@@ -90,6 +90,9 @@ Route::prefix('admin')->middleware('auth', 'admin')->group(function () {
 
 
     Route::get('member', [AdminMemberController::class, 'profile'])->name("admin.members");
+    Route::get('member/senior', [AdminMemberController::class, 'senior'])->name("admin.members.senior");
+    Route::get('member/senior/{id}/edit', [AdminMemberController::class, 'editSenior'])->name("admin.members.senior.edit");
+    Route::put('member/senior/{id}', [AdminMemberController::class, 'updateSenior'])->name("admin.members.senior.update");
     Route::get('member/type', [AdminMemberController::class, 'getMemberType'])->name("admin.membersType");
     Route::get('member/course', [AdminMemberController::class, 'adminMemberCourse']);
 
