@@ -239,9 +239,10 @@
                                 <div class="col-md-6">
                                     <label class="form-label fs-5">เบอร์โทรศัพท์</label>
                                     <div class="mb-2">
-                                        <input type="tel" name="phone" class="form-control form-control-lg"
-                                            maxlength="30" inputmode="tel" pattern="[0-9\s\-+]*"
-                                            placeholder="เบอร์โทรศัพท์ เช่น 08xxxxxxxx" value="{{ old('phone') }}">
+                                        <input type="tel" id="phone" name="phone"
+                                            class="form-control form-control-lg" maxlength="30" inputmode="tel"
+                                            pattern="[0-9\s\-+]*" placeholder="เบอร์โทรศัพท์ เช่น 08xxxxxxxx"
+                                            value="{{ old('phone') }}">
                                     </div>
                                     {{--                                    <div> --}}
                                     {{--                                        <input type="email" --}}
@@ -452,9 +453,10 @@
                 let firstName = $('input[name="first_name"]').val();
                 let lastName = $('input[name="last_name"]').val();
                 let birthDate = $('#birth_date').val();
+                let phone = $('#phone').val();
 
-                if (!firstName || !lastName || !birthDate) {
-                    alert('กรุณากรอกข้อมูล ชื่อ นามสกุล และ วันเกิด ให้ครบถ้วน');
+                if (!firstName || !lastName || !birthDate || !phone) {
+                    alert('กรุณากรอกข้อมูล ชื่อ นามสกุล วันเกิด และ เบอร์โทรศัพท์ ให้ครบถ้วน');
                     return;
                 }
 
@@ -481,7 +483,9 @@
                                         <i class="bi bi-person-check-fill fs-3 me-3"></i>
                                         <div>
                                             <strong>ไม่พบข้อมูลเดิม</strong><br>
-                                            ท่านเป็นสมาชิกใหม่ สามารถกดสมัครได้ทันที
+                                           <u> หากท่านเป็นสมาชิกใหม่ </u> สามารถกดสมัครได้ทันที
+                                           <br><u> หากท่านเป็นศิษย์เก่า </u> แต่หาข้อมูลไม่พบ กรุณาติดต่อผู้ดูแลระบบ ได้ที่ email: admin@bodhidhammayan.com
+
                                         </div>
                                     </div>`;
                             $('#member_id').val('');
