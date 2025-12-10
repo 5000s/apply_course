@@ -500,7 +500,7 @@
                                 html += `<button type="button" class="list-group-item list-group-item-action" onclick="selectMember(${m.id}, '${m.name}')">
                                             <div class="d-flex w-100 justify-content-between">
                                                 <h5 class="mb-1">${m.name} ${m.surname} (อายุ ${m.age_years} ปี)</h5>
-                                                <small>${m.status}</small>
+                                                <small>${(m.status || '').includes('วิปัสสนา') ? 'ศิษย์วิปัสสนา' : m.status}</small>
                                             </div>
                                          </button>`;
                             });

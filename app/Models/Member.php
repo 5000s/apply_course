@@ -242,12 +242,13 @@ class Member extends Model
         $last = trim($lastname);
 
         // Extract day and month if birthDate is provided
-        $day = $month = null;
+        $day = $month = $year = null;
         if ($birthDate) {
             try {
                 $dt = \Carbon\Carbon::parse($birthDate);
                 $day = $dt->day;
                 $month = $dt->month;
+                $year = $dt->year;
             } catch (\Exception $e) {
                 // ignore
             }
@@ -256,13 +257,17 @@ class Member extends Model
         // Broad query to get candidates
         // We filter strictly in PHP to handle the "80% similarity" requirement
         $candidates = self::where('gender', $gender)
-            ->where(function ($q) use ($first, $day, $month) {
+            ->where(function ($q) use ($first, $day, $month, $year) {
                 // Optimization: Match records with same birth day/month
                 if ($day && $month) {
                     $q->where(function ($q2) use ($day, $month) {
                         $q2->whereMonth('birthdate', $month)
                             ->whereDay('birthdate', $day);
                     });
+                }
+
+                if ($year) {
+                    $q->orWhereYear('birthdate', $year);
                 }
 
                 // OR Name starts with the same first character (Heuristic for performance)
@@ -274,7 +279,7 @@ class Member extends Model
             })
             ->get();
 
-        return $candidates->filter(function ($m) use ($first, $last, $day, $month) {
+        return $candidates->filter(function ($m) use ($first, $last, $day, $month, $year) {
             // Helper to calc percent
             $simName = 0;
             similar_text($m->name, $first, $simName);
@@ -284,25 +289,29 @@ class Member extends Model
             $surname = $m->surname ?? ''; // Handle null surname
             similar_text($surname, $last, $simSur);
 
-            if ($simName >= 80 && $simSur >= 80) {
+            if ($simName >= 90 && $simSur >= 90) {
                 return true;
             }
 
-            // 2) OR Name + Birth Day+Month
-            if ($day && $month && $m->birthdate) {
+            // 2) OR Name + Birth Day+Month OR Year
+            if ($m->birthdate) {
                 try {
                     $mDt = \Carbon\Carbon::parse($m->birthdate);
-                    if ($mDt->month == $month && $mDt->day == $day) {
+
+                    $isDayMonthMatch = ($day && $month && $mDt->month == $month && $mDt->day == $day);
+                    $isYearMatch = ($year && $mDt->year == $year);
+
+                    if ($isDayMonthMatch || $isYearMatch) {
                         // Check name similarity (e.g. > 75%)
-                        if ($simName >= 70 && $simSur >= 70) {
+                        if ($simName >= 75 && $simSur >= 75) {
                             return true;
                         }
 
-                        if ($simName >= 90 && $simSur >= 60) {
+                        if ($simName >= 90 && $simSur >= 70) {
                             return true;
                         }
 
-                        if ($simName >= 60 && $simSur >= 90) {
+                        if ($simName >= 70 && $simSur >= 90) {
                             return true;
                         }
                     }
@@ -311,6 +320,14 @@ class Member extends Model
             }
 
             return false;
-        })->values();
+        })
+            ->sortByDesc(function ($m) use ($first, $last) {
+                $simName = 0;
+                similar_text($m->name, $first, $simName);
+                $simSur = 0;
+                similar_text($m->surname ?? '', $last, $simSur);
+                return $simName + $simSur;
+            })
+            ->values();
     }
 }
