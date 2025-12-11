@@ -18,7 +18,7 @@ class AdminMemberController extends Controller
         $members = Member::where("surname", "!=", "")->get();
 
         // Pass the member data to the view
-        return view('admin.profile_list', ['members' => $members]);
+        return view('admin.profile_list', ['members' => $members, 'title' => 'รายการสมาชิก']);
     }
 
 
@@ -109,5 +109,68 @@ class AdminMemberController extends Controller
 
 
         return view('admin.member_type',  compact('data'));
+    }
+    public function senior()
+    {
+        ini_set('memory_limit', '256M');
+        $members = Member::where("surname", "!=", "")->where('current_level', '!=', '0')->get();
+        return view('admin.senior_member_list', ['members' => $members, 'title' => 'ตารางศิษย์อาวุโส (senior level)']);
+    }
+
+    public function editSenior($id)
+    {
+        $member = Member::findOrFail($id);
+        return view('admin.senior_member_edit', compact('member'));
+    }
+
+    public function updateSenior(Request $request, $id)
+    {
+        $request->validate([
+            'leave_date' => 'nullable|date',
+            'death_date' => 'nullable|date',
+            'leave_description' => 'nullable|string',
+            'promote_level' => 'nullable|integer|min:1|max:4',
+            'promote_date' => 'required_with:promote_level|nullable|date',
+        ]);
+
+        $member = Member::findOrFail($id);
+        
+        $updateData = [
+            'leave_date' => $request->leave_date,
+            'death_date' => $request->death_date,
+            'leave_description' => $request->leave_description,
+        ];
+
+        // If promote_level is set, update current_level and the specific level date
+        if ($request->filled('promote_level')) {
+            $newLevel = (int) $request->promote_level;
+            
+            // 1. Always update the date for the selected level (allows backfilling)
+            if ($request->filled('promote_date')) {
+                $updateData["level_{$newLevel}_date"] = $request->promote_date;
+            }
+
+            // 2. Only update current_level if the new level is higher than the current one
+            $currentLevelInt = (int) $member->current_level;
+            
+            \Illuminate\Support\Facades\Log::info("Updating Senior ID: {$id}", [
+                'promote_level_req' => $request->promote_level,
+                'newLevel' => $newLevel,
+                'currentLevelRaw' => $member->current_level,
+                'currentLevelInt' => $currentLevelInt,
+                'check' => ($newLevel > $currentLevelInt)
+            ]);
+
+            if ($newLevel > $currentLevelInt) {
+                 // Cast to string to prevent MySQL interpreting int as ENUM index
+                 $updateData['current_level'] = (string) $newLevel;
+            }
+        }
+        
+        \Illuminate\Support\Facades\Log::info("Update Data:", $updateData);
+
+        $member->update($updateData);
+
+        return redirect()->route('admin.members.senior')->with('success', 'บันทึกข้อมูลเรียบร้อยแล้ว');
     }
 }

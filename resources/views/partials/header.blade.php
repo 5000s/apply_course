@@ -21,6 +21,7 @@
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="adminMenu">
                                 <li><a class="dropdown-item" href="{{ route('admin.courses') }}">จัดการคอร์ส</a></li>
                                 <li><a class="dropdown-item" href="{{ route('admin.members') }}">จัดการสมาชิก</a></li>
+                                <li><a class="dropdown-item" href="{{ route('admin.members.senior') }}">จัดการสมาชิก senior</a></li>
                                 <li><a class="dropdown-item" href="{{ route('admin.membersType') }}">รายการสมาชิก</a></li>
                                 <li><a class="dropdown-item" href="{{ route('teams.index') }}">จัดการทีม</a></li>
                                 <li><a class="dropdown-item" href="{{ route('dashboard.index') }}">สถิติ</a></li>
