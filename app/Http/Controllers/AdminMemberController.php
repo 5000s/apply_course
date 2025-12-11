@@ -11,14 +11,118 @@ class AdminMemberController extends Controller
 {
     public function profile()
     {
-        ini_set('memory_limit', '256M');
+        // Return view without loading all members
+        return view('admin.profile_list', ['title' => 'รายการสมาชิก']);
+    }
 
+    public function getMembersAjax(Request $request)
+    {
+        $columns = [
+            0 => 'id',
+            1 => 'name',
+            2 => 'surname',
+            3 => 'nickname',
+            4 => 'gender',
+            5 => 'birthdate', // age
+            6 => 'techo_year',
+            7 => 'phone',
+            8 => 'email',
+            // ... hidden columns or actions
+        ];
 
-        // Retrieve all members related to this user by email
-        $members = Member::where("surname", "!=", "")->get();
+        // Base Query
+        $query = Member::query()->where("surname", "!=", "")->where("name", "!=", "");
 
-        // Pass the member data to the view
-        return view('admin.profile_list', ['members' => $members, 'title' => 'รายการสมาชิก']);
+        // Total Records (before filtering)
+        $totalRecords = $query->count();
+
+        // Filtering
+        if ($search = $request->input('search.value')) {
+            $keywords = explode(' ', $search);
+            $countKey = count($keywords);
+
+            if ($countKey == 1) {
+                $query->where(function ($mainQuery) use ($keywords) {
+                    foreach ($keywords as $word) {
+                        if (!empty($word)) {
+                            $mainQuery->orWhere(function ($q) use ($word) {
+                                $q->where('name', 'LIKE', "%{$word}%")
+                                    ->orWhere('surname', 'LIKE', "%{$word}%")
+                                    ->orWhere('nickname', 'LIKE', "%{$word}%")
+                                    ->orWhere('id', 'LIKE', "%{$word}%")
+                                    ->orWhere('email', 'LIKE', "%{$word}%")
+                                    ->orWhereRaw("REPLACE(phone, ' ', '') LIKE ?", ["%{$word}%"]);
+                            });
+                        }
+                    }
+                });
+            } else if ($countKey > 1) {
+                $name = $keywords[0];
+                $surname = $keywords[1];
+                $query->where('name', 'like', "%$name%")->where('surname', 'like', "%$surname%");
+            }
+        }
+
+        $filteredRecords = $query->count();
+
+        // Ordering
+        if ($request->has('order')) {
+            $orderColumnIndex = $request->input('order.0.column');
+            $orderDirection = $request->input('order.0.dir');
+            $orderColumn = $columns[$orderColumnIndex] ?? 'id';
+
+            // Handle special sort for age (birthdate)
+            if ($orderColumn == 'birthdate') {
+                $query->orderBy('birthdate', $orderDirection == 'asc' ? 'desc' : 'asc');
+            } else {
+                $query->orderBy($orderColumn, $orderDirection);
+            }
+        } else {
+            $query->orderBy('id', 'desc');
+        }
+
+        // Pagination
+        $start = $request->input('start', 0);
+        $length = $request->input('length', 10);
+        $query->skip($start)->take($length);
+
+        $members = $query->get();
+
+        // Transform Data
+        $data = [];
+        foreach ($members as $member) {
+            $editUrl = route('member.edit', $member->id);
+            $registerUrl = route('courses.index', $member->id);
+            $historyUrl = route('courses.history', $member->id);
+
+            // Age Calculation
+            $age = $member->birthdate ? $member->birthdate->age : 'ไม่ทราบ';
+
+            $data[] = [
+                $member->id,
+                $member->name,
+                $member->surname,
+                $member->nickname,
+                $member->gender,
+                $age,
+                $member->techo_year,
+                $member->phone,
+                $member->email,
+                // Hidden phone column
+                str_replace(' ', '', $member->phone),
+                // Actions
+                '<div style="text-align: center"><a target="_blank" href="' . $editUrl . '" class="btn btn-secondary">' . __('messages.edit') . '</a></div>',
+                '<div style="text-align: center"><a target="_blank" href="' . $registerUrl . '" class="btn btn-secondary">' . __('messages.register') . '</a></div>',
+                '<div style="text-align: center"><a target="_blank" href="' . $historyUrl . '" class="btn btn-secondary">' . __('messages.history') . '</a></div>',
+            ];
+        }
+
+        return response()->json([
+            'draw' => intval($request->input('draw')),
+            'recordsTotal' => $totalRecords,
+            'recordsFiltered' => $filteredRecords,
+            'data' => $data
+        ]);
     }
 
 
@@ -126,50 +230,38 @@ class AdminMemberController extends Controller
     public function updateSenior(Request $request, $id)
     {
         $request->validate([
-            'leave_date' => 'nullable|date',
-            'death_date' => 'nullable|date',
+            'current_level' => 'required|integer|min:0|max:4',
+            'level_1_date' => 'nullable|date',
+            'level_2_date' => 'nullable|date',
+            'level_3_date' => 'nullable|date',
+            'level_4_date' => 'nullable|date',
             'leave_description' => 'nullable|string',
-            'promote_level' => 'nullable|integer|min:1|max:4',
-            'promote_date' => 'required_with:promote_level|nullable|date',
         ]);
 
         $member = Member::findOrFail($id);
-        
+
         $updateData = [
-            'leave_date' => $request->leave_date,
-            'death_date' => $request->death_date,
-            'leave_description' => $request->leave_description,
+            'current_level' => (string)$request->current_level,
+            'level_1_date' => $request->level_1_date,
+            'level_2_date' => $request->level_2_date,
+            'level_3_date' => $request->level_3_date,
+            'level_4_date' => $request->level_4_date,
+            // 'leave_description' => $request->leave_description, // Optional: Keep or remove as per user? User said "Remove... I will put elsewhere" for death/leave date. But maybe description too? 
+            // The user said "วันที่เสียชีวิต, วันที่ออกจากสายธรรม หมายเหตุ เอาออก (Death date, Leave date, Remark remove)".
+            // So I will NOT update them here.
         ];
 
-        // If promote_level is set, update current_level and the specific level date
-        if ($request->filled('promote_level')) {
-            $newLevel = (int) $request->promote_level;
-            
-            // 1. Always update the date for the selected level (allows backfilling)
-            if ($request->filled('promote_date')) {
-                $updateData["level_{$newLevel}_date"] = $request->promote_date;
-            }
+        // I will actually remove leave_description from the update array if the user explicitly said "Note remove".
+        // Let's re-read: "วันที่เสียชีวิต, วันที่ออกจากสายธรรม หมายเหตุ เอาออก"
+        // Yes, remove 'leave_description' from update.
 
-            // 2. Only update current_level if the new level is higher than the current one
-            $currentLevelInt = (int) $member->current_level;
-            
-            \Illuminate\Support\Facades\Log::info("Updating Senior ID: {$id}", [
-                'promote_level_req' => $request->promote_level,
-                'newLevel' => $newLevel,
-                'currentLevelRaw' => $member->current_level,
-                'currentLevelInt' => $currentLevelInt,
-                'check' => ($newLevel > $currentLevelInt)
-            ]);
-
-            if ($newLevel > $currentLevelInt) {
-                 // Cast to string to prevent MySQL interpreting int as ENUM index
-                 $updateData['current_level'] = (string) $newLevel;
-            }
-        }
-        
-        \Illuminate\Support\Facades\Log::info("Update Data:", $updateData);
-
-        $member->update($updateData);
+        $member->update([
+            'current_level' => (string)$request->current_level,
+            'level_1_date' => $request->level_1_date,
+            'level_2_date' => $request->level_2_date,
+            'level_3_date' => $request->level_3_date,
+            'level_4_date' => $request->level_4_date,
+        ]);
 
         return redirect()->route('admin.members.senior')->with('success', 'บันทึกข้อมูลเรียบร้อยแล้ว');
     }
