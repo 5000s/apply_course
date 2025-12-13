@@ -110,6 +110,13 @@
                                             'เลือกข้อมูล: <strong>:name</strong> เรียบร้อยแล้ว <br> กรุณากดยืนยันว่าไม่ใช้หุ่นยนต์แล้วกดปุ่ม "ส่งคำขอสมัครคอร์ส"',
                                         'js_selected_new' =>
                                             'เลือก: <strong>ผู้สมัครใหม่</strong> เรียบร้อยแล้ว <br> กรุณากดยืนยันว่าไม่ใช้หุ่นยนต์แล้วกดปุ่ม "ส่งคำขอสมัครคอร์ส"',
+                                        'js_age_format' => '(อายุ :age ปี)',
+                                        'status_map' => [
+                                            'ผู้สมัครใหม่' => 'ผู้สมัครใหม่',
+                                            'ศิษย์อานาปานสติ' => 'ศิษย์อานาปานสติ',
+                                            'ศิษย์เตโชวิปัสสนา' => 'ศิษย์วิปัสสนา',
+                                            'ศิษย์อานาฯ ๑ วัน' => 'ศิษย์อานาฯ ๑ วัน',
+                                        ],
                                     ],
                                     'en' => [
                                         'place' => 'Location',
@@ -175,7 +182,14 @@
                                         'js_selected' =>
                                             'Selected: <strong>:name</strong> <br> Please confirm captcha and click "Submit Application".',
                                         'js_selected_new' =>
-                                            'Selected: <strong>New Applicant</strong> <br> Please confirm captcha and click "Submit Application".',
+                                            'Selected: <strong>New Applicant</strong>. <br> Please confirm you are not a robot and click "Submit Application".',
+                                        'js_age_format' => '(Age :age Years)',
+                                        'status_map' => [
+                                            'ผู้สมัครใหม่' => 'New Applicant',
+                                            'ศิษย์อานาปานสติ' => 'Anapanasati Student',
+                                            'ศิษย์เตโชวิปัสสนา' => 'Vipassana Student',
+                                            'ศิษย์อานาฯ ๑ วัน' => '1-Day Anapanasati Student',
+                                        ],
                                     ],
                                 ];
                                 $txt = $t[$lang];
@@ -744,8 +758,8 @@
                             res.members.forEach(m => {
                                 html += `<button type="button" class="list-group-item list-group-item-action" onclick="selectMember(${m.id}, '${m.name}')">
                                             <div class="d-flex w-100 justify-content-between">
-                                                <h5 class="mb-1">${m.name} ${m.surname} (อายุ ${m.age_years} ปี)</h5>
-                                                <small>${(m.status || '').includes('วิปัสสนา') ? TRANS.js_vipassana : m.status}</small>
+                                                <h5 class="mb-1">${m.name} ${m.surname} ${TRANS.js_age_format.replace(':age', m.age_years)}</h5>
+                                                <small>${TRANS.status_map[m.status] || m.status}</small>
                                             </div>
                                          </button>`;
                             });
