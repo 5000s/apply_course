@@ -42,19 +42,170 @@
 
                         <div class="p-3 p-md-4">
                             @php
-                                $th = function ($d) {
+                                $lang = $lang ?? 'th';
+                                $t = [
+                                    'th' => [
+                                        'place' => 'สถานที่',
+                                        'course' => 'คอร์ส',
+                                        'date' => 'วันที่',
+                                        'status' => 'สถานะ',
+                                        'state_open' => 'เปิดรับสมัคร',
+                                        'state_soon' => 'ใกล้เริ่มแล้ว',
+                                        'state_closed' => 'สิ้นสุดการรับสมัคร',
+                                        'state_unknown' => 'ไม่ระบุ',
+                                        'form_header' => 'กรอกข้อมูลเพื่อสมัครคอร์ส',
+                                        'instructions' =>
+                                            'กรุณากรอก <strong>ชื่อ</strong>, <strong>นามสกุล</strong>, <strong>วันเกิด</strong> และ <strong>เบอร์โทรศัพท์</strong> แล้วกดปุ่มส่งคำขอสมัครคอร์ส',
+                                        'gender' => 'เพศ',
+                                        'firstname' => 'ชื่อ',
+                                        'lastname' => 'นามสกุล',
+                                        'birthdate' => 'วันเกิด',
+                                        'day' => 'วัน',
+                                        'month' => 'เดือน',
+                                        'year' => 'ปี',
+                                        'year_ph' => 'ปี (พ.ศ.)', // Placeholder
+                                        'phone' => 'เบอร์โทรศัพท์',
+                                        'phone_placeholder' => 'เบอร์โทรศัพท์ เช่น 08xxxxxxxx',
+                                        'check_member' => 'ตรวจสอบข้อมูลสมาชิก',
+                                        'btn_check' => 'ตรวจสอบข้อมูล',
+                                        'robot_check' => 'ยืนยันว่าไม่ใช้หุ่นยนต์',
+                                        'submit_btn' => 'ส่งคำขอสมัครคอร์ส',
+                                        'privacy_note' =>
+                                            '* ข้อมูลของท่านจะถูกเก็บรักษาเป็นความลับ ใช้เฉพาะการจัดการใบสมัครคอร์ส',
+                                        'female' => 'หญิง',
+                                        'male' => 'ชาย',
+                                        'select_month' => 'เดือน',
+                                        // Modal & JS
+                                        'modal_title' => 'แจ้งปัญหาไม่พบข้อมูล',
+                                        'modal_body' =>
+                                            'ระบบจะทำการส่งเรื่องแจ้งไปยังเจ้าหน้าที่ <br> โปรดตรวจสอบข้อมูลของท่านเพื่อให้ทางเจ้าหน้าที่ติดต่อกลับ',
+                                        'modal_info_header' => 'ข้อมูลที่ค้นหา:',
+                                        'modal_name' => 'ชื่อ-นามสกุล',
+                                        'modal_gender' => 'เพศ',
+                                        'modal_dob' => 'วันเกิด',
+                                        'modal_phone' => 'เบอร์โทรศัพท์',
+                                        'modal_email' => 'อีเมล (ไม่จำเป็น)',
+                                        'modal_cancel' => 'ยกเลิก',
+                                        'modal_submit' => 'ยืนยันการแจ้งปัญหา',
+                                        'modal_sending' => 'กำลังส่งข้อมูล...',
+                                        'modal_success' => 'ระบบได้รับข้อมูลเรียบร้อยแล้ว',
+                                        'modal_contact_soon' => 'เจ้าหน้าที่จะติดต่อกลับโดยเร็วที่สุด',
+                                        'modal_close' => 'ปิดหน้าต่างนี้',
+                                        'modal_error' => 'เกิดข้อผิดพลาดในการส่งข้อมูล กรุณาลองใหม่อีกครั้ง',
+                                        'modal_phone_req' => 'กรุณาระบุเบอร์โทรศัพท์',
+
+                                        'js_fill_all' =>
+                                            'กรุณากรอกข้อมูล ชื่อ นามสกุล วันเกิด และ เบอร์โทรศัพท์ ให้ครบถ้วน',
+                                        'js_not_found_header' => 'ไม่พบข้อมูลเดิม',
+                                        'js_new_member_msg' =>
+                                            '<u> หากท่านเป็นสมาชิกใหม่ </u> สามารถกดสมัครได้ทันที <br><u> หากท่านเป็นศิษย์เก่า </u> แต่หาข้อมูลไม่พบ กรุณากดปุ่ม',
+                                        'js_btn_not_found' => 'แจ้งไม่พบข้อมูล',
+                                        'js_found_header' => 'พบข้อมูลที่อาจเป็นท่าน :count รายการ',
+                                        'js_vipassana' => 'ศิษย์วิปัสสนา',
+                                        'js_new_applicant' => 'ฉันเป็นผู้สมัครใหม่',
+                                        'js_select_guide' =>
+                                            'โปรดเลือกชื่อของท่าน หรือเลือก "ฉันผู้สมัครใหม่" แล้วกดปุ่มยืนยันด้านล่าง',
+                                        'js_error_check' => 'เกิดข้อผิดพลาดในการตรวจสอบข้อมูล',
+                                        'js_selected' =>
+                                            'เลือกข้อมูล: <strong>:name</strong> เรียบร้อยแล้ว <br> กรุณากดยืนยันว่าไม่ใช้หุ่นยนต์แล้วกดปุ่ม "ส่งคำขอสมัครคอร์ส"',
+                                        'js_selected_new' =>
+                                            'เลือก: <strong>ผู้สมัครใหม่</strong> เรียบร้อยแล้ว <br> กรุณากดยืนยันว่าไม่ใช้หุ่นยนต์แล้วกดปุ่ม "ส่งคำขอสมัครคอร์ส"',
+                                    ],
+                                    'en' => [
+                                        'place' => 'Location',
+                                        'course' => 'Course Category',
+                                        'date' => 'Date',
+                                        'status' => 'Status',
+                                        'state_open' => 'Open',
+                                        'state_soon' => 'Starting Soon',
+                                        'state_closed' => 'Closed',
+                                        'state_unknown' => 'Unknown',
+                                        'form_header' => 'Application Form',
+                                        'instructions' =>
+                                            'Please fill in <strong>First Name</strong>, <strong>Last Name</strong>, <strong>Birth Date</strong> and <strong>Phone Number</strong>.',
+                                        'gender' => 'Gender',
+                                        'firstname' => 'First Name',
+                                        'lastname' => 'Last Name',
+                                        'birthdate' => 'Birth Date',
+                                        'day' => 'Day',
+                                        'month' => 'Month',
+                                        'year' => 'Year',
+                                        'year_ph' => 'Year (A.D.)', // Placeholder
+                                        'phone' => 'Phone Number',
+                                        'phone_placeholder' => 'Enter phone number e.g. 08xxxxxxxx',
+                                        'check_member' => 'Check Member Info',
+                                        'btn_check' => 'Check Info',
+                                        'robot_check' => 'I am not a robot',
+                                        'submit_btn' => 'Submit Application',
+                                        'privacy_note' => '* Your data will be kept confidential.',
+                                        'female' => 'Female',
+                                        'male' => 'Male',
+                                        'select_month' => 'Month',
+                                        // Modal & JS
+                                        'modal_title' => 'Report Data Not Found',
+                                        'modal_body' =>
+                                            'The system will send a report to the staff. <br> Please verify your information so staff can contact you.',
+                                        'modal_info_header' => 'Search Information:',
+                                        'modal_name' => 'Name-Surname',
+                                        'modal_gender' => 'Gender',
+                                        'modal_dob' => 'Birth Date',
+                                        'modal_phone' => 'Phone',
+                                        'modal_email' => 'Email (Optional)',
+                                        'modal_cancel' => 'Cancel',
+                                        'modal_submit' => 'Confirm Report',
+                                        'modal_sending' => 'Sending...',
+                                        'modal_success' => 'Report received successfully.',
+                                        'modal_contact_soon' => 'Staff will contact you shortly.',
+                                        'modal_close' => 'Close Window',
+                                        'modal_error' => 'Error sending data. Please try again.',
+                                        'modal_phone_req' => 'Please enter phone number.',
+
+                                        'js_fill_all' =>
+                                            'Please fill in Name, Surname, Birth Date and Phone completely.',
+                                        'js_not_found_header' => 'No existing data found',
+                                        'js_new_member_msg' =>
+                                            '<u>If you are a new member</u>, you can apply immediately. <br><u>If you are an old student</u> but cannot find data, please click',
+                                        'js_btn_not_found' => 'Report Not Found',
+                                        'js_found_header' => 'Found :count possible matches',
+                                        'js_vipassana' => 'Vipassana Student',
+                                        'js_new_applicant' => 'I am a new applicant',
+                                        'js_select_guide' =>
+                                            'Please select your name or "I am a new applicant" then click confirm below.',
+                                        'js_error_check' => 'Error checking information.',
+                                        'js_selected' =>
+                                            'Selected: <strong>:name</strong> <br> Please confirm captcha and click "Submit Application".',
+                                        'js_selected_new' =>
+                                            'Selected: <strong>New Applicant</strong> <br> Please confirm captcha and click "Submit Application".',
+                                    ],
+                                ];
+                                $txt = $t[$lang];
+
+                                $formatDate = function ($d) use ($lang) {
                                     if (!$d) {
                                         return '-';
                                     }
-                                    $c = \Illuminate\Support\Carbon::parse($d)->locale('th');
-                                    return $c->translatedFormat('j F') . ' ' . ($c->year + 543);
+                                    $c = \Illuminate\Support\Carbon::parse($d);
+                                    if ($lang === 'th') {
+                                        $c->locale('th');
+                                        return $c->translatedFormat('j F') . ' ' . ($c->year + 543);
+                                    }
+                                    $c->locale('en');
+                                    return $c->translatedFormat('j F Y');
                                 };
-                                $badgeClass = match (true) {
-                                    ($vm['state'] ?? null) === 'เปิดรับสมัคร' => 'bg-success',
-                                    ($vm['state'] ?? null) === 'ใกล้เริ่มแล้ว' => 'bg-warning text-dark',
-                                    ($vm['state'] ?? null) === 'สิ้นสุดการรับสมัคร' => 'bg-secondary',
-                                    default => 'bg-light text-dark',
-                                };
+
+                                // Map state to display text
+                                $stateMap = [
+                                    'เปิดรับสมัคร' => ['text' => $txt['state_open'], 'class' => 'bg-success'],
+                                    'ใกล้เริ่มแล้ว' => [
+                                        'text' => $txt['state_soon'],
+                                        'class' => 'bg-warning text-dark',
+                                    ],
+                                    'สิ้นสุดการรับสมัคร' => ['text' => $txt['state_closed'], 'class' => 'bg-secondary'],
+                                ];
+
+                                $currentState = $vm['state'] ?? null;
+                                $displayState = $stateMap[$currentState]['text'] ?? ($currentState ?? '-'); // Fallback to raw state if no map
+                                $badgeClass = $stateMap[$currentState]['class'] ?? 'bg-light text-dark';
                             @endphp
 
                             <div class="table-responsive">
@@ -65,30 +216,41 @@
                                     </colgroup>
                                     <tbody>
                                         <tr>
-                                            <th scope="row" class="text-muted fw-semibold">สถานที่</th>
-                                            <td class="fs-5">{{ $vm['place_name'] ?? '-' }}</td>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row" class="text-muted fw-semibold">คอร์ส</th>
-                                            <td class="fs-5">{{ $course_cat->show_name ?? ($course_cat->name ?? '-') }}
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row" class="text-muted fw-semibold">วันที่</th>
+                                            <th scope="row" class="text-muted fw-semibold">{{ $txt['place'] }}</th>
                                             <td class="fs-5">
-                                                @if ($course->date_start != $course->date_end)
-                                                    {{ $th($course->date_start ?? $course->start_date) }} –
-                                                    {{ $th($course->date_end ?? $course->end_date) }}
+                                                @if ($lang === 'th')
+                                                    {{ $vm['place_name'] ?? '-' }}
                                                 @else
-                                                    {{ $th($course->date_start ?? $course->start_date) }}
+                                                    {{ $vm['place_name_en'] ?? '-' }}
                                                 @endif
                                             </td>
                                         </tr>
                                         <tr>
-                                            <th scope="row" class="text-muted fw-semibold">สถานะ</th>
+                                            <th scope="row" class="text-muted fw-semibold">{{ $txt['course'] }}</th>
+                                            <td class="fs-5">
+                                                @if ($lang === 'th')
+                                                    {{ $course_cat->show_name ?? ($course_cat->name ?? '-') }}
+                                                @else
+                                                    {{ $course_cat->show_name_en ?? ($course_cat->name_en ?? '-') }}
+                                                @endif
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row" class="text-muted fw-semibold">{{ $txt['date'] }}</th>
+                                            <td class="fs-5">
+                                                @if ($course->date_start != $course->date_end)
+                                                    {{ $formatDate($course->date_start ?? $course->start_date) }} –
+                                                    {{ $formatDate($course->date_end ?? $course->end_date) }}
+                                                @else
+                                                    {{ $formatDate($course->date_start ?? $course->start_date) }}
+                                                @endif
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row" class="text-muted fw-semibold">{{ $txt['status'] }}</th>
                                             <td class="fs-5">
                                                 <span
-                                                    class="badge {{ $badgeClass }} px-3 py-2">{{ $vm['state'] ?? '-' }}</span>
+                                                    class="badge {{ $badgeClass }} px-3 py-2">{{ $displayState }}</span>
                                             </td>
                                         </tr>
                                     </tbody>
@@ -104,7 +266,7 @@
                     {{-- ฟอร์มสมัคร (ไม่มี OTP แล้ว ใช้แค่ Captcha) --}}
                     <div class="card shadow-sm">
                         <div class="card-header bg-white">
-                            <h5 class="mb-0">กรอกข้อมูลเพื่อสมัครคอร์ส</h5>
+                            <h5 class="mb-0">{{ $txt['form_header'] }}</h5>
                         </div>
                         <div class="card-body">
 
@@ -127,8 +289,7 @@
                             @endif
 
                             <p class="text-muted fs-5">
-                                กรุณากรอก <strong>ชื่อ</strong>, <strong>นามสกุล</strong>, <strong>วันเกิด</strong> และ
-                                <strong>เบอร์โทรศัพท์</strong> แล้วกดปุ่มส่งคำขอสมัครคอร์ส
+                                {!! $txt['instructions'] !!}
                             </p>
 
                             {{-- เปลี่ยน action เป็น route สมัครจริง (ปรับตามหลังบ้าน) --}}
@@ -140,28 +301,29 @@
                                 @else
                                     <input type="hidden" name="member_id" id="member_id" value="">
                                 @endauth
+                                <input type="hidden" name="lang" value="{{ $lang }}">
 
                                 <div class="col-md-2">
-                                    <label class="form-label fs-5">เพศ</label>
+                                    <label class="form-label fs-5">{{ $txt['gender'] }}</label>
                                     <select class="form-select form-control form-control-lg" id="gender" name="gender"
                                         required>
                                         <option value="หญิง" {{ old('gender') === 'หญิง' ? 'selected' : '' }}>
-                                            {{ __('messages.female') }}
+                                            {{ $txt['female'] }}
                                         </option>
                                         <option value="ชาย" {{ old('gender') === 'ชาย' ? 'selected' : '' }}>
-                                            {{ __('messages.male') }}
+                                            {{ $txt['male'] }}
                                         </option>
                                     </select>
                                 </div>
 
                                 <div class="col-md-5">
-                                    <label class="form-label fs-5">ชื่อ</label>
+                                    <label class="form-label fs-5">{{ $txt['firstname'] }}</label>
                                     <input type="text" name="first_name" class="form-control form-control-lg"
                                         maxlength="100" required autocomplete="given-name" value="{{ old('first_name') }}">
                                 </div>
 
                                 <div class="col-md-5">
-                                    <label class="form-label fs-5">นามสกุล</label>
+                                    <label class="form-label fs-5">{{ $txt['lastname'] }}</label>
                                     <input type="text" name="last_name" class="form-control form-control-lg"
                                         maxlength="100" required autocomplete="family-name" value="{{ old('last_name') }}">
                                 </div>
@@ -176,28 +338,47 @@
                                         $defD = 1;
                                     }
                                     $defBE = $defY + 543;
-                                    $thMonths = [
-                                        'ม.ค.',
-                                        'ก.พ.',
-                                        'มี.ค.',
-                                        'เม.ย.',
-                                        'พ.ค.',
-                                        'มิ.ย.',
-                                        'ก.ค.',
-                                        'ส.ค.',
-                                        'ก.ย.',
-                                        'ต.ค.',
-                                        'พ.ย.',
-                                        'ธ.ค.',
-                                    ];
+
+                                    if ($lang === 'th') {
+                                        $displayMonths = [
+                                            'ม.ค.',
+                                            'ก.พ.',
+                                            'มี.ค.',
+                                            'เม.ย.',
+                                            'พ.ค.',
+                                            'มิ.ย.',
+                                            'ก.ค.',
+                                            'ส.ค.',
+                                            'ก.ย.',
+                                            'ต.ค.',
+                                            'พ.ย.',
+                                            'ธ.ค.',
+                                        ];
+                                    } else {
+                                        $displayMonths = [
+                                            'Jan',
+                                            'Feb',
+                                            'Mar',
+                                            'Apr',
+                                            'May',
+                                            'Jun',
+                                            'Jul',
+                                            'Aug',
+                                            'Sep',
+                                            'Oct',
+                                            'Nov',
+                                            'Dec',
+                                        ];
+                                    }
                                 @endphp
 
                                 {{-- วันเกิด เต็มแถว --}}
                                 <div class="col-md-6">
-                                    <label class="form-label fs-5">วันเกิด</label>
+                                    <label class="form-label fs-5">{{ $txt['birthdate'] }}</label>
                                     <div class="row g-2">
                                         <div class="col-4">
-                                            <select id="dob_day" class="form-select form-select-lg" aria-label="วัน">
+                                            <select id="dob_day" class="form-select form-select-lg"
+                                                aria-label="{{ $txt['day'] }}">
                                                 @for ($d = 1; $d <= 31; $d++)
                                                     <option value="{{ $d }}"
                                                         {{ $d === $defD ? 'selected' : '' }}>
@@ -207,9 +388,10 @@
                                             </select>
                                         </div>
                                         <div class="col-4">
-                                            <select id="dob_month" class="form-select form-select-lg" aria-label="เดือน">
-                                                <option value="">เดือน</option>
-                                                @foreach ($thMonths as $i => $name)
+                                            <select id="dob_month" class="form-select form-select-lg"
+                                                aria-label="{{ $txt['month'] }}">
+                                                <option value="">{{ $txt['select_month'] }}</option>
+                                                @foreach ($displayMonths as $i => $name)
                                                     <option value="{{ $i + 1 }}"
                                                         {{ $i + 1 === $defM ? 'selected' : '' }}>
                                                         {{ $name }}
@@ -219,14 +401,23 @@
                                         </div>
                                         <div class="col-4">
                                             <select id="dob_year" class="form-select form-select-lg"
-                                                aria-label="ปี (พ.ศ.)">
-                                                <option value="">ปี (พ.ศ.)</option>
-                                                @for ($year = now()->year - 15; $year >= 1945; $year--)
-                                                    <option value="{{ $year }}"
-                                                        {{ $year === $defBE ? 'selected' : '' }}>
-                                                        {{ $year + 543 }}
-                                                    </option>
-                                                @endfor
+                                                aria-label="{{ $txt['year_ph'] }}">
+                                                <option value="">{{ $txt['year_ph'] }}</option>
+                                                @if ($lang === 'th')
+                                                    @for ($year = now()->year - 15; $year >= 1945; $year--)
+                                                        <option value="{{ $year }}"
+                                                            {{ $year === $defY ? 'selected' : '' }}>
+                                                            {{ $year + 543 }}
+                                                        </option>
+                                                    @endfor
+                                                @else
+                                                    @for ($year = now()->year - 15; $year >= 1945; $year--)
+                                                        <option value="{{ $year }}"
+                                                            {{ $year === $defY ? 'selected' : '' }}>
+                                                            {{ $year }}
+                                                        </option>
+                                                    @endfor
+                                                @endif
                                             </select>
                                         </div>
                                     </div>
@@ -237,11 +428,11 @@
 
                                 {{-- ข้อมูลติดต่อ --}}
                                 <div class="col-md-6">
-                                    <label class="form-label fs-5">เบอร์โทรศัพท์</label>
+                                    <label class="form-label fs-5">{{ $txt['phone'] }}</label>
                                     <div class="mb-2">
                                         <input type="tel" id="phone" name="phone"
                                             class="form-control form-control-lg" maxlength="30" inputmode="tel"
-                                            pattern="[0-9\s\-+]*" placeholder="เบอร์โทรศัพท์ เช่น 08xxxxxxxx"
+                                            pattern="[0-9\s\-+]*" placeholder="{{ $txt['phone_placeholder'] }}"
                                             value="{{ old('phone') }}">
                                     </div>
                                     {{--                                    <div> --}}
@@ -264,11 +455,11 @@
 
                                 {{-- ส่วนตรวจสอบสมาชิก --}}
                                 <div class="col-12">
-                                    <label class="form-label fs-5">ตรวจสอบข้อมูลสมาชิก</label>
+                                    <label class="form-label fs-5">{{ $txt['check_member'] }}</label>
                                     <div class="d-grid gap-2 d-md-block">
                                         <button type="button" id="btnCheckMember"
                                             class="btn btn-info text-white btn-lg px-4">
-                                            ตรวจสอบข้อมูล
+                                            {{ $txt['btn_check'] }}
                                         </button>
                                     </div>
                                     <div id="search-result-area" class="mt-3"></div>
@@ -280,7 +471,7 @@
 
                                 {{-- Captcha --}}
                                 <div class="col-12 d-none" id="recaptcha-section">
-                                    <label class="form-label fs-5 d-block mb-2">ยืนยันว่าไม่ใช้หุ่นยนต์</label>
+                                    <label class="form-label fs-5 d-block mb-2">{{ $txt['robot_check'] }}</label>
 
                                     @if (config('services.recaptcha.site_key'))
                                         <div class="mb-2">
@@ -302,13 +493,13 @@
 
                                 <div class="col-12 d-none" id="submit-section">
                                     <button type="submit" id="submitBtn" class="btn btn-bodhi btn-lg px-4" disabled>
-                                        ส่งคำขอสมัครคอร์ส
+                                        {{ $txt['submit_btn'] }}
                                     </button>
                                 </div>
                             </form>
 
                             <div class="text-muted mt-3" style="font-size:1.05rem;">
-                                * ข้อมูลของท่านจะถูกเก็บรักษาเป็นความลับ ใช้เฉพาะการจัดการใบสมัครคอร์ส
+                                {{ $txt['privacy_note'] }}
                             </div>
                         </div>
                     </div>
@@ -325,41 +516,41 @@
             <div class="modal-content">
                 <div class="modal-header bg-warning text-dark">
                     <h5 class="modal-title" id="notFoundModalLabel">
-                        <i class="bi bi-exclamation-triangle-fill me-2"></i> แจ้งปัญหาไม่พบข้อมูล
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ $txt['modal_title'] }}
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <p class="mb-3">
-                        ระบบจะทำการส่งเรื่องแจ้งไปยังเจ้าหน้าที่ <br>
-                        โปรดตรวจสอบข้อมูลของท่านเพื่อให้ทางเจ้าหน้าที่ติดต่อกลับ
+                        {!! $txt['modal_body'] !!}
                     </p>
 
                     <div class="alert alert-light border mb-3">
-                        <strong>ข้อมูลที่ค้นหา:</strong>
+                        <strong>{{ $txt['modal_info_header'] }}</strong>
                         <ul class="mb-0 mt-1 small text-muted">
-                            <li>ชื่อ-นามสกุล: <span id="modal-name"></span></li>
-                            <li>เพศ: <span id="modal-gender"></span></li>
-                            <li>วันเกิด: <span id="modal-dob"></span></li>
+                            <li>{{ $txt['modal_name'] }}: <span id="modal-name"></span></li>
+                            <li>{{ $txt['modal_gender'] }}: <span id="modal-gender"></span></li>
+                            <li>{{ $txt['modal_dob'] }}: <span id="modal-dob"></span></li>
                         </ul>
                     </div>
 
                     <form id="notFoundForm">
                         <div class="mb-3">
-                            <label for="modal-phone" class="form-label">เบอร์โทรศัพท์ <span
+                            <label for="modal-phone" class="form-label">{{ $txt['modal_phone'] }} <span
                                     class="text-danger">*</span></label>
                             <input type="tel" class="form-control" id="modal-phone" required>
                         </div>
                         <div class="mb-3">
-                            <label for="modal-email" class="form-label">อีเมล (ไม่จำเป็น)</label>
+                            <label for="modal-email" class="form-label">{{ $txt['modal_email'] }}</label>
                             <input type="email" class="form-control" id="modal-email" placeholder="name@example.com">
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer" id="notFoundModalFooter">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                    <button type="button" class="btn btn-secondary"
+                        data-bs-dismiss="modal">{{ $txt['modal_cancel'] }}</button>
                     <button type="button" class="btn btn-primary" onclick="submitNotFoundReport()">
-                        ยืนยันการแจ้งปัญหา
+                        {{ $txt['modal_submit'] }}
                     </button>
                 </div>
             </div>
@@ -423,6 +614,8 @@
     </script>
 
     <script>
+        const TRANS = @json($txt);
+
         var isCaptchaValid = false;
         // Check if captcha is actually present on page. If not, we don't block on it.
         // PHP check: {{ config('services.recaptcha.site_key') ? 'true' : 'false' }} 
@@ -504,7 +697,7 @@
                 let phone = $('#phone').val();
 
                 if (!firstName || !lastName || !birthDate || !phone) {
-                    alert('กรุณากรอกข้อมูล ชื่อ นามสกุล วันเกิด และ เบอร์โทรศัพท์ ให้ครบถ้วน');
+                    alert(TRANS.js_fill_all);
                     return;
                 }
 
@@ -530,10 +723,9 @@
                             html = `<div class="alert alert-success d-flex align-items-center">
                                         <i class="bi bi-person-check-fill fs-3 me-3"></i>
                                         <div>
-                                            <strong>ไม่พบข้อมูลเดิม</strong><br>
-                                           <u> หากท่านเป็นสมาชิกใหม่ </u> สามารถกดสมัครได้ทันที
-                                           <br><u> หากท่านเป็นศิษย์เก่า </u> แต่หาข้อมูลไม่พบ กรุณากดปุ่ม 
-                                           <button type="button" class="btn btn-primary" onclick="showNotFoundModal()">แจ้งไม่พบข้อมูล</button>
+                                            <strong>${TRANS.js_not_found_header}</strong><br>
+                                           ${TRANS.js_new_member_msg}
+                                           <button type="button" class="btn btn-primary" onclick="showNotFoundModal()">${TRANS.js_btn_not_found}</button>
 
                                         </div>
                                     </div>`;
@@ -545,7 +737,7 @@
                             // count >= 1 (Found 1 or more)
                             html = `<div class="card border-info">
                                         <div class="card-header bg-info text-white">
-                                            พบข้อมูลที่อาจเป็นท่าน ${res.count} รายการ
+                                            ${TRANS.js_found_header.replace(':count', res.count)}
                                         </div>
                                         <div class="list-group list-group-flush">`;
 
@@ -553,18 +745,18 @@
                                 html += `<button type="button" class="list-group-item list-group-item-action" onclick="selectMember(${m.id}, '${m.name}')">
                                             <div class="d-flex w-100 justify-content-between">
                                                 <h5 class="mb-1">${m.name} ${m.surname} (อายุ ${m.age_years} ปี)</h5>
-                                                <small>${(m.status || '').includes('วิปัสสนา') ? 'ศิษย์วิปัสสนา' : m.status}</small>
+                                                <small>${(m.status || '').includes('วิปัสสนา') ? TRANS.js_vipassana : m.status}</small>
                                             </div>
                                          </button>`;
                             });
 
                             html += `<button type="button" class="list-group-item list-group-item-action list-group-item-light fw-bold text-primary" onclick="selectNewMember()">
-                                        <i class="bi bi-plus-circle"></i> ฉันเป็นผู้สมัครใหม่
+                                        <i class="bi bi-plus-circle"></i> ${TRANS.js_new_applicant}
                                      </button>`;
 
                             html += `</div></div>`;
                             html +=
-                                `<div class="mt-2 text-muted small">โปรดเลือกชื่อของท่าน หรือเลือก "ฉันผู้สมัครใหม่" แล้วกดปุ่มยืนยันด้านล่าง</div>`;
+                                `<div class="mt-2 text-muted small">${TRANS.js_select_guide}</div>`;
                         }
 
                         $('#search-result-area').html(html);
@@ -572,7 +764,7 @@
                     error: function(err) {
                         console.error(err);
                         $('#search-result-area').html(
-                            '<div class="alert alert-danger">เกิดข้อผิดพลาดในการตรวจสอบข้อมูล</div>'
+                            `<div class="alert alert-danger">${TRANS.js_error_check}</div>`
                         );
                     }
                 });
@@ -583,8 +775,7 @@
             $('#member_id').val(id);
             // Visual feedback
             $('#search-result-area').html(`<div class="alert alert-success">
-                                            <i class="bi bi-check-circle-fill"></i> เลือกข้อมูล: <strong>${name}</strong> เรียบร้อยแล้ว <br>
-                                            กรุณากดยืนยันว่าไม่ใช้หุ่นยนต์แล้วกดปุ่ม "ส่งคำขอสมัครคอร์ส"
+                                            <i class="bi bi-check-circle-fill"></i> ${TRANS.js_selected.replace(':name', name)}
                                            </div>`);
             if (window.setMemberChecked) window.setMemberChecked(true);
         }
@@ -592,8 +783,7 @@
         function selectNewMember() {
             $('#member_id').val('');
             $('#search-result-area').html(`<div class="alert alert-success">
-                                            <i class="bi bi-check-circle-fill"></i> เลือก: <strong>ผู้สมัครใหม่</strong> เรียบร้อยแล้ว <br>
-                                             กรุณากดยืนยันว่าไม่ใช้หุ่นยนต์แล้วกดปุ่ม "ส่งคำขอสมัครคอร์ส"
+                                            <i class="bi bi-check-circle-fill"></i> ${TRANS.js_selected_new}
                                            </div>`);
             if (window.setMemberChecked) window.setMemberChecked(true);
         }
@@ -601,9 +791,9 @@
         function showNotFoundModal() {
             // Reset Footer
             $('#notFoundModalFooter').html(`
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">${TRANS.modal_cancel}</button>
                 <button type="button" class="btn btn-primary" onclick="submitNotFoundReport()">
-                    ยืนยันการแจ้งปัญหา
+                    ${TRANS.modal_submit}
                 </button>
             `);
 
@@ -628,14 +818,14 @@
             let email = $('#modal-email').val();
 
             if (!phone) {
-                alert('กรุณาระบุเบอร์โทรศัพท์');
+                alert(TRANS.modal_phone_req);
                 return;
             }
 
             // Disable button
             let btn = $('#notFoundModal .btn-primary');
             let oldText = btn.text();
-            btn.prop('disabled', true).text('กำลังส่งข้อมูล...');
+            btn.prop('disabled', true).text(TRANS.modal_sending);
             let data = {
                 _token: "{{ csrf_token() }}",
                 gender: $('#gender').val(),
@@ -675,16 +865,16 @@
                     $('#notFoundModalFooter').html(`
                         <div class="d-flex flex-column align-items-center w-100">
                             <span class="text-success fw-bold mb-2">
-                                <i class="bi bi-check-circle-fill me-1"></i> ระบบได้รับข้อมูลเรียบร้อยแล้ว
+                                <i class="bi bi-check-circle-fill me-1"></i> ${TRANS.modal_success}
                             </span>
-                            <small class="text-muted mb-3">เจ้าหน้าที่จะติดต่อกลับโดยเร็วที่สุด</small>
-                            <button type="button" class="btn btn-secondary w-100" data-bs-dismiss="modal">ปิดหน้าต่างนี้</button>
+                            <small class="text-muted mb-3">${TRANS.modal_contact_soon}</small>
+                            <button type="button" class="btn btn-secondary w-100" data-bs-dismiss="modal">${TRANS.modal_close}</button>
                         </div>
                     `);
                 },
                 error: function(err) {
                     console.error(err);
-                    alert('เกิดข้อผิดพลาดในการส่งข้อมูล กรุณาลองใหม่อีกครั้ง');
+                    alert(TRANS.modal_error);
                     btn.prop('disabled', false).text(oldText);
                 }
             });

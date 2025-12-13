@@ -131,6 +131,9 @@ class CourseApplyController extends Controller
         $placeName = $location?->show_name
             ?? null;
 
+        $placeNameEn = $location?->show_name_en
+            ?? null;
+
         // 3) วันที่ format
         $startText = $course->start_date
             ? Carbon::parse($course->start_date)->format('d M Y')
@@ -141,11 +144,15 @@ class CourseApplyController extends Controller
             : null;
 
         // 4) ส่ง view model ให้ Blade
+        $lang = $request->input('lang', 'th');
+
         return view('apply.direct', [
             'course'     => $course,
             'course_cat' => $courseCat,
+            'lang'       => $lang,
             'vm' => [
                 'place_name' => $placeName,
+                'place_name_en' => $placeNameEn,
                 'image_url'  => $imageUrl,
                 'start_text' => $startText,
                 'end_text'   => $endText,
@@ -274,11 +281,13 @@ class CourseApplyController extends Controller
         }
 
         $placeName = $location?->show_name ?? null;
+        $placeNameEn = $location?->show_name_en ?? null;
         $startText = $course->start_date ? Carbon::parse($course->start_date)->format('d M Y') : null;
         $endText = $course->end_date ? Carbon::parse($course->end_date)->format('d M Y') : null;
 
         $vm = [
             'place_name' => $placeName,
+            'place_name_en' => $placeNameEn,
             'image_url'  => $imageUrl,
             'start_text' => $startText,
             'end_text'   => $endText,
@@ -304,6 +313,8 @@ class CourseApplyController extends Controller
         $data['vm'] = $vm;
         $data['provinces'] = $provinceArray;
         $data['nations'] = MemberController::$nationals;
+
+        $data['lang']    = $request->input('lang', 'th');
 
         // 5) redirect ไปหน้าแบบฟอร์มเต็ม (Step 2)
         return  view('apply.full_form', $data);
@@ -489,7 +500,9 @@ class CourseApplyController extends Controller
         $apply->state = "ยื่นใบสมัคร";
         $apply->save();
 
-        return view('apply.complete', ['apply' => $apply, 'course' => $course, 'location' => $location, 'courseCategory' => $courseCategory]);
+        $lang = $request->input('lang', 'th');
+
+        return view('apply.complete', ['apply' => $apply, 'course' => $course, 'location' => $location, 'courseCategory' => $courseCategory, 'lang' => $lang]);
     }
 
     //     $data = $request->validate([
