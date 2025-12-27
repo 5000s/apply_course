@@ -19,6 +19,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Http;
 use function Symfony\Component\String\b;
 use App\Models\ReportCase;
+use App\Models\CourseLocationLimit;
 
 class CourseApplyController extends Controller
 {
@@ -166,7 +167,6 @@ class CourseApplyController extends Controller
 
     public function applyCourse(Request $request)
     {
-
         // 1) validate ฟอร์มหน้าแรก
         $data = $request->validate([
             'course_id'  => ['required', 'integer', 'exists:courses,id'],
@@ -487,6 +487,12 @@ class CourseApplyController extends Controller
             ->where('cancel', "!=", 1)
             ->first();
 
+        $member = Member::find($member_id);
+
+        if (!$member) {
+            return response()->json(['ok' => false, 'message' => 'ไม่พบข้อมูลสมาชิก'], 404);
+        }
+
         if (!$apply) {
             $apply = new Apply();
             $apply->member_id = $member_id;
@@ -502,8 +508,77 @@ class CourseApplyController extends Controller
 
         $lang = $request->input('lang', 'th');
 
-        return view('apply.complete', ['apply' => $apply, 'course' => $course, 'location' => $location, 'courseCategory' => $courseCategory, 'lang' => $lang]);
+        $isNeedConfirm = false;
+
+        if (str_contains($course->category, "วิปัสสนา")) {
+            $isNeedConfirm = true;
+        } else {
+            $courseLimit = $this->getCourseLimit($course->category_id, $location->id);
+            $applyCount = $this->getApplyCount($course_id);
+
+            if ($member->gender == "ชาย") {
+                $applyCount->male = $applyCount->male + 1;
+            } else {
+                $applyCount->female = $applyCount->female + 1;
+            }
+
+            $totalCount = $applyCount->male + $applyCount->female;
+
+            if ($applyCount->male > $courseLimit['male_limit'] || $applyCount->female > $courseLimit['female_limit'] || $totalCount > $courseLimit['max_limit']) {
+                $isNeedConfirm = true;
+            }
+        }
+
+        if ($isNeedConfirm) {
+            return view('apply.complete_non_confirm', ['apply' => $apply, 'course' => $course, 'location' => $location, 'courseCategory' => $courseCategory, 'lang' => $lang]);
+        }
+
+        $apply->state = "ยืนยันแล้ว";
+        $apply->remark = "ระบบยืนยันการสมัคร";
+        $apply->save();
+
+        return view('apply.complete_ana', ['apply' => $apply, 'course' => $course, 'location' => $location, 'courseCategory' => $courseCategory, 'lang' => $lang]);
     }
+
+    public function getCourseLimit($course_category_id, $location_id)
+    {
+        $courseLimit = CourseLocationLimit::where('course_category_id', $course_category_id)
+            ->where('location_id', $location_id)
+            ->first();
+
+        if ($courseLimit) {
+            $male_limit = $courseLimit->male_limit;
+            $female_limit = $courseLimit->female_limit;
+            $max_limit = $courseLimit->max_limit;
+        }
+
+        return [
+            'male_limit' => $male_limit,
+            'female_limit' => $female_limit,
+            'max_limit' => $max_limit,
+        ];
+    }
+
+    public function getApplyCount($course_id)
+    {
+        $applyList = Apply::where('course_id', $course_id)
+            ->where('cancel', "!=", 1)
+            ->with('member')
+            ->get();
+
+        $male_count = $applyList->where('member.gender', 'ชาย')->count();
+        $female_count = $applyList->where('member.gender', 'หญิง')->count();
+        $total_count = $applyList->count();
+
+        return (object) [
+            'male' => $male_count,
+            'female' => $female_count,
+            'total' => $total_count
+        ];
+    }
+
+
+
 
     //     $data = $request->validate([
     //         'course_id'  => ['required', Rule::exists('courses','id')],

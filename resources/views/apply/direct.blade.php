@@ -310,11 +310,8 @@
                             <form id="applyForm" class="row g-3" method="POST" action="{{ route('apply.direct.apply') }}">
                                 @csrf
                                 <input type="hidden" name="course_id" value="{{ $course->id }}">
-                                @auth
-                                    <input type="hidden" name="member_id" value="{{ auth()->id() }}">
-                                @else
-                                    <input type="hidden" name="member_id" id="member_id" value="">
-                                @endauth
+                                <input type="hidden" name="member_id" id="member_id" value="">
+
                                 <input type="hidden" name="lang" value="{{ $lang }}">
 
                                 <div class="col-md-2">
