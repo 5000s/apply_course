@@ -18,38 +18,39 @@ use Illuminate\Support\Facades\DB;
 class ApplyController extends Controller
 {
 
-    public function showCourseForStudent(){
+    public function showCourseForStudent()
+    {
 
         $now = Carbon::now();
 
         // Query to get courses
-        $courses_saraburi = self::getCourses(1,$now);
-        $courses_surin = self::getCourses(2,$now);
-        $courses_hadyai = self::getCourses(3,$now);
-        $courses_bangkok = self::getCourses(4,$now);
-        $courses_phuket = self::getCourses(5,$now);
+        $courses_saraburi = self::getCourses(1, $now);
+        $courses_surin = self::getCourses(2, $now);
+        $courses_hadyai = self::getCourses(3, $now);
+        $courses_bangkok = self::getCourses(4, $now);
+        $courses_phuket = self::getCourses(5, $now);
 
         $data = [];
 
         $data['courses_saraburi'] = $courses_saraburi;
-        $data['location_saraburi'] = Location::where("id",1)->first();
+        $data['location_saraburi'] = Location::where("id", 1)->first();
 
         $data['courses_surin'] = $courses_surin;
-        $data['location_surin'] = Location::where("id",2)->first();
+        $data['location_surin'] = Location::where("id", 2)->first();
 
         $data['courses_hadyai'] = $courses_hadyai;
-        $data['location_hadyai'] = Location::where("id",3)->first();
+        $data['location_hadyai'] = Location::where("id", 3)->first();
 
         $data['courses_bangkok'] = $courses_bangkok;
-        $data['location_bangkok'] = Location::where("id",4)->first();
+        $data['location_bangkok'] = Location::where("id", 4)->first();
 
         $data['courses_phuket'] = $courses_phuket;
-        $data['location_phuket'] = Location::where("id",5)->first();
+        $data['location_phuket'] = Location::where("id", 5)->first();
 
 
 
 
-        return view('courses.list',$data); // Return the view with the courses list
+        return view('courses.list', $data); // Return the view with the courses list
     }
 
     public static function getCourses($location_id, $dateStart)
@@ -66,7 +67,7 @@ class ApplyController extends Controller
                 'c.state'
             )
             ->whereDate('c.date_start', '>', $dateStart)
-//            ->whereIn('c.category_id', [1, 3, 5, 6, 8])
+            //            ->whereIn('c.category_id', [1, 3, 5, 6, 8])
             ->where('c.location_id', $location_id)
             ->orderBy('c.date_start', 'asc')
             ->get()
@@ -197,7 +198,6 @@ class ApplyController extends Controller
 
                 return $course;
             });
-
     }
 
     public static function getCourse(int $course_id)
@@ -266,9 +266,9 @@ class ApplyController extends Controller
         $now = Carbon::now();
 
         // Query to get courses
-        $courses = self::getCourseWithMember($location_id,$member_id,$now);
-        $location = Location::where("id",$location_id)->first();
-        $member = Member::where("id",$member_id)->first();
+        $courses = self::getCourseWithMember($location_id, $member_id, $now);
+        $location = Location::where("id", $location_id)->first();
+        $member = Member::where("id", $member_id)->first();
 
         $customOrder = [4, 1, 3, 5]; // IDs in the order you want
         $locations = Location::whereIn("id", $customOrder)
@@ -287,11 +287,11 @@ class ApplyController extends Controller
 
         $member_status = $member->status;
 
-        if ($member_status == "ผู้สมัครใหม่" || $member_status == "ศิษย์อานาฯ ๑ วัน"){
+        if ($member_status == "ผู้สมัครใหม่" || $member_status == "ศิษย์อานาฯ ๑ วัน") {
             $data['allow_types'] = CourseCategory::where('allow_new', 1)->pluck('id')->all();
-        }else if ($member_status == "ศิษย์อานาปานสติ"){
+        } else if ($member_status == "ศิษย์อานาปานสติ") {
             $data['allow_types'] = CourseCategory::where('allow_anapa', 1)->pluck('id')->all();
-        }else if ($member_status == "ศิษย์เตโชวิปัสสนา"){
+        } else if ($member_status == "ศิษย์เตโชวิปัสสนา") {
             $data['allow_types'] = CourseCategory::where('allow_techo', 1)->pluck('id')->all();
         }
 
@@ -304,9 +304,9 @@ class ApplyController extends Controller
 
     public function memberApplyHistory(Request $request, $member_id)
     {
-        $user= Auth::user();
+        $user = Auth::user();
 
-        if ( !$this->checkUserAccessMember($member_id)){
+        if (!$this->checkUserAccessMember($member_id)) {
             return redirect()->route('profile')->withErrors('The Member is not found.');
         }
 
@@ -390,9 +390,9 @@ class ApplyController extends Controller
 
     public function checkUserAccessMember($member_id): bool
     {
-        $user= Auth::user();
+        $user = Auth::user();
 
-        if ($user->admin == 1){
+        if ($user->admin == 1) {
             return true;
         }
 
@@ -401,8 +401,8 @@ class ApplyController extends Controller
 
         $email = Auth::user()->email;
 
-        $members = Member::where("email",$email)->where("id",$member_id)->first();
-        if($members){
+        $members = Member::where("email", $email)->where("id", $member_id)->first();
+        if ($members) {
             return true;
         }
         return false;
@@ -411,13 +411,15 @@ class ApplyController extends Controller
     public function show($member_id, $course_id)
     {
 
-       if ( !$this->checkUserAccessMember($member_id)){
-           return redirect()->route('profile')->withErrors('The Member is not found.');
-       }
+
+
+        if (!$this->checkUserAccessMember($member_id)) {
+            return redirect()->route('profile')->withErrors('The Member is not found.');
+        }
 
         $course = self::getCourse($course_id);
 
-       $location = Location::find($course->location_id);
+        $location = Location::find($course->location_id);
 
         // Ensure the course status is 'open', otherwise show an error or redirect
         $apply = Apply::where('course_id', $course_id)
@@ -431,9 +433,9 @@ class ApplyController extends Controller
 
 
 
-        $member = Member::where("id",$member_id)->first();
+        $member = Member::where("id", $member_id)->first();
 
-        if(!$apply){
+        if (!$apply) {
             $apply = new Apply();
             $apply->member_id = $member_id;
             $apply->course_id = $course_id;
@@ -443,7 +445,15 @@ class ApplyController extends Controller
         if ($course->state != 'เปิดรับสมัคร') {
             return redirect()->route('courses.index', $member_id)->withErrors('Course is not open for application.');
         }
-        return view('courses.show', compact('course', 'location','member_id', 'apply' , 'member' )); // Return the view with the course details
+        $CourseApplyController = new CourseApplyController();
+
+        $lang = "th";
+        if (preg_match('/[a-zA-Z]/', $member->first_name)) {
+            $lang = "en";
+        }
+        return  $CourseApplyController->applyConfirm($member_id, $course_id, $member->first_name, $member->last_name, $member->gender, $member->phone, $member->birth_date, $lang);
+
+        // return view('courses.show', compact('course', 'location', 'member_id', 'apply', 'member')); // Return the view with the course details
     }
 
     public function save(Request $request, $member_id)
@@ -453,22 +463,22 @@ class ApplyController extends Controller
 
         $course_id = $request->input("course_id");
 
-        if ( !$this->checkUserAccessMember($member_id)){
+        if (!$this->checkUserAccessMember($member_id)) {
             return redirect()->route('profile')->withErrors('The Member is not found.');
         }
 
 
-        $course = Course::where("id",$course_id)->first();
+        $course = Course::where("id", $course_id)->first();
         $van = $request->input("van");
         $shelter = $request->input("shelter", "ทั่วไป");
 
-        $course = Course::where("id",$course_id)->first();
-        if(!$course){
+        $course = Course::where("id", $course_id)->first();
+        if (!$course) {
             return redirect()->route('profile')->withErrors('The Course is not found.');
         }
 
 
-        if($course){
+        if ($course) {
             $apply = new Apply();
             $apply->member_id = $member_id;
             $apply->course_id = $course_id;
@@ -494,7 +504,7 @@ class ApplyController extends Controller
                 logger()->info('File size being uploaded: ' . $file->getSize());
 
                 $extension = $file->getClientOriginalExtension();
-                $filename = $this->generateFileName($member_id,$course_id,$extension);
+                $filename = $this->generateFileName($member_id, $course_id, $extension);
                 $storagePath = 'uploads/courses/' . $course_id;
 
                 $file->storeAs($storagePath, $filename, 'public');
@@ -503,11 +513,10 @@ class ApplyController extends Controller
                 $apply->save();
 
                 return redirect()->route('courses.show', ['member_id' => $member_id, 'course_id' => $course_id]);
-
-            }else{
+            } else {
                 dd($request->file('registration_form'));
             }
-        }else{
+        } else {
             return redirect()->route('profile')->withErrors('The Course is not found.');
         }
     }
@@ -518,17 +527,17 @@ class ApplyController extends Controller
 
         $course_id = $request->input("course_id");
 
-        if ( !$this->checkUserAccessMember($member_id)){
+        if (!$this->checkUserAccessMember($member_id)) {
             return redirect()->route('profile')->withErrors('The Member is not found.');
         }
 
-        $course = Course::where("id",$course_id)->first();
-        if(!$course){
+        $course = Course::where("id", $course_id)->first();
+        if (!$course) {
             return redirect()->route('profile')->withErrors('The Course is not found.');
         }
 
 
-        $apply = Apply::where("id",$apply_id)->where("member_id",$member_id)->first();
+        $apply = Apply::where("id", $apply_id)->where("member_id", $member_id)->first();
         $van = $request->input("van");
         $shelter = $request->input("shelter", "ทั่วไป");
 
@@ -537,7 +546,6 @@ class ApplyController extends Controller
         $apply->save();
 
         return redirect()->route('courses.show', ['member_id' => $member_id, 'course_id' => $course_id]);
-
     }
 
 
@@ -545,16 +553,16 @@ class ApplyController extends Controller
     {
 
         $course_id = $request->input("course_id");
-        $cancel= $request->input("cancel");
+        $cancel = $request->input("cancel");
 
-        if ( !$this->checkUserAccessMember($member_id)){
+        if (!$this->checkUserAccessMember($member_id)) {
             return redirect()->route('profile')->withErrors('The Member is not found.');
         }
 
 
         if ($cancel == "cancel") {
-            $applys = Apply::where("course_id",$course_id)->where("member_id",$member_id)->get();
-            foreach ($applys as $apply){
+            $applys = Apply::where("course_id", $course_id)->where("member_id", $member_id)->get();
+            foreach ($applys as $apply) {
                 $apply->cancel = 1;
                 $apply->cancel_at = Carbon::now();
                 $apply->updated_by = "USER";
@@ -563,14 +571,14 @@ class ApplyController extends Controller
             }
 
             return redirect()->route('courses.show', ['member_id' => $member_id, 'course_id' => $course_id]);
-
-        }else{
+        } else {
             dd($request->file('registration_form'));
         }
     }
 
 
-    function generateFileName($course_id, $member_id, $fileExtension) {
+    function generateFileName($course_id, $member_id, $fileExtension)
+    {
         $inputString = $member_id . "_" . $course_id;
 
         // Generate an MD5 hash of the input string
@@ -585,7 +593,7 @@ class ApplyController extends Controller
         }
 
         // Concatenate the short hash and the file extension to form the final string
-        $hashedFilename = $member_id . "_" . $course_id . "_" .$shortHash . "." . $fileExtension;
+        $hashedFilename = $member_id . "_" . $course_id . "_" . $shortHash . "." . $fileExtension;
 
         return $hashedFilename;
     }
@@ -594,16 +602,12 @@ class ApplyController extends Controller
     {
         $apply = Apply::find($apply_id);
 
-        if ($apply){
+        if ($apply) {
             $apply->remark = request('remark');
             $apply->save();
-            return response()->json(['status'=>'ok']);
-        }else{
-            return response()->json(['status'=>'error']);
+            return response()->json(['status' => 'ok']);
+        } else {
+            return response()->json(['status' => 'error']);
         }
-
     }
-
-
-
 }

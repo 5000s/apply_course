@@ -209,11 +209,21 @@ class CourseApplyController extends Controller
         $gender = $data['gender'];
         $phone = $data['phone'];
         $birth_date = $data['birth_date'];
+        $course_id = $data['course_id'];
+        $lang = $data['lang'];
+
+
+        return $this->applyConfirm($member_id, $course_id, $firstname, $lastname, $gender, $phone, $birth_date, $lang);
+    }
+
+    public function applyConfirm($member_id, $course_id, $firstname, $lastname, $gender, $phone, $birth_date, $lang)
+    {
+
         $code = $this->getApplyCode();
         $email = "";
 
 
-        $course  = Course::findOrFail($data['course_id']);
+        $course  = Course::findOrFail($course_id);
 
         if ($member_id) {
             $member = Member::findOrFail($member_id);
@@ -227,7 +237,7 @@ class CourseApplyController extends Controller
             $member_new = true;
         } else {
             // update เบา ๆ เผื่อข้อมูลใหม่กว่า
-            $member->phone_new     = $data['phone'];
+            $member->phone_new     = $phone;
             $member->updated_by = 'web-direct';
             $member->save();
             $member_new = false;
@@ -314,7 +324,7 @@ class CourseApplyController extends Controller
         $data['provinces'] = $provinceArray;
         $data['nations'] = MemberController::$nationals;
 
-        $data['lang']    = $request->input('lang', 'th');
+        $data['lang']    = $lang;
 
         // 5) redirect ไปหน้าแบบฟอร์มเต็ม (Step 2)
         return  view('apply.full_form', $data);
