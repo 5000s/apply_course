@@ -130,14 +130,20 @@ class AuthController extends Controller
                     'password' => Hash::make(Str::random(8)), // กำหนดรหัสผ่านเริ่มต้นแบบสุ่ม
                 ]);
             }
-            // ส่งอีเมลเพื่อสร้างรหัสผ่านใหม่
-            $status = Password::sendResetLink(['email' => $user->email]);
+            try {
+                $emails = self::getValidEmails($user->email);
+                $sendEmail = $emails[0];
+                // ส่งอีเมลเพื่อสร้างรหัสผ่านใหม่
+                $status = Password::sendResetLink(['email' => $sendEmail]);
 
-            if ($status === Password::RESET_LINK_SENT) {
-                $maskedEmail = $this->maskEmail($user->email);
-                return view('members.password-reset-sent', ['maskedEmail' => $maskedEmail]);
-            } else {
-                return back()->withErrors(['email' => __($status)]);
+                if ($status === Password::RESET_LINK_SENT) {
+                    $maskedEmail = $this->maskEmail($sendEmail);
+                    return view('members.password-reset-sent', ['maskedEmail' => $maskedEmail]);
+                } else {
+                    return back()->withErrors(['email' => __($status)]);
+                }
+            } catch (\Exception $e) {
+                return back()->withErrors(['email' => $e->getMessage()]);
             }
         }
 
@@ -157,7 +163,6 @@ class AuthController extends Controller
             $member->save();
         }
     }
-
 
 
     public static function getPhoneSlug($phone)
@@ -200,5 +205,23 @@ class AuthController extends Controller
         }
 
         return $text;
+    }
+
+    public static function getValidEmails($string)
+    {
+        $pattern = '/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/';
+
+        preg_match_all($pattern, $string, $matches);
+
+        $emails = [];
+        if (!empty($matches[0])) {
+            foreach ($matches[0] as $email) {
+                if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                    $emails[] = $email;
+                }
+            }
+        }
+
+        return implode(', ', array_unique($emails));
     }
 }
