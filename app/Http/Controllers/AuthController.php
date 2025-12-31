@@ -98,10 +98,21 @@ class AuthController extends Controller
                 return redirect()->back()->with('error', 'ไม่พบอีเมลบันทึกในระบบ กรุณาติดต่อผู้ดูแลระบบ');
             }
 
-            return view('members.display-emails', ['most_matched_member' => $most_matched_member]);
+            return redirect()->route('check-email.result')->with('most_matched_member', $most_matched_member);
         } else {
             return redirect()->back()->with('error', 'ไม่พบข้อมูลที่ตรงกับการค้นหาของคุณ กรุณาตรวจสอบให้ถูกต้อง');
         }
+    }
+
+    public function checkEmailResult()
+    {
+        $most_matched_member = session('most_matched_member');
+
+        if (!$most_matched_member) {
+            return redirect()->route('request-access');
+        }
+
+        return view('members.display-emails', ['most_matched_member' => $most_matched_member]);
     }
 
     private function maskEmail($email)
@@ -132,7 +143,8 @@ class AuthController extends Controller
             }
             try {
                 $emails = self::getValidEmails($user->email);
-                $sendEmail = $emails[0];
+                $emailList = explode(',', $emails);
+                $sendEmail = trim($emailList[0]);
                 // ส่งอีเมลเพื่อสร้างรหัสผ่านใหม่
                 $status = Password::sendResetLink(['email' => $sendEmail]);
 
@@ -140,10 +152,20 @@ class AuthController extends Controller
                     $maskedEmail = $this->maskEmail($sendEmail);
                     return view('members.password-reset-sent', ['maskedEmail' => $maskedEmail]);
                 } else {
-                    return back()->withErrors(['email' => __($status)]);
+                    $most_matched_member = [
+                        'id' => $member->id,
+                        'email' => $this->maskEmail($member->email),
+                        'similarity' => 0
+                    ];
+                    return back()->withErrors(['email' => __($status)])->with('most_matched_member', $most_matched_member);
                 }
             } catch (\Exception $e) {
-                return back()->withErrors(['email' => $e->getMessage()]);
+                $most_matched_member = [
+                    'id' => $member->id,
+                    'email' => $this->maskEmail($member->email),
+                    'similarity' => 0
+                ];
+                return back()->withErrors(['email' => $e->getMessage()])->with('most_matched_member', $most_matched_member);
             }
         }
 
