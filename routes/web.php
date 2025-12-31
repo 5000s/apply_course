@@ -42,6 +42,9 @@ Route::get('/preregister', [AuthController::class, 'preregister'])->name('prereg
 Route::get('/request-access', [AuthController::class, 'formPreregister'])->name('request-access');
 
 Route::post('/check-email', [AuthController::class, 'checkEmail'])->name('check-email');
+Route::get('/check-email', function () {
+    return redirect()->route('request-access');
+});
 Route::post('/request-password-reset', [AuthController::class, 'requestPasswordReset'])->name('request-password-reset');
 Route::get('/request-password-reset', [AuthController::class, 'requestPasswordReset'])->name('request-password-reset');
 
