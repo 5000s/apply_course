@@ -100,10 +100,10 @@ class CourseApplyController extends Controller
 
         if (!$startCarbon) {
             $state = 'ยังไม่กำหนดวันเริ่ม';
-        } elseif ($daysUntilStart >= 14) {
+        } elseif ($daysUntilStart >= 4) {
             $isOpen = true;
             $state  = 'เปิดรับสมัคร';
-        } elseif ($daysUntilStart >= 0) {
+        } elseif ($daysUntilStart >= 1) {
             $state = 'ใกล้เริ่มแล้ว';
         } else {
             $state = 'สิ้นสุดการรับสมัคร';
@@ -267,13 +267,23 @@ class CourseApplyController extends Controller
 
         if (!$startCarbon) {
             $state = 'ยังไม่กำหนดวันเริ่ม';
-        } elseif ($daysUntilStart >= 14) {
+        } elseif ($daysUntilStart >= 4) {
             $isOpen = true;
             $state  = 'เปิดรับสมัคร';
-        } elseif ($daysUntilStart >= 0) {
+        } elseif ($daysUntilStart >= 1) {
             $state = 'ใกล้เริ่มแล้ว';
         } else {
             $state = 'สิ้นสุดการรับสมัคร';
+        }
+
+        if (!$isOpen) {
+            $request = new Request();
+            $request->merge([
+                'course_id' => $course->id,
+                'member_id' => $member->id,
+            ]);
+
+            return $this->directApply($request);
         }
 
         $location = null;

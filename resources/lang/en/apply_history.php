@@ -6,6 +6,7 @@ return [
         'submitted' => 'Submitted',
         'abandoned' => 'Abandoned',
         'cancelled' => 'Cancelled',
+        'confirmed' => 'Confirmed',
         'other'     => 'Other',
     ],
 ];

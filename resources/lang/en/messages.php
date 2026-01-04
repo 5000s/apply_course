@@ -80,6 +80,7 @@ return [
     'register_course' => 'Register for Course',
     'history' => 'History',
     'edit' => 'Edit',
+    'cancle' => 'Cancle',
     'register' => 'Register',
 
 
@@ -116,6 +117,11 @@ return [
     'found_member'  => 'We found a record that matches your search. Please send a request to create a new password:',
     'not_found'     => 'No records matching your search were found.',
     'send_request'  => 'Send Request',
+
+    'confirm_cancel_title' => 'Confirm Cancellation',
+    'confirm_cancel_body'  => 'Are you sure you want to cancel this application?',
+    'btn_confirm'          => 'Confirm',
+    'btn_close'            => 'Close',
 
 
 ];

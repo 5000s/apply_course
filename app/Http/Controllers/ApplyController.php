@@ -306,9 +306,12 @@ class ApplyController extends Controller
     {
         $user = Auth::user();
 
+
         if (!$this->checkUserAccessMember($member_id)) {
             return redirect()->route('profile')->withErrors('The Member is not found.');
         }
+
+        $member = Member::where("id", $member_id)->first();
 
         $applies  = DB::table('applies as a')
             ->select(
@@ -333,7 +336,7 @@ class ApplyController extends Controller
             ->join('locations as l', 'c.location_id', '=', 'l.id') // Join course categories
 
             ->where('a.member_id', $member_id)
-            ->orderBy('a.created_at', 'desc')
+            ->orderBy('c.date_start', 'desc')
             ->get()
             ->map(function ($course) {
 
@@ -385,7 +388,7 @@ class ApplyController extends Controller
                 return $course;
             });
 
-        return view('members.history', compact('applies', 'member_id', 'user'));
+        return view('members.history', compact('applies', 'member_id', 'user', 'member'));
     }
 
     public function checkUserAccessMember($member_id): bool
@@ -574,6 +577,32 @@ class ApplyController extends Controller
         } else {
             dd($request->file('registration_form'));
         }
+    }
+
+    public function cancelByUser(Request $request, $member_id, $apply_id)
+    {
+
+        if (!$this->checkUserAccessMember($member_id)) {
+            return redirect()->route('profile')->withErrors('The Member is not found.');
+        }
+
+        $apply = Apply::where("id", $apply_id)->where("member_id", $member_id)->first();
+
+        if (!$apply) {
+            return redirect()->route('profile')->withErrors('The Apply is not found.');
+        }
+
+        $applys = Apply::where("course_id", $apply->course_id)->where("member_id", $member_id)->get();
+
+        foreach ($applys as $apply) {
+            $apply->cancel = 1;
+            $apply->cancel_at = Carbon::now();
+            $apply->updated_by = "USER";
+            $apply->application = null;
+            $apply->save();
+        }
+
+        return redirect()->route('courses.history', ['member_id' => $member_id]);
     }
 
 

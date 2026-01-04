@@ -31,10 +31,10 @@ class CourseController extends Controller
         return view('admin.course_create', compact('locations', 'categories'));
     }
 
-    public function courseEdit(Request $request,$course_id)
+    public function courseEdit(Request $request, $course_id)
     {
 
-        $course = Course::where("id",$course_id)->first();
+        $course = Course::where("id", $course_id)->first();
         $locations = Location::all();
         $categories = CourseCategory::all();
 
@@ -48,7 +48,7 @@ class CourseController extends Controller
     public function courseSave(Request $request)
     {
         $user = Auth::user();
-        if( $user->admin != 1 || $user->editor != 1){
+        if ($user->admin != 1 || $user->editor != 1) {
             return back()->withErrors(['error' => 'You have no permission to create/edit']);
         }
 
@@ -75,8 +75,8 @@ class CourseController extends Controller
         $course->category_id  = $request->input('category_id');
         $course->state        = $request->input('state');
         $course->description        = $request->input('description');
-        $location = Location::where("id",  $course->location_id )->first()->name;
-        $category = CourseCategory::where("id", $course->category_id )->first()->name;
+        $location = Location::where("id",  $course->location_id)->first()->name;
+        $category = CourseCategory::where("id", $course->category_id)->first()->name;
 
         $course->location = $location;
         $course->category = $category;
@@ -88,7 +88,8 @@ class CourseController extends Controller
         return   redirect()->route('admin.courses.edit', ['course_id' => $course->id])->with('success', 'Course created successfully!');
     }
 
-    function generateCourseName($start_date, $end_date) {
+    function generateCourseName($start_date, $end_date)
+    {
         Carbon::setLocale('th');
 
         $start = Carbon::parse($start_date);
@@ -132,7 +133,7 @@ class CourseController extends Controller
     {
 
         $user = Auth::user();
-        if( $user->admin != 1 || $user->editor != 1){
+        if ($user->admin != 1 || $user->editor != 1) {
             return back()->withErrors(['error' => 'You have no permission to create/edit']);
         }
 
@@ -160,8 +161,8 @@ class CourseController extends Controller
         $course->category_id  = $request->input('category_id');
         $course->state        = $request->input('state');
         $course->description        = $request->input('description');
-        $location = Location::where("id",  $course->location_id )->first()->name;
-        $category = CourseCategory::where("id", $course->category_id )->first()->name;
+        $location = Location::where("id",  $course->location_id)->first()->name;
+        $category = CourseCategory::where("id", $course->category_id)->first()->name;
 
         $course->location = $location;
         $course->category = $category;
@@ -171,12 +172,11 @@ class CourseController extends Controller
         $course->save();
 
         return   redirect()->route('admin.courses.edit', ['course_id' => $course->id])->with('success', 'Course updated successfully!');
-
     }
 
 
 
-        public function courseList(Request $request)
+    public function courseList(Request $request)
     {
 
         $data = [];
@@ -212,7 +212,7 @@ class CourseController extends Controller
             )
             ->leftJoin('applies as a', 'c.id', '=', 'a.course_id');
 
-        if($status != "ทั้งหมด"){
+        if ($status != "ทั้งหมด") {
             $courses = $courses->where('c.state', $status);
         }
 
@@ -222,14 +222,14 @@ class CourseController extends Controller
         }
 
         if ($category_id != "0") {
-            if ($category_id == 1 || $category_id == "1"){
-                $courses = $courses->whereIn('c.category_id', [1,2,3,4,6,8,10,12]);
-            }else if ($category_id == 2  || $category_id == "2"){
-                $courses = $courses->whereIn('c.category_id', [5,7,9,11,13,14]);
+            if ($category_id == 1 || $category_id == "1") {
+                $courses = $courses->whereIn('c.category_id', [1, 2, 3, 4, 6, 8, 10, 12]);
+            } else if ($category_id == 2  || $category_id == "2") {
+                $courses = $courses->whereIn('c.category_id', [5, 7, 9, 11, 13, 14]);
             }
         }
 
-        if ($month != 0){
+        if ($month != 0) {
 
             $courses = $courses->where(function ($query) use ($month) {
                 $query->whereMonth('c.date_start', $month)
@@ -245,7 +245,7 @@ class CourseController extends Controller
 
 
         // Group by and get results
-        $courses = $courses->groupBy( 'c.state', 'c.location', 'c.id', 'c.category', 'c.date_start', 'c.date_end', 'cc.show_name')
+        $courses = $courses->groupBy('c.state', 'c.location', 'c.id', 'c.category', 'c.date_start', 'c.date_end', 'cc.show_name')
             ->get()->map(function ($course) {
                 // Parse the start and end dates
                 $startDate = Carbon::parse($course->date_start)->locale('th');
@@ -318,46 +318,46 @@ class CourseController extends Controller
         switch ($group) {
             case 'male':
                 $members = (clone $base)
-                    ->where('a.shelter','ทั่วไป'  )
-                    ->where('m.gender','ชาย')
-                    ->where('m.buddhism','ฆราวาส')
+                    ->where('a.shelter', 'ทั่วไป')
+                    ->where('m.gender', 'ชาย')
+                    ->where('m.buddhism', 'ฆราวาส')
                     ->get();
                 break;
 
             case 'female':
                 $members = (clone $base)
-                    ->where('a.shelter','ทั่วไป'  )
-                    ->where('m.gender','หญิง')
-                    ->where('m.buddhism','ฆราวาส')
+                    ->where('a.shelter', 'ทั่วไป')
+                    ->where('m.gender', 'หญิง')
+                    ->where('m.buddhism', 'ฆราวาส')
                     ->get();
                 break;
 
             case 'malespecial':
                 $members = (clone $base)
-                    ->where('a.shelter','กุฏิพิเศษ'  )
-                    ->where('m.gender','ชาย')
-                    ->where('m.buddhism','ฆราวาส')
+                    ->where('a.shelter', 'กุฏิพิเศษ')
+                    ->where('m.gender', 'ชาย')
+                    ->where('m.buddhism', 'ฆราวาส')
                     ->get();
                 break;
 
             case 'femalespecial':
                 $members = (clone $base)
-                    ->where('a.shelter','กุฏิพิเศษ'  )
-                    ->where('m.gender','หญิง')
-                    ->where('m.buddhism','ฆราวาส')
+                    ->where('a.shelter', 'กุฏิพิเศษ')
+                    ->where('m.gender', 'หญิง')
+                    ->where('m.buddhism', 'ฆราวาส')
                     ->get();
                 break;
 
 
             case 'monk':
                 $members = (clone $base)
-                    ->where('m.buddhism','ภิกษุ')
+                    ->where('m.buddhism', 'ภิกษุ')
                     ->get();
                 break;
 
             case 'nun':
                 $members = (clone $base)
-                    ->where('m.buddhism','แม่ชี')
+                    ->where('m.buddhism', 'แม่ชี')
                     ->get();
                 break;
 
@@ -366,27 +366,27 @@ class CourseController extends Controller
                 break;
         }
 
-// ----------------- นับจำนวนแต่ละกลุ่ม (เอาไว้โชว์บนแท็บ/สรุป) -----------------
+        // ----------------- นับจำนวนแต่ละกลุ่ม (เอาไว้โชว์บนแท็บ/สรุป) -----------------
         $stats = [
-            'male'   => (clone $base)->where('a.shelter','ทั่วไป'  )->where('m.gender','ชาย'  )->where('m.buddhism','ฆราวาส')->count(),
-            'female' => (clone $base)->where('a.shelter','ทั่วไป'  )->where('m.gender','หญิง')->where('m.buddhism','ฆราวาส')->count(),
-            'malespecial'   => (clone $base)->where('a.shelter','กุฏิพิเศษ'  )->where('m.gender','ชาย'  )->where('m.buddhism','ฆราวาส')->count(),
-            'femalespecial' => (clone $base)->where('a.shelter','กุฏิพิเศษ'  )->where('m.gender','หญิง')->where('m.buddhism','ฆราวาส')->count(),
-            'monk'   => (clone $base)->where('m.buddhism','ภิกษุ')->count(),
-            'nun'    => (clone $base)->where('m.buddhism','แม่ชี')->count(),
+            'male'   => (clone $base)->where('a.shelter', 'ทั่วไป')->where('m.gender', 'ชาย')->where('m.buddhism', 'ฆราวาส')->count(),
+            'female' => (clone $base)->where('a.shelter', 'ทั่วไป')->where('m.gender', 'หญิง')->where('m.buddhism', 'ฆราวาส')->count(),
+            'malespecial'   => (clone $base)->where('a.shelter', 'กุฏิพิเศษ')->where('m.gender', 'ชาย')->where('m.buddhism', 'ฆราวาส')->count(),
+            'femalespecial' => (clone $base)->where('a.shelter', 'กุฏิพิเศษ')->where('m.gender', 'หญิง')->where('m.buddhism', 'ฆราวาส')->count(),
+            'monk'   => (clone $base)->where('m.buddhism', 'ภิกษุ')->count(),
+            'nun'    => (clone $base)->where('m.buddhism', 'แม่ชี')->count(),
             'all'    => (clone $base)->count(),
         ];
 
 
         // ─── add 'gap' onto each member ──────────────────────────────────────
-        $members = $members->map(function($member) use ($currentCourse) {
+        $members = $members->map(function ($member) use ($currentCourse) {
             // find last completed 7-day course before this one
             $lastDate = DB::table('applies as a')
                 ->join('courses as c', 'a.course_id', '=', 'c.id')
                 ->join('course_categories as cc', 'c.category_id', '=', 'cc.id')
                 ->where('a.member_id', $member->uid)
                 ->where('a.state', 'ผ่านการอบรม')
-                ->where('cc.day', ">=" ,7)
+                ->where('cc.day', ">=", 7)
                 ->where('c.date_start', '<', $currentCourse->date_start)
                 ->orderByDesc('c.date_start')
                 ->value('c.date_start');
@@ -572,29 +572,38 @@ class CourseController extends Controller
     public function updateApplyStatus($course_id, $apply_id, $status)
     {
         $user = Auth::user();
-        if( $user->admin != 1 || $user->editor != 1){
+        if ($user->admin != 1 || $user->editor != 1) {
             return back()->withErrors(['error' => 'You have no permission to create/edit']);
         }
 
-       $admin = Auth::user();
+        $admin = Auth::user();
 
-        $apply = Apply::where("id", $apply_id)->first();
-        $apply->state = $status;
-        $apply->updated_by = $admin->name;
-        $apply->save();
+        if ($status == 'ยกเลิกการสมัคร') {
+            $apply = Apply::where("id", $apply_id)->first();
+            $apply->cancel = 1;
+            $apply->cancel_at = now();
+            $apply->updated_by = $admin->name;
+            $apply->save();
+        } else {
+            $apply = Apply::where("id", $apply_id)->first();
+            $apply->state = $status;
+            $apply->updated_by = $admin->name;
+            $apply->save();
+        }
 
         return redirect()->route('admin.courseList', ['course_id' => $course_id]);
     }
 
-    public function compareByNameTh($a, $b) {
+    public function compareByNameTh($a, $b)
+    {
         return strcmp($a['name_th'], $b['name_th']);
     }
 
     public function adminSearchMember(Request $request)
     {
         //        if (!Auth::check()){
-//            return redirect("admin/login");
-//        }
+        //            return redirect("admin/login");
+        //        }
 
         $members = Member::select("id as i", "name as n", "surname as s", "phone_slug as p")->get();
         return view('admin.courser_admin_member', ['members' => $members]);
@@ -604,8 +613,8 @@ class CourseController extends Controller
     {
 
         //        if (!Auth::check()){
-//            return redirect("admin/login");
-//        }
+        //            return redirect("admin/login");
+        //        }
 
         $member = $request->member;
 
@@ -796,7 +805,6 @@ class CourseController extends Controller
 
                     $message[] = "คอร์สอานาปานสติ ๑ วัน นั้นไม่ได้จัดที่ไว้เพื่อ ศิษย์เก่าทั้ง อานาปานสติ และ เตโชวิปัสสนา โปรดเลือกสมัครคอร์ส อานาปานสติ หรือ เตโชวิปัสสนา";
                 }
-
             } else if ($course->category == "คอร์สอานาปานสติ") {
 
                 if ($pass_anapa_count >= 2) {
@@ -804,16 +812,13 @@ class CourseController extends Controller
 
                     $message[] = "ท่านเข้าคอร์สอานาปานสติครบ 2 ครั้งแล้ว โปรดเลือกสมัครคอร์ส เตโชวิปัสสนา";
                 }
-
             } else if ($course->category == "คอร์สศิษย์เก่า (๓ วัน)") {
 
                 if (!$pass_anapa && !$pass_techo) {
                     $pass = false;
                     $message[] = "คอร์สศิษย์เก่า (๓ วัน) เป็นคอร์สสำหรับศิษย์ที่ผ่าน เตโชวิปัสสนา หรือ คอร์สอานาปานสติ มาแล้วเท่านั้น";
                 }
-
             } else if ($course->category == "ธรรมะแคมป์") {
-
             } else if ($course->category == "คอร์สเตโชวิปัสสนา") {
 
 
@@ -871,8 +876,6 @@ class CourseController extends Controller
                     $bh_year = $year + 543;
                     $message[] = "ท่านสมัครคอร์สเตโชวิปัสสนาในปีพ.ศ. $bh_year เกิน 2 ครั้ง โปรดสมัครคอร์สศิษย์เก่า (๓ วัน) ";
                 }
-
-
             } else if ("คอร์สเตโชฯ (ศิษย์เก่า)") {
 
                 if (!$pass_techo) {
@@ -880,7 +883,6 @@ class CourseController extends Controller
                     $message[] = "$course->category  เป็นคอร์สสำหรับศิษย์ที่ผ่าน เตโชวิปัสสนา มาแล้วเท่านั้น";
                 }
             } else if ($course->category == "คอร์สฤาษี (๑๔ วัน)" || $course->category == "คอร์สวิถีอาสวะ") {
-
             }
         }
 
@@ -934,14 +936,14 @@ class CourseController extends Controller
             $apply->member = $apply->member()->first();
         }
         //        if(!$apply){
-//            $apply = new Apply();
-//            $my_apply->member_id = $member_id;
-//            $my_apply->course_id = $course_id;
-//            $my_apply->role = "ผู้เข้าอบรม";
-//            $my_apply->shelter = "ทั้วไป";
-//            $my_apply->confirmed = "no";
-//            $my_apply->van = "no";
-//        }
+        //            $apply = new Apply();
+        //            $my_apply->member_id = $member_id;
+        //            $my_apply->course_id = $course_id;
+        //            $my_apply->role = "ผู้เข้าอบรม";
+        //            $my_apply->shelter = "ทั้วไป";
+        //            $my_apply->confirmed = "no";
+        //            $my_apply->van = "no";
+        //        }
 
         $member->update($input);
 
@@ -996,7 +998,6 @@ class CourseController extends Controller
         try {
             $my_apply->shelter = $input['shelter'];
         } catch (\Exception $exception) {
-
         }
 
         $my_apply->save();
@@ -1070,15 +1071,11 @@ class CourseController extends Controller
     {
 
         return response()->download(storage_path("app/userform/$time/$member_id/$filename"));
-
     }
 
 
 
-    public function rankingMonk()
-    {
-
-    }
+    public function rankingMonk() {}
 
 
     public function calculateGap(int $courseId)
@@ -1123,7 +1120,7 @@ class CourseController extends Controller
                     'days'      => $days,
                 ];
             })
-            ->sortByDesc(function($row) {
+            ->sortByDesc(function ($row) {
                 // sort by total days as a rough proxy: years*365 + months*30 + days
                 if (is_null($row['years'])) return -1;
                 return $row['years'] * 365 + $row['months'] * 30 + $row['days'];
@@ -1181,5 +1178,4 @@ class CourseController extends Controller
             $course->save();
         }
     }
-
 }

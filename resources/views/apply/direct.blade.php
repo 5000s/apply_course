@@ -75,6 +75,10 @@
                                         'female' => 'หญิง',
                                         'male' => 'ชาย',
                                         'select_month' => 'เดือน',
+                                        'msg_closed_online' => 'คอร์สนี้ปิดรับสมัครทางออนไลน์แล้ว',
+                                        'msg_contact_seat' => 'กรุณาติดต่อมูลนิธิฯ เพื่อตรวจสอบที่นั่งว่างได้ที่',
+                                        'email_label' => 'อีเมล',
+                                        'tel_label' => 'โทร',
                                         // Modal & JS
                                         'modal_title' => 'แจ้งปัญหาไม่พบข้อมูล',
                                         'modal_body' =>
@@ -148,6 +152,11 @@
                                         'female' => 'Female',
                                         'male' => 'Male',
                                         'select_month' => 'Month',
+                                        'msg_closed_online' => 'Online application for this course is closed.',
+                                        'msg_contact_seat' =>
+                                            'Please contact the foundation to check for available seats at:',
+                                        'email_label' => 'Email',
+                                        'tel_label' => 'Tel',
                                         // Modal & JS
                                         'modal_title' => 'Report Data Not Found',
                                         'modal_body' =>
@@ -275,8 +284,32 @@
                     </div>
                 </div>
 
-                @if ($vm['is_open'])
 
+                @if ($vm['state'] === 'ใกล้เริ่มแล้ว')
+                    <div class="card shadow-sm border-warning mt-4">
+                        <div class="card-body text-center p-4 p-md-5">
+                            <h4 class="text-danger mb-3 fw-bold">
+                                <i class="bi bi-x-circle-fill me-2"></i> {{ $txt['msg_closed_online'] }}
+                            </h4>
+                            <p class="fs-5 mb-4 text-muted">
+                                {{ $txt['msg_contact_seat'] }}
+                            </p>
+                            <div class="d-inline-block text-start bg-light p-4 rounded-3 border">
+                                <p class="mb-2 fs-5">
+                                    <i class="bi bi-envelope-fill me-2 text-primary"></i>
+                                    <strong>{{ $txt['email_label'] }}:</strong>
+                                    <a href="mailto:info@bodhidhammayan.org"
+                                        class="text-decoration-none fw-semibold">info@bodhidhammayan.org</a>
+                                </p>
+                                <p class="mb-0 fs-5">
+                                    <i class="bi bi-telephone-fill me-2 text-success"></i>
+                                    <strong>{{ $txt['tel_label'] }}:</strong>
+                                    <a href="tel:021174063" class="text-decoration-none fw-semibold">02-117-4063</a>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                @elseif ($vm['is_open'])
                     {{-- ฟอร์มสมัคร (ไม่มี OTP แล้ว ใช้แค่ Captcha) --}}
                     <div class="card shadow-sm">
                         <div class="card-header bg-white">

@@ -189,6 +189,9 @@ Route::middleware(['verified'])->group(function () {
 
     Route::post('apply/{member_id}/courses/{apply}/cancel', [ApplyController::class, 'cancel'])->name('courses.cancel');
 
+    Route::get('apply/{member_id}/courses/{apply_id}/cancelbyuser', [ApplyController::class, 'cancelByUser'])->name('courses.cancelbyuser');
+
+
     Route::get('apply/{member_id}/courses/edit/{course_id}', [ApplyController::class, 'edit'])->name('courses.edit');
 });
 
