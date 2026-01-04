@@ -522,7 +522,7 @@ class CourseApplyController extends Controller
 
         $apply->van = $van;
         $apply->shelter = $shelter;
-        $apply->cancel = 0;
+        $apply->cancel = null;
         $apply->state = "ยื่นใบสมัคร";
         $apply->save();
 
