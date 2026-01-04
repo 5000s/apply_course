@@ -111,9 +111,9 @@
                                             'โปรดเลือกชื่อของท่าน หรือเลือก "ฉันผู้สมัครใหม่" แล้วกดปุ่มยืนยันด้านล่าง',
                                         'js_error_check' => 'เกิดข้อผิดพลาดในการตรวจสอบข้อมูล',
                                         'js_selected' =>
-                                            'เลือกข้อมูล: <strong>:name</strong> เรียบร้อยแล้ว <br> กรุณากดยืนยันว่าไม่ใช้หุ่นยนต์แล้วกดปุ่ม "ส่งคำขอสมัครคอร์ส"',
+                                            'เลือกข้อมูลเรียบร้อยแล้ว: <br> <strong>:name</strong> <strong>:surname</strong> (อายุ :age ปี) <br> กรุณากดยืนยันว่าไม่ใช้หุ่นยนต์แล้วกดปุ่ม <br> "ส่งคำขอสมัครคอร์ส"',
                                         'js_selected_new' =>
-                                            'เลือก: <strong>ผู้สมัครใหม่</strong> เรียบร้อยแล้ว <br> กรุณากดยืนยันว่าไม่ใช้หุ่นยนต์แล้วกดปุ่ม "ส่งคำขอสมัครคอร์ส"',
+                                            'เลือก: <strong>ผู้สมัครใหม่</strong> เรียบร้อยแล้ว <br> กรุณากดยืนยันว่าไม่ใช้หุ่นยนต์แล้วกดปุ่ม <br> "ส่งคำขอสมัครคอร์ส"',
                                         'js_age_format' => '(อายุ :age ปี)',
                                         'status_map' => [
                                             'ผู้สมัครใหม่' => 'ผู้สมัครใหม่',
@@ -189,9 +189,9 @@
                                             'Please select your name or "I am a new applicant" then click confirm below.',
                                         'js_error_check' => 'Error checking information.',
                                         'js_selected' =>
-                                            'Selected: <strong>:name</strong> <br> Please confirm captcha and click "Submit Application".',
+                                            'Selected: <br> <strong>:name</strong> <strong>:surname</strong> (Age :age Years) <br> Please confirm captcha and click <br> "Submit Application".',
                                         'js_selected_new' =>
-                                            'Selected: <strong>New Applicant</strong>. <br> Please confirm you are not a robot and click "Submit Application".',
+                                            'Selected: <strong>New Applicant</strong>. <br> Please confirm you are not a robot and click <br> "Submit Application".',
                                         'js_age_format' => '(Age :age Years)',
                                         'status_map' => [
                                             'ผู้สมัครใหม่' => 'New Applicant',
@@ -786,7 +786,7 @@
                                         <div class="list-group list-group-flush">`;
 
                             res.members.forEach(m => {
-                                html += `<button type="button" class="list-group-item list-group-item-action" onclick="selectMember(${m.id}, '${m.name}')">
+                                html += `<button type="button" class="list-group-item list-group-item-action" onclick="selectMember(${m.id}, '${m.name}', '${m.surname}', ${m.age_years})">
                                             <div class="d-flex w-100 justify-content-between">
                                                 <h5 class="mb-1">${m.name} ${m.surname} ${TRANS.js_age_format.replace(':age', m.age_years)}</h5>
                                                 <small>${TRANS.status_map[m.status] || m.status}</small>
@@ -815,11 +815,11 @@
             });
         });
 
-        function selectMember(id, name) {
+        function selectMember(id, name, surname, age) {
             $('#member_id').val(id);
             // Visual feedback
             $('#search-result-area').html(`<div class="alert alert-success">
-                                            <i class="bi bi-check-circle-fill"></i> ${TRANS.js_selected.replace(':name', name)}
+                                            <i class="bi bi-check-circle-fill"></i> ${TRANS.js_selected.replace(':name', name).replace(':surname', surname).replace(':age', age)}
                                            </div>`);
             if (window.setMemberChecked) window.setMemberChecked(true);
         }
