@@ -303,21 +303,20 @@ class CourseController extends Controller
                 'm.status',
                 'a.state',
                 'a.role',
+                'a.cancel',
                 'a.updated_by'
             )
             ->join('applies as a', 'a.member_id', '=', 'm.id')
             ->join('courses as c', 'c.id', '=', 'a.course_id')
             ->where('a.course_id', $course_id)
-            ->where(function ($query) {
-                $query->where('a.cancel', 0)
-                    ->orWhereNull('a.cancel');
-            })
+
             ->orderByRaw("DATE_FORMAT(a.created_at, '%Y-%m-%d %H:%i:%s')");
 
         // ----------------- ดึงข้อมูลตามแท็บที่เลือก -----------------
         switch ($group) {
             case 'male':
                 $members = (clone $base)
+                    ->whereNull('a.cancel')
                     ->where('a.shelter', 'ทั่วไป')
                     ->where('m.gender', 'ชาย')
                     ->where('m.buddhism', 'ฆราวาส')
@@ -326,6 +325,7 @@ class CourseController extends Controller
 
             case 'female':
                 $members = (clone $base)
+                    ->whereNull('a.cancel')
                     ->where('a.shelter', 'ทั่วไป')
                     ->where('m.gender', 'หญิง')
                     ->where('m.buddhism', 'ฆราวาส')
@@ -334,6 +334,7 @@ class CourseController extends Controller
 
             case 'malespecial':
                 $members = (clone $base)
+                    ->whereNull('a.cancel')
                     ->where('a.shelter', 'กุฏิพิเศษ')
                     ->where('m.gender', 'ชาย')
                     ->where('m.buddhism', 'ฆราวาส')
@@ -342,6 +343,7 @@ class CourseController extends Controller
 
             case 'femalespecial':
                 $members = (clone $base)
+                    ->whereNull('a.cancel')
                     ->where('a.shelter', 'กุฏิพิเศษ')
                     ->where('m.gender', 'หญิง')
                     ->where('m.buddhism', 'ฆราวาส')
@@ -351,13 +353,22 @@ class CourseController extends Controller
 
             case 'monk':
                 $members = (clone $base)
+                    ->whereNull('a.cancel')
                     ->where('m.buddhism', 'ภิกษุ')
                     ->get();
                 break;
 
             case 'nun':
                 $members = (clone $base)
+                    ->whereNull('a.cancel')
                     ->where('m.buddhism', 'แม่ชี')
+                    ->get();
+                break;
+
+
+            case 'cancel':
+                $members = (clone $base)
+                    ->where('a.cancel', 1)
                     ->get();
                 break;
 
@@ -368,13 +379,22 @@ class CourseController extends Controller
 
         // ----------------- นับจำนวนแต่ละกลุ่ม (เอาไว้โชว์บนแท็บ/สรุป) -----------------
         $stats = [
-            'male'   => (clone $base)->where('a.shelter', 'ทั่วไป')->where('m.gender', 'ชาย')->where('m.buddhism', 'ฆราวาส')->count(),
-            'female' => (clone $base)->where('a.shelter', 'ทั่วไป')->where('m.gender', 'หญิง')->where('m.buddhism', 'ฆราวาส')->count(),
-            'malespecial'   => (clone $base)->where('a.shelter', 'กุฏิพิเศษ')->where('m.gender', 'ชาย')->where('m.buddhism', 'ฆราวาส')->count(),
-            'femalespecial' => (clone $base)->where('a.shelter', 'กุฏิพิเศษ')->where('m.gender', 'หญิง')->where('m.buddhism', 'ฆราวาส')->count(),
-            'monk'   => (clone $base)->where('m.buddhism', 'ภิกษุ')->count(),
-            'nun'    => (clone $base)->where('m.buddhism', 'แม่ชี')->count(),
-            'all'    => (clone $base)->count(),
+            'male'   => (clone $base)->whereNull('a.cancel')->where('a.shelter', 'ทั่วไป')->where('m.gender', 'ชาย')->where('m.buddhism', 'ฆราวาส')->count(),
+
+            'female' => (clone $base)->whereNull('a.cancel')->where('a.shelter', 'ทั่วไป')->where('m.gender', 'หญิง')->where('m.buddhism', 'ฆราวาส')->count(),
+
+            'malespecial'   => (clone $base)->whereNull('a.cancel')->where('a.shelter', 'กุฏิพิเศษ')->where('m.gender', 'ชาย')->where('m.buddhism', 'ฆราวาส')->count(),
+
+            'femalespecial' => (clone $base)->whereNull('a.cancel')->where('a.shelter', 'กุฏิพิเศษ')->where('m.gender', 'หญิง')->where('m.buddhism', 'ฆราวาส')->count(),
+
+            'monk'   => (clone $base)->whereNull('a.cancel')->where('m.buddhism', 'ภิกษุ')->count(),
+
+            'nun'    => (clone $base)->whereNull('a.cancel')->where('m.buddhism', 'แม่ชี')->count(),
+
+            'all'    => (clone $base)
+                ->whereNull('a.cancel')->count(),
+
+            'cancel'    => (clone $base)->where('a.cancel', 1)->count(),
         ];
 
 

@@ -57,6 +57,7 @@
                 {!! $makeTab('female', 'หญิง', $stats['female'] ?? 0) !!}
                 {!! $makeTab('malespecial', 'ชาย กุฏิพิเศษ', $stats['malespecial'] ?? 0) !!}
                 {!! $makeTab('femalespecial', 'หญิง กุฏิพิเศษ', $stats['femalespecial'] ?? 0) !!}
+                {!! $makeTab('cancel', 'ยกเลิก', $stats['cancel'] ?? 0) !!}
             </div>
         </div>
     </div>
