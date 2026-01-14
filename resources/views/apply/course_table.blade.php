@@ -146,8 +146,8 @@
                     </span>
 
                     @if (isset($regis) && $regis == 1 && $course->date_start >= date('Y-m-d'))
-                        <a href="{{ route('apply.direct', ['course_id' => $course->id]) }}" target="_blank"
-                            class="btn-register">
+                        <a href="{{ route('apply.direct', ['course_id' => $course->id]) }}&lang={{ $lang }}"
+                            target="_blank" class="btn-register">
                             @if ($lang == 'th')
                                 สมัคร
                             @else
