@@ -210,7 +210,12 @@ class CourseApplyController extends Controller
         $phone = $data['phone'];
         $birth_date = $data['birth_date'];
         $course_id = $data['course_id'];
-        $lang = $data['lang'];
+
+        try {
+            $lang = $data['lang'];
+        } catch (\Exception $e) {
+            $lang = "th";
+        }
 
 
         return $this->applyConfirm($member_id, $course_id, $firstname, $lastname, $gender, $phone, $birth_date, $lang);
