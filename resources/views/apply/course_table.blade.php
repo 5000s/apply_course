@@ -145,7 +145,9 @@
                         @endif
                     </span>
 
-                    @if (isset($regis) && $regis == 1 && $course->date_start >= date('Y-m-d'))
+                    @if (isset($regis) &&
+                            $regis == 1 &&
+                            $course->date_start->copy()->addDays(1)->gte(now()->startOfDay()))
                         <a href="{{ route('apply.direct', ['course_id' => $course->id]) }}&lang={{ $lang }}"
                             target="_blank" class="btn-register">
                             @if ($lang == 'th')
