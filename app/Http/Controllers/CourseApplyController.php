@@ -174,7 +174,7 @@ class CourseApplyController extends Controller
             'first_name' => ['required', 'string', 'max:100'],
             'last_name'  => ['required', 'string', 'max:100'],
             'birth_date' => ['required', 'date'],
-            'phone'      => ['required', 'string', 'max:30'],
+            'phone'      => ['nullable', 'string', 'max:30'],
             'email'      => ['nullable', 'email', 'max:190'],
             'g-recaptcha-response' => app()->environment('production')
                 ? ['required']
@@ -207,9 +207,17 @@ class CourseApplyController extends Controller
         $firstname = $data['first_name'];
         $lastname = $data['last_name'];
         $gender = $data['gender'];
-        $phone = $data['phone'];
+
         $birth_date = $data['birth_date'];
         $course_id = $data['course_id'];
+
+        try {
+            $phone = $data['phone'];
+        } catch (\Exception $e) {
+            $phone = "";
+        }
+
+
 
         try {
             $lang = $data['lang'];

@@ -471,26 +471,26 @@
                                 </div>
 
                                 {{-- ข้อมูลติดต่อ --}}
-                                <div class="col-md-6">
+                                {{-- <div class="col-md-6">
                                     <label class="form-label fs-5">{{ $txt['phone'] }}</label>
                                     <div class="mb-2">
                                         <input type="tel" id="phone" name="phone"
                                             class="form-control form-control-lg" maxlength="30" inputmode="tel"
                                             pattern="[0-9\s\-+]*" placeholder="{{ $txt['phone_placeholder'] }}"
                                             value="{{ old('phone') }}">
-                                    </div>
-                                    {{--                                    <div> --}}
-                                    {{--                                        <input type="email" --}}
-                                    {{--                                               name="email" --}}
-                                    {{--                                               class="form-control form-control-lg" --}}
-                                    {{--                                               maxlength="190" --}}
-                                    {{--                                               placeholder="อีเมล เช่น you@example.com" --}}
-                                    {{--                                               value="{{ old('email') }}"> --}}
-                                    {{--                                    </div> --}}
-                                    {{--                                    <div class="form-text"> --}}
-                                    {{--                                        อย่างน้อย 1 ช่องทาง (เบอร์โทรศัพท์ หรือ อีเมล) สำหรับติดต่อกลับ --}}
-                                    {{--                                    </div> --}}
-                                </div>
+                                    </div> --}}
+                                {{--                                    <div> --}}
+                                {{--                                        <input type="email" --}}
+                                {{--                                               name="email" --}}
+                                {{--                                               class="form-control form-control-lg" --}}
+                                {{--                                               maxlength="190" --}}
+                                {{--                                               placeholder="อีเมล เช่น you@example.com" --}}
+                                {{--                                               value="{{ old('email') }}"> --}}
+                                {{--                                    </div> --}}
+                                {{--                                    <div class="form-text"> --}}
+                                {{--                                        อย่างน้อย 1 ช่องทาง (เบอร์โทรศัพท์ หรือ อีเมล) สำหรับติดต่อกลับ --}}
+                                {{--                                    </div> --}}
+                                {{-- </div> --}}
 
                                 {{-- เส้นแบ่ง --}}
                                 <div class="col-12">
@@ -578,7 +578,7 @@
                         </ul>
                     </div>
 
-                    <form id="notFoundForm">
+                    {{-- <form id="notFoundForm">
                         <div class="mb-3">
                             <label for="modal-phone" class="form-label">{{ $txt['modal_phone'] }} <span
                                     class="text-danger">*</span></label>
@@ -588,7 +588,7 @@
                             <label for="modal-email" class="form-label">{{ $txt['modal_email'] }}</label>
                             <input type="email" class="form-control" id="modal-email" placeholder="name@example.com">
                         </div>
-                    </form>
+                    </form> --}}
                 </div>
                 <div class="modal-footer" id="notFoundModalFooter">
                     <button type="button" class="btn btn-secondary"
@@ -738,9 +738,9 @@
                 let firstName = $('input[name="first_name"]').val();
                 let lastName = $('input[name="last_name"]').val();
                 let birthDate = $('#birth_date').val();
-                let phone = $('#phone').val();
+                // let phone = $('#phone').val();
 
-                if (!firstName || !lastName || !birthDate || !phone) {
+                if (!firstName || !lastName || !birthDate) {
                     alert(TRANS.js_fill_all);
                     return;
                 }
@@ -846,25 +846,25 @@
             let firstName = $('input[name="first_name"]').val();
             let lastName = $('input[name="last_name"]').val();
             let birthDate = $('#birth_date').val();
-            let phone = $('#phone').val();
+            // let phone = $('#phone').val();
 
             // แสดงใน Modal
             $('#modal-name').text(firstName + ' ' + lastName);
             $('#modal-gender').text(gender);
             $('#modal-dob').text(birthDate);
-            $('#modal-phone').val(phone); // Pre-fill phone
+            // $('#modal-phone').val(phone); // Pre-fill phone
 
             $('#notFoundModal').modal('show');
         }
 
         function submitNotFoundReport() {
-            let phone = $('#modal-phone').val();
-            let email = $('#modal-email').val();
+            // let phone = $('#modal-phone').val();
+            // let email = $('#modal-email').val();
 
-            if (!phone) {
-                alert(TRANS.modal_phone_req);
-                return;
-            }
+            // if (!phone) {
+            //     alert(TRANS.modal_phone_req);
+            //     return;
+            // }
 
             // Disable button
             let btn = $('#notFoundModal .btn-primary');
@@ -876,8 +876,8 @@
                 first_name: $('input[name="first_name"]').val(),
                 last_name: $('input[name="last_name"]').val(),
                 birth_date: $('#birth_date').val(),
-                phone: phone,
-                email: email,
+                // phone: "",
+                // email: "",
             };
 
             // Fetch location data
