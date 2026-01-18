@@ -234,7 +234,7 @@ class CourseApplyController extends Controller
 
         $code = $this->getApplyCode();
         $email = "";
-
+        $member_new = false;
 
         $course  = Course::findOrFail($course_id);
 
@@ -349,8 +349,33 @@ class CourseApplyController extends Controller
 
         $data['lang']    = $lang;
 
-        // 5) redirect ไปหน้าแบบฟอร์มเต็ม (Step 2)
-        return  view('apply.full_form', $data);
+
+        $need_more_info = false;
+        if (
+            Str::contains($courseCat->show_name ?? '', 'วิปัสสนา') &&
+            Str::contains($vm['place_name'] ?? '', 'แก่งคอย')
+        ) {
+            $need_more_info = true;
+        }
+
+        if ($member_new) {
+            $need_more_info = true;
+        }
+
+        if ($need_more_info) {
+            // 5) redirect ไปหน้าแบบฟอร์มเต็ม (Step 2)
+            return  view('apply.full_form', $data);
+        } else {
+
+            $request = new Request();
+            $request->merge([
+                'course_id' => $course->id,
+                'member_id' => $member->id,
+            ]);
+
+
+            return $this->directConfirm($request, $course_id, $member_id);
+        }
     }
 
     public function newApply($member_id, $course_id, $van, $shelter)
@@ -517,7 +542,10 @@ class CourseApplyController extends Controller
 
         $apply = Apply::where('course_id', $course_id)
             ->where('member_id', $member_id)
-            ->where('cancel', "!=", 1)
+            ->where(function ($query) {
+                $query->where('cancel', '!=', 1)
+                    ->orWhereNull('cancel');
+            })
             ->first();
 
         $member = Member::find($member_id);

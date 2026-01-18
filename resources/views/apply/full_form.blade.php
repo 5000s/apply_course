@@ -247,15 +247,21 @@
                             <div class="row g-3">
                                 <div class="col-md-6">
                                     <label class="form-label">{{ $txt['name'] }}</label>
-                                    <input type="text" name="name" class="form-control"
-                                        @if ($member_new == false) readonly @endif
-                                        value="{{ old('name', $member->name) }}">
+                                    @if ($member_new == false)
+                                        {{ $member->name }}
+                                    @else
+                                        <input type="text" name="name" class="form-control"
+                                            value="{{ old('name', $member->name) }}">
+                                    @endif
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label">{{ $txt['surname'] }}</label>
-                                    <input type="text" name="surname" class="form-control"
-                                        @if ($member_new == false) readonly @endif
-                                        value="{{ old('surname', $member->surname) }}">
+                                    @if ($member_new == false)
+                                        {{ $member->surname }}
+                                    @else
+                                        <input type="text" name="surname" class="form-control"
+                                            value="{{ old('surname', $member->surname) }}">
+                                    @endif
                                 </div>
 
                                 <div class="col-md-6" @if ($member_new == false) hidden @endif>

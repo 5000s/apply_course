@@ -181,6 +181,9 @@
                             <p class="fw-bold">{{ $txt['team'] }}</p>
                             <a href="https://bodhidhammayan.org/" target="_self"
                                 class="btn btn-outline-secondary mt-3">{{ $txt['back_home'] }}</a>
+
+                            <a href="{{ route('apply.direct') }}?lang={{ $lang }}&course_id={{ $course->id }}"
+                                target="_self" class="btn btn-outline-secondary mt-3">กลับสู่หน้าสมัคร</a>
                         </div>
 
                     </div>
