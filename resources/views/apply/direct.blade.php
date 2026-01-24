@@ -876,6 +876,7 @@
                 first_name: $('input[name="first_name"]').val(),
                 last_name: $('input[name="last_name"]').val(),
                 birth_date: $('#birth_date').val(),
+                lang: $('#lang').val(),
                 // phone: "",
                 // email: "",
             };

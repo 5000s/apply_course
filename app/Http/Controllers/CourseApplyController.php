@@ -176,6 +176,7 @@ class CourseApplyController extends Controller
             'birth_date' => ['required', 'date'],
             'phone'      => ['nullable', 'string', 'max:30'],
             'email'      => ['nullable', 'email', 'max:190'],
+            'lang'       => ['nullable', 'string', 'max:10'],
             'g-recaptcha-response' => app()->environment('production')
                 ? ['required']
                 : ['nullable'],   // local ข้ามได้
@@ -218,7 +219,6 @@ class CourseApplyController extends Controller
         }
 
 
-
         try {
             $lang = $data['lang'];
         } catch (\Exception $e) {
@@ -241,7 +241,8 @@ class CourseApplyController extends Controller
         if ($member_id) {
             $member = Member::findOrFail($member_id);
         } else {
-            $member = Member::findCandidate($gender, $firstname, $lastname, $birth_date);
+            // $member = Member::findCandidate($gender, $firstname, $lastname, $birth_date);
+            $member = null;
         }
 
         if (!$member) {
@@ -260,6 +261,44 @@ class CourseApplyController extends Controller
 
         // 4) Prepare View Model (Same as directApply)
         $courseCat = CourseCategory::findOrFail($course->category_id);
+
+        $need_check_history_apply = false;
+        if (Str::contains($courseCat->show_name ?? '', 'วิปัสสนา')) {
+            $need_check_history_apply = true;
+        }
+
+
+        if ($need_check_history_apply) {
+
+            $not_pass = false;
+
+            if ($member_new) {
+                $not_pass = true;
+            }
+
+            $passCourseCategoryID = [1, 2, 3, 4, 5, 6, 8, 10, 12, 13, 14, 15, 16, 17];
+
+            $applyHistory = Apply::where('member_id', $member->id)
+                ->whereHas('course', function ($q) use ($passCourseCategoryID) {
+                    $q->whereIn('category_id', $passCourseCategoryID);
+                })
+                ->with('course')
+                ->get();
+
+            if (count($applyHistory) == 0) {
+                $not_pass = true;
+            }
+
+            if ($not_pass) {
+                $message_eng =  "New applicants must have attended at least one Anapanasati meditation course (3-4 days course) at Bodhidhammayan before registering for Vipassana meditation.";
+                $message_th = "ผู้สมัครศิษย์ใหม่ที่จะเข้าอบรมวิปัสสนากรรมฐานได้ “ต้องผ่านการอบรมสมาธิอานาปานสติ (3-4 วัน) ของโพธิธรรมญาณ ก่อนอย่างน้อย 1 ครั้ง";
+
+                return back()
+                    ->withErrors(['course_id' => $lang == 'en' ? $message_eng : $message_th])  // หรือข้อความอื่น
+                    ->withInput();
+            }
+        }
+
 
         // Logic to construct $vm
         $th = function ($d) {
@@ -371,6 +410,7 @@ class CourseApplyController extends Controller
             $request->merge([
                 'course_id' => $course->id,
                 'member_id' => $member->id,
+                'lang' => $lang,
             ]);
 
 
@@ -510,6 +550,19 @@ class CourseApplyController extends Controller
 
     public function createMember($gender, $firstname, $lastname, $birthDate, $phone, $email, $applyCode)
     {
+        $member = Member::findCandidate($gender, $firstname, $lastname, $birthDate);
+
+        if ($member) {
+            if (
+                $member->name == $firstname
+                && $member->surname == $lastname
+                && $member->gender == $gender
+                && $member->birthdate->format('Y-m-d') == $birthDate
+            ) {
+                return $member;
+            }
+        }
+
         $member = new Member();
         $member->gender = $gender;
         $member->name = $firstname;
@@ -532,6 +585,46 @@ class CourseApplyController extends Controller
     // public function directConfirm(Request $request, $course_id, $member_id)
     public function directConfirm(Request $request, $course_id, $member_id)
     {
+
+        $full_form = false;
+        $no_update = false;
+
+        if ($request->input('full_form') == 1 || $request->input('full_form') == "1") {
+            $full_form = true;
+        }
+
+        if ($request->input('no_update') == 1 || $request->input('no_update') == "1") {
+            $no_update = true;
+        }
+
+
+
+        if ($full_form && !$no_update) {
+
+            $member = Member::find($member_id);
+            $member->gender = $request->input('gender');
+            $member->name = $request->input('name');
+            $member->surname = $request->input('surname');
+            $member->birthdate = $request->input('birthdate');
+            $member->email = $request->input('email');
+            $member->phone = $request->input('phone');
+            $member->phone_new = $request->input('phone_2');
+            $member->line = $request->input('line');
+            $member->nationality = $request->input('nationality');
+            $member->province = $request->input('province');
+            $member->country = $request->input('country');
+            $member->medical_condition = $request->input('disease');
+            $member->degree = $request->input('degree');
+            $member->organization = $request->input('organization');
+            $member->career = $request->input('career');
+            $member->expertise = $request->input('expertise');
+            $member->name_emergency = $request->input('name_emergency');
+            $member->surname_emergency = $request->input('surname_emergency');
+            $member->phone_emergency = $request->input('phone_emergency');
+            $member->relation_emergency = $request->input('relation_emergency');
+            $member->save();
+        }
+
         $van = $request->input('van', "no");
         $shelter = "ทั่วไป";
         $course = Course::find($course_id);
@@ -539,6 +632,7 @@ class CourseApplyController extends Controller
 
 
         $courseCategory = CourseCategory::find($course->category_id);
+
 
         $apply = Apply::where('course_id', $course_id)
             ->where('member_id', $member_id)
@@ -566,6 +660,8 @@ class CourseApplyController extends Controller
         $apply->cancel = null;
         $apply->state = "ยื่นใบสมัคร";
         $apply->save();
+
+
 
         $lang = $request->input('lang', 'th');
 

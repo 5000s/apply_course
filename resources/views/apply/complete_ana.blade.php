@@ -24,6 +24,8 @@
                     '<strong>ห้ามผู้ทำสีผมและทาเล็บทุกชนิด</strong> เข้ารับการอบรมปฏิบัติภาวนา และต้องตัดเล็บสั้น รวมทั้งหากผมยาวจะต้องรวบผมให้เรียบร้อย',
                 'details_header' => 'รายละเอียด',
                 'name_label' => 'ชื่อผู้สมัคร :',
+                'email' => 'อีเมล :',
+                'phone' => 'เบอร์โทรศัพท์ :',
                 'course_label' => 'คอร์สที่สมัคร :',
                 'date_prefix' => 'วันที่',
                 'note_header' => 'หมายเหตุ :',
@@ -34,6 +36,7 @@
                 'regards' => 'ด้วยความนับถือ',
                 'team' => 'ทีมงาน',
                 'back_home' => 'กลับสู่หน้าหลัก',
+                'back_apply' => 'กลับสู่หน้าสมัคร',
             ],
             'en' => [
                 'header_success' => 'Application Request Saved Successfully',
@@ -52,6 +55,8 @@
                     '<strong>No colored hair or painted nails</strong> allowed. Nails must be short. Long hair must be tied properly.',
                 'details_header' => 'Details',
                 'name_label' => 'Applicant Name :',
+                'email' => 'Email :',
+                'phone' => 'Phone :',
                 'course_label' => 'Applied Course :',
                 'date_prefix' => 'Date',
                 'note_header' => 'Note :',
@@ -62,6 +67,7 @@
                 'regards' => 'Best Regards,',
                 'team' => 'Team',
                 'back_home' => 'Back to Home',
+                'back_apply' => 'Back to Apply',
             ],
         ];
         $txt = $t[$lang];
@@ -151,6 +157,14 @@
                                             <td>{{ $member->name }} {{ $member->surname }}</td>
                                         </tr>
                                         <tr>
+                                            <th scope="row" style="width: 140px;">{{ $txt['email'] }}</th>
+                                            <td>{{ $member->email }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row" style="width: 140px;">{{ $txt['phone'] }}</th>
+                                            <td>{{ $member->phone }}</td>
+                                        </tr>
+                                        <tr>
                                             <th scope="row">{{ $txt['course_label'] }}</th>
                                             <td>
 
@@ -181,6 +195,9 @@
                             <p class="fw-bold">{{ $txt['team'] }}</p>
                             <a href="https://bodhidhammayan.org/" target="_self"
                                 class="btn btn-outline-secondary mt-3">{{ $txt['back_home'] }}</a>
+
+                            <a href="{{ route('apply.direct') }}?lang={{ $lang }}&course_id={{ $course->id }}"
+                                target="_self" class="btn btn-outline-secondary mt-3">{{ $txt['back_apply'] }}</a>
                         </div>
 
                     </div>

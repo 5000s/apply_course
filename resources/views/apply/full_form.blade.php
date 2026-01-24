@@ -57,6 +57,7 @@
                                         'name' => 'ชื่อ',
                                         'surname' => 'นามสกุล',
                                         'phone' => 'โทรศัพท์',
+                                        'email' => 'อีเมล',
                                         'phone2' => 'โทรศัพท์ที่ 2',
                                         'gender' => 'เพศ',
                                         'line' => 'ไลน์',
@@ -100,6 +101,7 @@
                                         'header_info' => 'Applicant Information',
                                         'name' => 'First Name',
                                         'surname' => 'Last Name',
+                                        'email' => 'Email',
                                         'phone' => 'Phone',
                                         'phone2' => 'Phone 2',
                                         'gender' => 'Gender',
@@ -233,10 +235,12 @@
                     </div>
                 @endif
 
-                <form method="POST" action="{{ route('apply.form.confirm', [$course->id, $member->id]) }}">
+                <form id="applicationForm" method="POST"
+                    action="{{ route('apply.form.confirm', [$course->id, $member->id]) }}">
                     @csrf
                     @method('PUT')
                     <input type="hidden" name="lang" value="{{ $lang }}">
+                    <input type="hidden" name="full_form" value="1">
 
                     {{-- ข้อมูลผู้สมัคร --}}
                     <div class="card mb-4">
@@ -246,7 +250,7 @@
                         <div class="card-body">
                             <div class="row g-3">
                                 <div class="col-md-6">
-                                    <label class="form-label">{{ $txt['name'] }}</label>
+                                    <label class="form-label">{{ $txt['name'] }} *</label>
                                     @if ($member_new == false)
                                         {{ $member->name }}
                                     @else
@@ -255,7 +259,7 @@
                                     @endif
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label">{{ $txt['surname'] }}</label>
+                                    <label class="form-label">{{ $txt['surname'] }} *</label>
                                     @if ($member_new == false)
                                         {{ $member->surname }}
                                     @else
@@ -263,13 +267,18 @@
                                             value="{{ old('surname', $member->surname) }}">
                                     @endif
                                 </div>
-
                                 <div class="col-md-6" @if ($member_new == false) hidden @endif>
-                                    <label class="form-label">{{ $txt['phone'] }}</label>
+                                    <label class="form-label">{{ $txt['email'] }} *</label>
+                                    <input type="text" name="email" class="form-control"
+                                        value="{{ old('email', $member->email) }}">
+                                </div>
+
+                                <div class="col-md-3" @if ($member_new == false) hidden @endif>
+                                    <label class="form-label">{{ $txt['phone'] }} *</label>
                                     <input type="text" name="phone" class="form-control"
                                         value="{{ old('phone', $member->phone) }}">
                                 </div>
-                                <div class="col-md-6" @if ($member_new == false) hidden @endif>
+                                <div class="col-md-3" @if ($member_new == false) hidden @endif>
                                     <label class="form-label">{{ $txt['phone2'] }}</label>
                                     <input type="text" name="phone_2" class="form-control"
                                         value="{{ old('phone_2', $member->phone_2) }}">
@@ -492,6 +501,9 @@
                     @if (
                         \Illuminate\Support\Str::contains($course_cat->show_name ?? '', 'วิปัสสนา') &&
                             \Illuminate\Support\Str::contains($vm['place_name'] ?? '', 'แก่งคอย'))
+                        {{-- input hidden --}}
+                        <input type="hidden" name="no_update" value="1">
+
                         <div class="card mb-4">
                             <div class="card-header bg-white">
                                 <h5 class="mb-0">{{ $txt['header_travel'] }}</h5>
@@ -525,6 +537,73 @@
             </div>
         </div>
     </div>
+
+    {{-- SweetAlert2 & Validation --}}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('applicationForm');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    const lang = "{{ $lang ?? 'th' }}"; // 'th' or 'en'
+                    let missingFields = [];
+
+                    // Define field names for display
+                    const fieldNames = {
+                        th: {
+                            name: 'ชื่อ',
+                            surname: 'นามสกุล',
+                            email: 'อีเมล',
+                            phone: 'เบอร์โทรศัพท์'
+                        },
+                        en: {
+                            name: 'First Name',
+                            surname: 'Last Name',
+                            email: 'Email',
+                            phone: 'Phone'
+                        }
+                    };
+
+                    const currentNames = fieldNames[lang === 'en' ? 'en' : 'th'];
+
+                    // Helper to check if input is visible
+                    const isVisible = (elem) => !!(elem.offsetWidth || elem.offsetHeight || elem
+                        .getClientRects()
+                        .length);
+
+                    // Fields to validate: name, surname, email, phone
+                    const fields = ['name', 'surname', 'email', 'phone'];
+
+                    fields.forEach(field => {
+                        const input = form.querySelector(`[name="${field}"]`);
+                        if (input && isVisible(input)) {
+                            if (!input.value.trim()) {
+                                missingFields.push(currentNames[field]);
+                            }
+                        }
+                    });
+
+                    if (missingFields.length > 0) {
+                        e.preventDefault(); // Stop submission
+
+                        let title = lang === 'en' ? 'Incomplete Information' : 'ข้อมูลไม่ครบถ้วน';
+                        let text = lang === 'en' ?
+                            'Please fill in the following required fields:\n' + missingFields.join(', ') :
+                            'กรุณากรอกข้อมูลดังต่อไปนี้ให้ครบถ้วน:\n' + missingFields.join(', ');
+                        let confirmBtn = lang === 'en' ? 'OK' : 'ตกลง';
+
+                        Swal.fire({
+                            icon: 'warning',
+                            title: title,
+                            text: text,
+                            confirmButtonText: confirmBtn,
+                            confirmButtonColor: '#c9a750' // Bodhi Gold color
+                        });
+                    }
+                });
+            }
+        });
+    </script>
 @endsection
 
 @push('scripts')
