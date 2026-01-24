@@ -29,6 +29,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\CalendarController;
 
 
 Auth::routes();
@@ -70,7 +71,17 @@ Route::get('profile/course', [CourseController::class, 'userCourse']);
 
 #### MEMBER ADMIN
 
+Route::get('/calendar/{location_id}/{lang}/{index}/{year}', [CalendarController::class, 'getCalendar'])->name('calendar.get');
+
 Route::prefix('admin')->middleware('auth', 'admin')->group(function () {
+
+    // Route for upload image calendar /calendar/upload-image
+    Route::get('/calendar', [CalendarController::class, 'index'])->name('calendar.index');
+    Route::get('/calendar/{location_id}', [CalendarController::class, 'locationCalendar'])->name('calendar.location');
+    Route::post('/calendar/upload-image/{location_id}', [CalendarController::class, 'uploadImage'])->name('calendar.upload-image');
+    Route::post('/calendar/delete-image/{location_id}', [CalendarController::class, 'deleteImage'])->name('calendar.delete-image');
+
+
     Route::get('courses', [CourseController::class, 'courseList'])->name("admin.courses");
     Route::get('courses/create', [CourseController::class, 'courseCreate'])->name("admin.courses.create");
     Route::get('courses/edit/{course_id}', [CourseController::class, 'courseEdit'])->name("admin.courses.edit");
