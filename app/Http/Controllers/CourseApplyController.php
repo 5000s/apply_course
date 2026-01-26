@@ -251,7 +251,11 @@ class CourseApplyController extends Controller
             $member_new = true;
         } else {
             // update เบา ๆ เผื่อข้อมูลใหม่กว่า
-            $member->phone_new     = $phone;
+            if (strlen($phone) > 80) {
+                $phone = substr($phone, 0, 80);
+            }
+
+            $member->phone_new = $phone;
             $member->updated_by = 'web-direct';
             $member->save();
             $member_new = false;
