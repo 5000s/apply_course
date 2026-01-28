@@ -11,21 +11,21 @@
                     </div>
                     <div class="card-body">
                         <div class="list-group">
-                            <a href="{{ route('calendar.location', ['location_id' => 1]) }}"
+                            <a href="{{ route('calendar.location', ['location_id' => 4]) }}"
                                 class="list-group-item list-group-item-action">
-                                Location 1 (กรุงเทพฯ - Bangkok)
+                                1 ห้องภาวนามูลนิธิฯ อ่อนนุช กรุงเทพฯ
                             </a>
                             <a href="{{ route('calendar.location', ['location_id' => 2]) }}"
                                 class="list-group-item list-group-item-action">
-                                Location 2 (แก่งคอย - Kaeng Khoi)
+                                2 โพธิธรรมญาณสถาน อ. แก่งคอย จ. สระบุรี
                             </a>
                             <a href="{{ route('calendar.location', ['location_id' => 3]) }}"
                                 class="list-group-item list-group-item-action">
-                                Location 3 (หาดใหญ่ - Hat Yai)
+                                3 แสงธรรมโพธิญาณ จ. หาดใหญ่
                             </a>
-                            <a href="{{ route('calendar.location', ['location_id' => 4]) }}"
+                            <a href="{{ route('calendar.location', ['location_id' => 5]) }}"
                                 class="list-group-item list-group-item-action">
-                                Location 4 (พิษณุโลก - Phitsanulok)
+                                4 โพธิธรรมญาณสถาน จ.ภูเก็ต
                             </a>
                         </div>
                     </div>

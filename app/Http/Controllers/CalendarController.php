@@ -16,7 +16,7 @@ class CalendarController extends Controller
     public function locationCalendar($location_id)
     {
         // $location_id should be 1-4
-        if (!in_array($location_id, [1, 2, 3, 4])) {
+        if (!in_array($location_id, [1, 2, 3, 4, 5])) {
             abort(404);
         }
 
