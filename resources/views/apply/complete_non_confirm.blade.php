@@ -156,14 +156,14 @@
                                             <th scope="row" style="width: 140px;">{{ $txt['name_label'] }}</th>
                                             <td>{{ $member->name }} {{ $member->surname }}</td>
                                         </tr>
-                                        <tr>
+                                        {{-- <tr>
                                             <th scope="row" style="width: 140px;">{{ $txt['email'] }}</th>
                                             <td>{{ $member->email }}</td>
                                         </tr>
                                         <tr>
                                             <th scope="row" style="width: 140px;">{{ $txt['phone'] }}</th>
                                             <td>{{ $member->phone }}</td>
-                                        </tr>
+                                        </tr> --}}
                                         <tr>
                                             <th scope="row">{{ $txt['course_label'] }}</th>
                                             <td>
