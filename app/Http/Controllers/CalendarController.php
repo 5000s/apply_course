@@ -21,7 +21,7 @@ class CalendarController extends Controller
         }
 
         $files = [];
-        $path = public_path('calendar');
+        $path = public_path('calendars');
         if (File::exists($path)) {
             $allFiles = File::files($path);
             foreach ($allFiles as $file) {
@@ -76,7 +76,7 @@ class CalendarController extends Controller
 
         // Name format: {location_id}_{lang}_{index}_{year}.jpg
         $fileName = "{$location_id}_{$lang}_{$index}_{$year}.jpg";
-        $destinationPath = public_path('calendar');
+        $destinationPath = public_path('calendars');
 
         // Ensure directory exists
         if (!File::exists($destinationPath)) {
@@ -91,7 +91,7 @@ class CalendarController extends Controller
     public function getCalendar($location_id, $lang, $index, $year)
     {
         $fileName = "{$location_id}_{$lang}_{$index}_{$year}.jpg";
-        $path = public_path('calendar/' . $fileName);
+        $path = public_path('calendars/' . $fileName);
 
         if (!File::exists($path)) {
             // Return 404 or a placeholder if preferred, user requested return image
@@ -112,7 +112,7 @@ class CalendarController extends Controller
             return back()->with('error', 'Invalid file for this location.');
         }
 
-        $path = public_path('calendar/' . $filename);
+        $path = public_path('calendars/' . $filename);
         if (File::exists($path)) {
             File::delete($path);
             return back()->with('success', 'Image deleted successfully.');
