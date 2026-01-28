@@ -63,7 +63,7 @@ class CalendarController extends Controller
             'image' => 'required|image|mimes:jpeg,jpg|max:4096', // assuming jpg only as per request convention
         ]);
 
-        if (!in_array($location_id, [1, 2, 3, 4])) {
+        if (!in_array($location_id, [1, 2, 3, 4, 5])) {
             abort(404);
         }
 
