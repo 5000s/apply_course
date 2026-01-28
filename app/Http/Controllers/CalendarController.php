@@ -15,10 +15,7 @@ class CalendarController extends Controller
 
     public function locationCalendar($location_id)
     {
-        // $location_id should be 1-4
-        if (!in_array($location_id, [1, 2, 3, 4, 5])) {
-            abort(404);
-        }
+
 
         $files = [];
         $path = public_path('calendars');
@@ -36,7 +33,7 @@ class CalendarController extends Controller
                             'lang' => $parts[1],
                             'index' => $parts[2],
                             'year' => $parts[3],
-                            'url' => asset('calendar/' . $filename)
+                            'url' => asset('calendars/' . $filename)
                         ];
                     }
                 }
@@ -62,10 +59,6 @@ class CalendarController extends Controller
             'lang' => 'required|in:th,en',
             'image' => 'required|image|mimes:jpeg,jpg|max:4096', // assuming jpg only as per request convention
         ]);
-
-        if (!in_array($location_id, [1, 2, 3, 4, 5])) {
-            abort(404);
-        }
 
 
 
