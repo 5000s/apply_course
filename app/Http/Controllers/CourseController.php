@@ -225,7 +225,7 @@ class CourseController extends Controller
             if ($category_id == 1 || $category_id == "1") {
                 $courses = $courses->whereIn('c.category_id', [1, 2, 3, 4, 6, 8, 10, 12]);
             } else if ($category_id == 2  || $category_id == "2") {
-                $courses = $courses->whereIn('c.category_id', [5, 7, 9, 11, 13, 14]);
+                $courses = $courses->whereIn('c.category_id', [5, 7, 9, 11, 13, 14, 18]);
             }
         }
 
@@ -1179,6 +1179,8 @@ class CourseController extends Controller
             'คอร์สสมาธิอานาปานสติ 4 วัน 3 คืน' => 14,
             'คอร์สวิปัสสานาสติปัฏฐานสี่ เผากิเลส 3 วัน 2 คืน (ศิษย์เก่า)' => 10,
             'คอร์สวิปัสสานาสติปัฏฐานสี่ เผากิเลส (ศิษย์เก่า)' => 3,
+            'คอร์สการเดินทางสู่จิตใจ' => 17,
+            'คอร์สสมาธิอานาปานสติ 1 วัน (อายุ14-25ปี)' => 18,
         ];
 
         $locationMap = [
