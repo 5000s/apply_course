@@ -98,8 +98,7 @@
                                         'modal_error' => 'เกิดข้อผิดพลาดในการส่งข้อมูล กรุณาลองใหม่อีกครั้ง',
                                         'modal_phone_req' => 'กรุณาระบุเบอร์โทรศัพท์',
 
-                                        'js_fill_all' =>
-                                            'กรุณากรอกข้อมูล ชื่อ นามสกุล วันเกิด และ เบอร์โทรศัพท์ ให้ครบถ้วน',
+                                        'js_fill_all' => 'กรุณากรอกข้อมูล ชื่อ นามสกุล และ วันเกิด ให้ครบถ้วน',
                                         'js_not_found_header' => 'ไม่พบข้อมูลเดิม',
                                         'js_new_member_msg' =>
                                             '<u> หากท่านเป็นสมาชิกใหม่ </u> สามารถกดสมัครได้ทันที <br><u> หากท่านเป็นศิษย์เก่า </u> แต่หาข้อมูลไม่พบ กรุณากดปุ่ม',
@@ -176,8 +175,7 @@
                                         'modal_error' => 'Error sending data. Please try again.',
                                         'modal_phone_req' => 'Please enter phone number.',
 
-                                        'js_fill_all' =>
-                                            'Please fill in Name, Surname, Birth Date and Phone completely.',
+                                        'js_fill_all' => 'Please fill in Name, Surname and Birth Date completely.',
                                         'js_not_found_header' => 'No existing data found',
                                         'js_new_member_msg' =>
                                             '<u>If you are a new member</u>, you can apply immediately. <br><u>If you are an old student</u> but cannot find data, please click',
