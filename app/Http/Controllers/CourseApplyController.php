@@ -657,6 +657,7 @@ class CourseApplyController extends Controller
             $apply->member_id = $member_id;
             $apply->course_id = $course_id;
             $apply->created_by = "USER";
+            $apply->updated_by = "USER";
         }
 
         $apply->van = $van;
