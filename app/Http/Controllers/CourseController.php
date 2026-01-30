@@ -225,7 +225,7 @@ class CourseController extends Controller
             if ($category_id == 1 || $category_id == "1") {
                 $courses = $courses->whereIn('c.category_id', [1, 2, 3, 4, 6, 8, 10, 12]);
             } else if ($category_id == 2  || $category_id == "2") {
-                $courses = $courses->whereIn('c.category_id', [5, 7, 9, 11, 13, 14, 17,18]);
+                $courses = $courses->whereIn('c.category_id', [5, 7, 9, 11, 13, 14, 17, 18]);
             }
         }
 
@@ -296,7 +296,7 @@ class CourseController extends Controller
                 'm.nationality',
                 'm.shelter_number',
                 'm.email',
-                'm.age',
+                DB::raw("TIMESTAMPDIFF(YEAR, m.birthdate, CURDATE()) as age"),
                 'm.gender',
                 'm.medical_condition',
                 'm.buddhism',
@@ -499,7 +499,7 @@ class CourseController extends Controller
                 'm.surname',
                 'm.phone',
                 'm.email',
-                'm.age',
+                DB::raw("TIMESTAMPDIFF(YEAR, m.birthdate, CURDATE()) as age"),
                 'm.gender',
                 'm.buddhism',
                 'a.state',
