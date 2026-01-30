@@ -373,7 +373,7 @@ class CourseController extends Controller
                 break;
 
             default:        // all
-                $members = (clone $base)->get();
+                $members = (clone $base)->whereNull('a.cancel')->get();
                 break;
         }
 
