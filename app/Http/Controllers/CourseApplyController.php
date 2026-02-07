@@ -712,6 +712,10 @@ class CourseApplyController extends Controller
             $male_limit = $courseLimit->male_limit;
             $female_limit = $courseLimit->female_limit;
             $max_limit = $courseLimit->max_limit;
+        } else {
+            $male_limit = 0;
+            $female_limit = 0;
+            $max_limit = 0;
         }
 
         return [

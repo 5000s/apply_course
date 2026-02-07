@@ -152,8 +152,8 @@ class Member extends Model
     {
         $candidate = self::whereDate('birthdate', $birthDate)
             ->where('gender', $gender)
-            ->where('name', $firstname)
-            ->where('surname', $lastname)
+            ->whereRaw('LOWER(name) = ?', [mb_strtolower($firstname)])
+            ->whereRaw('LOWER(surname) = ?', [mb_strtolower($lastname)])
             ->first();
 
         if ($candidate) {
@@ -193,7 +193,7 @@ class Member extends Model
             $candFirst3 = mb_substr($norm($first), 0, 3, 'UTF-8');
             $candLast3  = mb_substr($norm($last),  0, 3, 'UTF-8');
 
-            return ($candFirst3 === $inFirst3) && ($candLast3 === $inLast3);
+            return (mb_strtolower($candFirst3) === mb_strtolower($inFirst3)) && (mb_strtolower($candLast3) === mb_strtolower($inLast3));
         });
 
         return $match ?: null;
@@ -291,12 +291,12 @@ class Member extends Model
         return $candidates->filter(function ($m) use ($first, $last, $day, $month, $year) {
             // Helper to calc percent
             $simName = 0;
-            similar_text($m->name, $first, $simName);
+            similar_text(mb_strtolower($m->name), mb_strtolower($first), $simName);
 
             // 1) Name + Surname (Partial / Loose Match ~ 80%)
             $simSur = 0;
             $surname = $m->surname ?? ''; // Handle null surname
-            similar_text($surname, $last, $simSur);
+            similar_text(mb_strtolower($surname), mb_strtolower($last), $simSur);
 
             if ($simName >= 90 && $simSur >= 90) {
                 return true;
@@ -332,9 +332,9 @@ class Member extends Model
         })
             ->sortByDesc(function ($m) use ($first, $last) {
                 $simName = 0;
-                similar_text($m->name, $first, $simName);
+                similar_text(mb_strtolower($m->name), mb_strtolower($first), $simName);
                 $simSur = 0;
-                similar_text($m->surname ?? '', $last, $simSur);
+                similar_text(mb_strtolower($m->surname ?? ''), mb_strtolower($last), $simSur);
                 return $simName + $simSur;
             })
             ->values();
