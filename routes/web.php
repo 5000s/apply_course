@@ -97,6 +97,8 @@ Route::prefix('admin')->middleware('auth', 'admin')->group(function () {
 
     Route::get('courses/applylist/{course_id}/{apply_id}/form', [CourseController::class, 'viewForm'])->name("admin.courseApplyForm");
 
+    Route::post('courses/add-member', [CourseController::class, 'adminAddExistingMember'])->name('admin.courses.addExistingMember');
+
     Route::get('courses/applylist/{course_id}/{apply_id}/update/{status}', [CourseController::class, 'updateApplyStatus'])->name("admin.courseApplyStatus");
 
 

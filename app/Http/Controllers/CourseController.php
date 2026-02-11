@@ -284,6 +284,9 @@ class CourseController extends Controller
                 'a.id as apply_id',
                 'a.shelter as shelter',
                 'a.remark as remark',
+                'a.is_cook as is_cook',
+                'a.is_volunteer as is_volunteer',
+                'a.is_walkin as is_walkin',
                 'a.van as van',
                 'c.id as course_id',
                 'm.id as uid',
@@ -317,6 +320,8 @@ class CourseController extends Controller
             case 'male':
                 $members = (clone $base)
                     ->whereNull('a.cancel')
+                    ->whereNull('a.is_cook')
+                    ->whereNull('a.is_volunteer')
                     ->where('a.shelter', 'ทั่วไป')
                     ->where('m.gender', 'ชาย')
                     ->where('m.buddhism', 'ฆราวาส')
@@ -326,6 +331,8 @@ class CourseController extends Controller
             case 'female':
                 $members = (clone $base)
                     ->whereNull('a.cancel')
+                    ->whereNull('a.is_cook')
+                    ->whereNull('a.is_volunteer')
                     ->where('a.shelter', 'ทั่วไป')
                     ->where('m.gender', 'หญิง')
                     ->where('m.buddhism', 'ฆราวาส')
@@ -335,6 +342,8 @@ class CourseController extends Controller
             case 'malespecial':
                 $members = (clone $base)
                     ->whereNull('a.cancel')
+                    ->whereNull('a.is_cook')
+                    ->whereNull('a.is_volunteer')
                     ->where('a.shelter', 'กุฏิพิเศษ')
                     ->where('m.gender', 'ชาย')
                     ->where('m.buddhism', 'ฆราวาส')
@@ -344,6 +353,8 @@ class CourseController extends Controller
             case 'femalespecial':
                 $members = (clone $base)
                     ->whereNull('a.cancel')
+                    ->whereNull('a.is_cook')
+                    ->whereNull('a.is_volunteer')
                     ->where('a.shelter', 'กุฏิพิเศษ')
                     ->where('m.gender', 'หญิง')
                     ->where('m.buddhism', 'ฆราวาส')
@@ -354,6 +365,8 @@ class CourseController extends Controller
             case 'monk':
                 $members = (clone $base)
                     ->whereNull('a.cancel')
+                    ->whereNull('a.is_cook')
+                    ->whereNull('a.is_volunteer')
                     ->where('m.buddhism', 'ภิกษุ')
                     ->get();
                 break;
@@ -361,10 +374,33 @@ class CourseController extends Controller
             case 'nun':
                 $members = (clone $base)
                     ->whereNull('a.cancel')
+                    ->whereNull('a.is_cook')
+                    ->whereNull('a.is_volunteer')
                     ->where('m.buddhism', 'แม่ชี')
                     ->get();
                 break;
 
+            case 'cook':
+                $members = (clone $base)
+                    ->whereNull('a.cancel')
+                    ->whereNull('a.is_volunteer')
+                    ->where('a.is_cook', 1)
+                    ->get();
+                break;
+
+            case 'volunteer':
+                $members = (clone $base)
+                    ->whereNull('a.cancel')
+                    ->where('a.is_volunteer', 1)
+                    ->get();
+                break;
+
+            case 'walkin':
+                $members = (clone $base)
+                    ->whereNull('a.cancel')
+                    ->where('a.is_walkin', 1)
+                    ->get();
+                break;
 
             case 'cancel':
                 $members = (clone $base)
@@ -379,22 +415,29 @@ class CourseController extends Controller
 
         // ----------------- นับจำนวนแต่ละกลุ่ม (เอาไว้โชว์บนแท็บ/สรุป) -----------------
         $stats = [
-            'male'   => (clone $base)->whereNull('a.cancel')->where('a.shelter', 'ทั่วไป')->where('m.gender', 'ชาย')->where('m.buddhism', 'ฆราวาส')->count(),
+            'male'   => (clone $base)->whereNull('a.cancel')->whereNull('a.is_cook')->whereNull('a.is_volunteer')->where('a.shelter', 'ทั่วไป')->where('m.gender', 'ชาย')->where('m.buddhism', 'ฆราวาส')->count(),
 
-            'female' => (clone $base)->whereNull('a.cancel')->where('a.shelter', 'ทั่วไป')->where('m.gender', 'หญิง')->where('m.buddhism', 'ฆราวาส')->count(),
+            'female' => (clone $base)->whereNull('a.cancel')->whereNull('a.is_cook')->whereNull('a.is_volunteer')->where('a.shelter', 'ทั่วไป')->where('m.gender', 'หญิง')->where('m.buddhism', 'ฆราวาส')->count(),
 
-            'malespecial'   => (clone $base)->whereNull('a.cancel')->where('a.shelter', 'กุฏิพิเศษ')->where('m.gender', 'ชาย')->where('m.buddhism', 'ฆราวาส')->count(),
+            'malespecial'   => (clone $base)->whereNull('a.cancel')->whereNull('a.is_cook')->whereNull('a.is_volunteer')->where('a.shelter', 'กุฏิพิเศษ')->where('m.gender', 'ชาย')->where('m.buddhism', 'ฆราวาส')->count(),
 
-            'femalespecial' => (clone $base)->whereNull('a.cancel')->where('a.shelter', 'กุฏิพิเศษ')->where('m.gender', 'หญิง')->where('m.buddhism', 'ฆราวาส')->count(),
+            'femalespecial' => (clone $base)->whereNull('a.cancel')->whereNull('a.is_cook')->whereNull('a.is_volunteer')->where('a.shelter', 'กุฏิพิเศษ')->where('m.gender', 'หญิง')->where('m.buddhism', 'ฆราวาส')->count(),
 
-            'monk'   => (clone $base)->whereNull('a.cancel')->where('m.buddhism', 'ภิกษุ')->count(),
+            'monk'   => (clone $base)->whereNull('a.cancel')->whereNull('a.is_cook')->whereNull('a.is_volunteer')->where('m.buddhism', 'ภิกษุ')->count(),
 
-            'nun'    => (clone $base)->whereNull('a.cancel')->where('m.buddhism', 'แม่ชี')->count(),
+            'nun'    => (clone $base)->whereNull('a.cancel')->whereNull('a.is_cook')->whereNull('a.is_volunteer')->where('m.buddhism', 'แม่ชี')->count(),
+
+            'walkin'    => (clone $base)->whereNull('a.cancel')->where('a.is_walkin', 1)->count(),
 
             'all'    => (clone $base)
-                ->whereNull('a.cancel')->count(),
+                ->whereNull('a.cancel')->whereNull('a.is_cook')->whereNull('a.is_volunteer')->count(),
 
             'cancel'    => (clone $base)->where('a.cancel', 1)->count(),
+
+            'cook'    => (clone $base)->where('a.is_cook', 1)->count(),
+
+            'volunteer'    => (clone $base)->where('a.is_volunteer', 1)->count(),
+
         ];
 
 
@@ -602,6 +645,34 @@ class CourseController extends Controller
             $apply = Apply::where("id", $apply_id)->first();
             $apply->cancel = 1;
             $apply->cancel_at = now();
+            $apply->updated_by = $admin->name;
+            $apply->save();
+        } else if ($status == 'volunteer') {
+            $apply = Apply::where("id", $apply_id)->first();
+            $apply->is_volunteer = 1;
+            $apply->is_walkin = null;
+            $apply->is_cook = null;
+            $apply->updated_by = $admin->name;
+            $apply->save();
+        } else if ($status == 'cook') {
+            $apply = Apply::where("id", $apply_id)->first();
+            $apply->is_cook = 1;
+            $apply->is_walkin = null;
+            $apply->is_volunteer = null;
+            $apply->updated_by = $admin->name;
+            $apply->save();
+        } else if ($status == 'walk_in') {
+            $apply = Apply::where("id", $apply_id)->first();
+            $apply->is_walkin = 1;
+            $apply->is_volunteer = null;
+            $apply->is_cook = null;
+            $apply->updated_by = $admin->name;
+            $apply->save();
+        } else if ($status == 'normal') {
+            $apply = Apply::where("id", $apply_id)->first();
+            $apply->is_walkin = null;
+            $apply->is_volunteer = null;
+            $apply->is_cook = null;
             $apply->updated_by = $admin->name;
             $apply->save();
         } else {
@@ -1199,5 +1270,46 @@ class CourseController extends Controller
 
             $course->save();
         }
+    }
+    public function adminAddExistingMember(Request $request)
+    {
+        $request->validate([
+            'course_id' => 'required|integer|exists:courses,id',
+            'member_id' => 'required|integer|exists:members,id',
+        ]);
+
+        $courseId = $request->input('course_id');
+        $memberId = $request->input('member_id');
+
+        // Check if already applied
+        $existingApply = Apply::where('course_id', $courseId)
+            ->where('member_id', $memberId)
+            ->where(function ($q) {
+                $q->whereNull('cancel')->orWhere('cancel', 0);
+            })
+            ->first();
+
+        if ($existingApply) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'สมาชิกนี้สมัครคอร์สนี้อยู่แล้ว (สถานะ: ' . $existingApply->state . ')',
+            ], 400);
+        }
+
+        // Create new apply
+        $apply = new Apply();
+        $apply->member_id = $memberId;
+        $apply->course_id = $courseId;
+        $apply->state = 'ยื่นใบสมัคร'; // Default state for admin add? Or 'ยืนยันแล้ว'? Let's go with 'ยื่นใบสมัคร' first as per plan.
+        $apply->created_by = Auth::user()->name ?? 'Admin';
+        $apply->updated_by = Auth::user()->name ?? 'Admin';
+        $apply->shelter = 'ทั่วไป';
+        $apply->van = 'no';
+        $apply->save();
+
+        return response()->json([
+            'ok' => true,
+            'message' => 'เพิ่มผู้สมัครเรียบร้อยแล้ว',
+        ]);
     }
 }
