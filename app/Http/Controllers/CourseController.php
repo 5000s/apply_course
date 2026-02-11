@@ -383,7 +383,6 @@ class CourseController extends Controller
             case 'cook':
                 $members = (clone $base)
                     ->whereNull('a.cancel')
-                    ->whereNull('a.is_volunteer')
                     ->where('a.is_cook', 1)
                     ->get();
                 break;
