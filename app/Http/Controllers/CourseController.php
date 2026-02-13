@@ -394,7 +394,10 @@ class CourseController extends Controller
             case 'volunteer':
                 $members = (clone $base)
                     ->whereNull('a.cancel')
-                    ->where('a.is_volunteer', 1)
+                    ->where(function ($q) {
+                        $q->where('a.is_volunteer', 1)
+                            ->orWhere('a.role', 'ธรรมะบริกร');
+                    })
                     ->get();
                 break;
 
