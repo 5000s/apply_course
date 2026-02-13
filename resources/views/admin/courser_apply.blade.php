@@ -367,7 +367,7 @@
                                             </li>
                                             <li>
                                                 <a
-                                                    href="{{ route('admin.courseApplyStatus', ['course_id' => $member->course_id, 'apply_id' => $member->apply_id, 'status' => 'normal']) }}">ปรกติ</a>
+                                                    href="{{ route('admin.courseApplyStatus', ['course_id' => $member->course_id, 'apply_id' => $member->apply_id, 'status' => 'normal']) }}">ผู้เข้าอบรม</a>
                                             </li>
                                         </ul>
                                     </div>

@@ -383,7 +383,11 @@ class CourseController extends Controller
             case 'cook':
                 $members = (clone $base)
                     ->whereNull('a.cancel')
-                    ->where('a.is_cook', 1)
+                    ->where(function ($q) {
+                        $q->where('a.is_cook', 1)
+                            ->orWhere('a.role', 'แม่ครัว')
+                            ->orWhere('a.role', 'ผู้ช่วยแม่ครัว');
+                    })
                     ->get();
                 break;
 
@@ -433,9 +437,16 @@ class CourseController extends Controller
 
             'cancel'    => (clone $base)->where('a.cancel', 1)->count(),
 
-            'cook'    => (clone $base)->where('a.is_cook', 1)->count(),
+            'cook'    => (clone $base)->where(function ($q) {
+                $q->where('a.is_cook', 1)
+                    ->orWhere('a.role', 'แม่ครัว')
+                    ->orWhere('a.role', 'ผู้ช่วยแม่ครัว');
+            })->count(),
 
-            'volunteer'    => (clone $base)->where('a.is_volunteer', 1)->count(),
+            'volunteer'    => (clone $base)->where(function ($q) {
+                $q->where('a.is_volunteer', 1)
+                    ->orWhere('a.role', 'ธรรมะบริกร');
+            })->count(),
 
         ];
 
@@ -649,12 +660,14 @@ class CourseController extends Controller
         } else if ($status == 'volunteer') {
             $apply = Apply::where("id", $apply_id)->first();
             $apply->is_volunteer = 1;
+            $apply->role = "ธรรมะบริกร";
             $apply->is_walkin = null;
             $apply->is_cook = null;
             $apply->updated_by = $admin->name;
             $apply->save();
         } else if ($status == 'cook') {
             $apply = Apply::where("id", $apply_id)->first();
+            $apply->role = "แม่ครัว";
             $apply->is_cook = 1;
             $apply->is_walkin = null;
             $apply->is_volunteer = null;
@@ -662,6 +675,7 @@ class CourseController extends Controller
             $apply->save();
         } else if ($status == 'walk_in') {
             $apply = Apply::where("id", $apply_id)->first();
+            $apply->role = "ผู้เข้าอบรม";
             $apply->is_walkin = 1;
             $apply->is_volunteer = null;
             $apply->is_cook = null;
@@ -669,6 +683,7 @@ class CourseController extends Controller
             $apply->save();
         } else if ($status == 'normal') {
             $apply = Apply::where("id", $apply_id)->first();
+            $apply->role = "ผู้เข้าอบรม";
             $apply->is_walkin = null;
             $apply->is_volunteer = null;
             $apply->is_cook = null;
