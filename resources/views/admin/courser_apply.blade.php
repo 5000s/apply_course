@@ -49,6 +49,14 @@
                             </svg>
                         </span>
                         {{ $course->category }}
+                        <a href="{{ route('admin.courses.edit', $course->id) }}" class="btn btn-primary gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                            </svg>
+                            แก้ไข
+                        </a>
                     </h1>
 
                     <div
@@ -71,6 +79,11 @@
                             </svg>
                             {{ $course->date_start->format('d/m/') . ($course->date_start->year + 543) }} -
                             {{ $course->date_end->format('d/m/') . ($course->date_end->year + 543) }}
+                        </div>
+
+                        {{-- show course status --}}
+                        <div class="flex items-center gap-2 bg-base-200/50 px-3 py-1.5 rounded-lg">
+                            สถานะ : {{ $course->state }}
                         </div>
                     </div>
                 </div>
@@ -163,12 +176,12 @@
                         <td class="text-center eprint" style="width: 20px;">รถตู้</td>
                         <td class="text-center eprint" style="display: none;">โทร</td>
                         <td class="text-center " style="display: none;">อีเมล</td>
-                        <td class="text-center eprint">role</td>
+                        {{-- <td class="text-center eprint">role</td> --}}
                         <td class="text-center eprint">ที่พัก</td>
                         <td class="text-center " style="width: 145px;">ติดต่อ</td>
                         <td class="text-center eprint" style="width: 20px;">ห่างคอร์ส<br>(เดือน)</td>
                         <td class="text-center " style="width: 200px;">คอร์สล่าสุด</td>
-                        <td class="text-center remark-col eprint" style="max-width: 200px;">เพิ่มเติม</td>
+                        <td class="text-center remark-col eprint" style="max-width: 100px;">เพิ่มเติม</td>
                         <td class="text-center ">สถานะ</td>
                         <td class="text-center ">ข้อมูล/status</td>
                     </tr>
@@ -250,7 +263,7 @@
                                 {!! $member->email !!}
                             </td>
 
-                            <td class="text-center">{{ $member->role }}</td>
+                            {{-- <td class="text-center">{{ $member->role }}</td> --}}
 
                             <td class="text-center">
                                 {{ $member->shelter }} @if ($member->shelter == 'กุฏิพิเศษ')

@@ -93,21 +93,25 @@ class CourseApplyController extends Controller
         // -------------------------------
         $now            = now(); // ตาม timezone ใน config/app.php
         $startCarbon    = $course->date_start ? Carbon::parse($course->date_start) : null;
-        $daysUntilStart = $startCarbon ? $now->diffInDays($startCarbon, false) : null; // ติดลบถ้าเลยแล้ว
+        $hoursUntilStart = $startCarbon ? $now->diffInHours($startCarbon, false) : null; // ติดลบถ้าเลยแล้ว
 
         $isOpen = false;
         $state  = 'ไม่ระบุ';
 
         if (!$startCarbon) {
             $state = 'ยังไม่กำหนดวันเริ่ม';
-        } elseif ($daysUntilStart >= 4) {
+        } elseif ($hoursUntilStart > 3) {
             $isOpen = true;
             $state  = 'เปิดรับสมัคร';
-        } elseif ($daysUntilStart >= 1) {
-            $state = 'ใกล้เริ่มแล้ว';
         } else {
             $state = 'สิ้นสุดการรับสมัคร';
         }
+
+        // elseif ($daysUntilStart >= 0) {
+        //     $isOpen = true;
+        //     // $state = 'ใกล้เริ่มแล้ว';
+        //     $state  = 'เปิดรับสมัคร';
+        // }
 
 
         // Query #2: หาสถานที่
@@ -160,7 +164,7 @@ class CourseApplyController extends Controller
                 'alt'        => $placeName ?: $course->title,
                 'is_open'         => $isOpen,
                 'state'           => $state,
-                'days_until_start' => $daysUntilStart,
+                'hours_until_start' => $hoursUntilStart,
             ],
         ]);
     }
