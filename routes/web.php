@@ -30,6 +30,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\CalendarController;
+use App\Http\Controllers\CronController;
 
 
 Auth::routes();
@@ -233,6 +234,7 @@ Route::get('lang/{locale}', function ($locale) {
 
 
 Route::get('/setCourseData', [CourseController::class, 'setCourseData'])->name('admin.course.sync');
+Route::get('/setCoursePastApply', [CronController::class, 'checkAndCancelPastApplications'])->name('admin.course.past.sync');
 
 
 
@@ -259,3 +261,5 @@ Route::get('/search/member', [CourseApplyController::class, 'searchMember'])->na
 
 
 Route::post('/search/member/report', [CourseApplyController::class, 'reportMemberNotFound'])->name('report.member');
+
+Route::get('/cron/cancel-past-applications', [CronController::class, 'checkAndCancelPastApplications']);

@@ -3,6 +3,7 @@
 namespace App\Console;
 
 use App\Http\Controllers\CourseController;
+use App\Http\Controllers\CronController;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -22,6 +23,10 @@ class Kernel extends ConsoleKernel
             // ถ้าไม่มี dependency พิเศษ ใช้แบบนี้ได้เลย
             (new CourseController)->setCourseData();
         })->hourly();
+
+        $schedule->call(function () {
+            (new CronController)->checkAndCancelPastApplications();
+        })->daily();
     }
 
     /**
@@ -31,7 +36,7 @@ class Kernel extends ConsoleKernel
      */
     protected function commands()
     {
-        $this->load(__DIR__.'/Commands');
+        $this->load(__DIR__ . '/Commands');
 
         require base_path('routes/console.php');
     }
