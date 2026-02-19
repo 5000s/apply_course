@@ -271,8 +271,13 @@ class CourseApplyController extends Controller
         $courseCat = CourseCategory::findOrFail($course->category_id);
 
         $need_check_history_apply = false;
+        $need_check_onlynew_history_apply = false;
         if (Str::contains($courseCat->show_name ?? '', 'วิปัสสนา')) {
             $need_check_history_apply = true;
+        }
+
+        if ($courseCat->day <= 0) {
+            $need_check_onlynew_history_apply = true;
         }
 
 
@@ -307,6 +312,38 @@ class CourseApplyController extends Controller
             }
         }
 
+        if ($need_check_onlynew_history_apply) {
+
+
+            $not_pass = false;
+
+            if ($member_new) {
+                $not_pass = true;
+            }
+
+            $passCourseCategoryID = [1, 2, 3, 4, 5, 6, 8, 10, 12, 13, 14, 15, 16, 17];
+
+            $applyHistory = Apply::where('member_id', $member->id)
+                ->whereHas('course', function ($q) use ($passCourseCategoryID) {
+                    $q->whereIn('category_id', $passCourseCategoryID);
+                })
+                ->with('course')
+                ->get();
+
+            if (count($applyHistory) == 0) {
+                $not_pass = true;
+            }
+
+            if (!$not_pass) {
+                $message_eng =  "This course is only for those who have never attended a 3-day or longer course before.";
+                $message_th = "คอร์สนี้สำหรับผู้ที่ไม่เคยผ่านการอบรมคอร์ส 3 วันขึ้นไปมาก่อนเท่านั้น";
+
+                return back()
+                    ->withErrors(['course_id' => $lang == 'en' ? $message_eng : $message_th])  // หรือข้อความอื่น
+                    ->withInput();
+            }
+        }
+
 
         // Logic to construct $vm
         $th = function ($d) {
@@ -320,17 +357,17 @@ class CourseApplyController extends Controller
 
         $now            = now();
         $startCarbon    = $course->date_start ? Carbon::parse($course->date_start) : null;
-        $daysUntilStart = $startCarbon ? $now->diffInDays($startCarbon, false) : null;
+        $hoursUntilStart = $startCarbon ? $now->diffInHours($startCarbon, false) : null;
 
         $isOpen = false;
         $state  = 'ไม่ระบุ';
 
         if (!$startCarbon) {
             $state = 'ยังไม่กำหนดวันเริ่ม';
-        } elseif ($daysUntilStart >= 4) {
+        } elseif ($hoursUntilStart >= 4) {
             $isOpen = true;
             $state  = 'เปิดรับสมัคร';
-        } elseif ($daysUntilStart >= 1) {
+        } elseif ($hoursUntilStart >= 1) {
             $state = 'ใกล้เริ่มแล้ว';
         } else {
             $state = 'สิ้นสุดการรับสมัคร';
@@ -374,7 +411,7 @@ class CourseApplyController extends Controller
             'alt'        => $placeName ?: $course->title,
             'is_open'         => $isOpen,
             'state'           => $state,
-            'days_until_start' => $daysUntilStart,
+            'hours_until_start' => $hoursUntilStart,
         ];
 
         // Fetch and sort provinces
@@ -651,6 +688,7 @@ class CourseApplyController extends Controller
             ->first();
 
         $member = Member::find($member_id);
+
 
         if (!$member) {
             return response()->json(['ok' => false, 'message' => 'ไม่พบข้อมูลสมาชิก'], 404);
