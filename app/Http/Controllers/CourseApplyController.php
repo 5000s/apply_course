@@ -365,10 +365,13 @@ class CourseApplyController extends Controller
 
                 if (!$is_range_course_more_than_4) {
                     $message_eng =  "You have registered for less than 4 consecutive Vipassana meditation courses. Please take a break of at least 4 courses.";
+                    $message_eng .= "<br>If you need to attend the course, please contact the staff.";
+
                     foreach ($courseInRangeApplyCourses as $courseInRangeApplyCourse) {
                         $message_eng .= "<br> > " . $courseInRangeApplyCourse->getCourseLongDateTxtEnAttribute();
                     }
                     $message_th = "คุณได้มีการลงสมัครคอร์ส วิปัสสนากรรมฐาน ติดกันน้อยกว่า 4 คอร์ส กรุณาเว้นระยะห่างอย่างน้อย 4 คอร์ส";
+                    $message_th .= "<br>ถ้ามีความจำเป็นต้องเข้าคอร์สให้ติดต่อเจ้าหน้าที่";
                     foreach ($courseInRangeApplyCourses as $courseInRangeApplyCourse) {
                         $message_th .= "<br> > " . $courseInRangeApplyCourse->getCourseLongDateTxtAttribute();
                     }
