@@ -270,10 +270,11 @@ class CourseApplyController extends Controller
         // 4) Prepare View Model (Same as directApply)
         $courseCat = CourseCategory::findOrFail($course->category_id);
 
-        $need_check_history_apply = false;
+        $need_check_vipassana_history_apply = false;
         $need_check_onlynew_history_apply = false;
         if (Str::contains($courseCat->show_name ?? '', 'วิปัสสนา')) {
-            $need_check_history_apply = true;
+
+            $need_check_vipassana_history_apply = true;
         }
 
         if ($courseCat->day <= 0) {
@@ -281,7 +282,7 @@ class CourseApplyController extends Controller
         }
 
 
-        if ($need_check_history_apply) {
+        if ($need_check_vipassana_history_apply) {
 
             $not_pass = false;
 
@@ -295,6 +296,7 @@ class CourseApplyController extends Controller
                 ->whereHas('course', function ($q) use ($passCourseCategoryID) {
                     $q->whereIn('category_id', $passCourseCategoryID);
                 })
+                ->where('state', 'ผ่านการอบรม')
                 ->with('course')
                 ->get();
 
@@ -309,6 +311,72 @@ class CourseApplyController extends Controller
                 return back()
                     ->withErrors(['course_id' => $lang == 'en' ? $message_eng : $message_th])  // หรือข้อความอื่น
                     ->withInput();
+            }
+
+
+            if ($course->location_id == 1) {
+                $passVipassanaSaraburyCourseCategoryID = [1, 3, 4, 8, 12, 15, 16];
+
+
+
+
+                $vipassanaSaraburyCoursesApply = Apply::where('member_id', $member->id)
+                    ->whereHas('course', function ($q) use ($passVipassanaSaraburyCourseCategoryID) {
+                        $q->whereIn('category_id', $passVipassanaSaraburyCourseCategoryID);
+                        $q->where('location_id', 1);
+                    })
+                    ->where('state', '!=', 'ยกเลิกสมัคร')
+                    ->get();
+
+                $date_start_limit = Carbon::parse($course->date_start)->subDays(365);
+                $date_end_limit = Carbon::parse($course->date_start)->addDays(365);
+                $vipassanaSaraburyCourses = Course::whereIn('category_id', $passVipassanaSaraburyCourseCategoryID)
+                    ->where('location_id', 1)
+                    ->where('date_start', '>', $date_start_limit)
+                    ->where('date_end', '<', $date_end_limit)
+                    ->orderBy('date_start', 'asc')
+                    ->get();
+
+                $courseInRangeApply = [];
+                $courseInRangeApplyCourses = [];
+                $courseIndex = 99;
+
+
+                foreach ($vipassanaSaraburyCourses as $index => $vipassanaSaraburyCourse) {
+                    if ($vipassanaSaraburyCourse->id == $course->id) {
+                        $courseIndex = $index;
+                    }
+
+                    foreach ($vipassanaSaraburyCoursesApply as $index2 => $vipassanaSaraburyCourseApply) {
+                        if ($vipassanaSaraburyCourseApply->course_id == $vipassanaSaraburyCourse->id) {
+                            $courseInRangeApply[] = $index;
+                            $courseInRangeApplyCourses[] = $vipassanaSaraburyCourse;
+                        }
+                    }
+                }
+
+                $is_range_course_more_than_4 = true;
+
+                foreach ($courseInRangeApply as $index2 => $courseInRangeApply2) {
+                    if (abs($courseInRangeApply2 - $courseIndex) <= 4) {
+                        $is_range_course_more_than_4 = false;
+                    }
+                }
+
+                if (!$is_range_course_more_than_4) {
+                    $message_eng =  "You have registered for less than 4 consecutive Vipassana meditation courses. Please take a break of at least 4 courses.";
+                    foreach ($courseInRangeApplyCourses as $courseInRangeApplyCourse) {
+                        $message_eng .= "<br> > " . $courseInRangeApplyCourse->getCourseLongDateTxtEnAttribute();
+                    }
+                    $message_th = "คุณได้มีการลงสมัครคอร์ส วิปัสสนากรรมฐาน ติดกันน้อยกว่า 4 คอร์ส กรุณาเว้นระยะห่างอย่างน้อย 4 คอร์ส";
+                    foreach ($courseInRangeApplyCourses as $courseInRangeApplyCourse) {
+                        $message_th .= "<br> > " . $courseInRangeApplyCourse->getCourseLongDateTxtAttribute();
+                    }
+
+                    return back()
+                        ->withErrors(['course_id' => $lang == 'en' ? $message_eng : $message_th])  // หรือข้อความอื่น
+                        ->withInput();
+                }
             }
         }
 

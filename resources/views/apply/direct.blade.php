@@ -320,7 +320,7 @@
                                 <div class="alert alert-danger fs-5">
                                     <ul class="mb-0">
                                         @foreach ($errors->all() as $error)
-                                            <li>{{ $error }}</li>
+                                            <li>{!! $error !!}</li>
                                         @endforeach
                                     </ul>
                                 </div>
