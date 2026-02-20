@@ -1,6 +1,6 @@
 @extends('layouts.bodhi')
 
-@section('title', ($lang ?? 'th') === 'th' ? 'บันทึกคำขอสมัครคอร์สเรียบร้อย' : 'Application Saved')
+@section('title', ($lang ?? 'th') === 'th' ? 'ยืนยันสมัครคอร์สเรียบร้อย' : 'Application Confirmed')
 
 @section('content')
     @php
@@ -8,7 +8,7 @@
 
         $t = [
             'th' => [
-                'header_success' => 'บันทึกคำขอสมัครคอร์สเรียบร้อย',
+                'header_success' => 'ยืนยันสมัครคอร์สเรียบร้อย',
                 'dear_applicant' => 'เรียนท่านผู้สมัครหรือตัวแทน ที่นับถือ',
                 'warning_msg' => 'ท่านได้รับการยื่นการสมัครแล้ว <br>
                                 และได้รับ การยืนยันว่าท่านได้รับการอบรม <br><br>
@@ -39,7 +39,7 @@
                 'back_apply' => 'กลับสู่หน้าสมัคร',
             ],
             'en' => [
-                'header_success' => 'Application Request Saved Successfully',
+                'header_success' => 'Application Confirmed',
                 'dear_applicant' => 'Dear Applicant',
                 'warning_msg' => 'Your application has been submitted <br>
                                 and you are confirmed for the training. <br><br>
