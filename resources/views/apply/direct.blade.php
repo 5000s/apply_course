@@ -55,7 +55,7 @@
                                         'state_unknown' => 'ไม่ระบุ',
                                         'form_header' => 'กรอกข้อมูลเพื่อสมัครคอร์ส',
                                         'instructions' =>
-                                            'กรุณากรอก <strong>ชื่อ</strong>, <strong>นามสกุล</strong>, <strong>วันเกิด</strong> และ <strong>เบอร์โทรศัพท์</strong> แล้วกดปุ่มส่งคำขอสมัครคอร์ส',
+                                            'กรุณากรอก <strong>ชื่อ</strong>, <strong>นามสกุล</strong>, และ <strong>วันเกิด</strong> แล้วกดปุ่มส่งคำขอสมัครคอร์ส',
                                         'gender' => 'เพศ',
                                         'firstname' => 'ชื่อ',
                                         'lastname' => 'นามสกุล',
@@ -132,7 +132,7 @@
                                         'state_unknown' => 'Unknown',
                                         'form_header' => 'Application Form',
                                         'instructions' =>
-                                            'Please fill in <strong>First Name</strong>, <strong>Last Name</strong>, <strong>Birth Date</strong> and <strong>Phone Number</strong>.',
+                                            'Please fill in <strong>First Name</strong>, <strong>Last Name</strong>, and <strong>Birth Date</strong>.',
                                         'gender' => 'Gender',
                                         'firstname' => 'First Name',
                                         'lastname' => 'Last Name',
