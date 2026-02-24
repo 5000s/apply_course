@@ -27,6 +27,10 @@ class Kernel extends ConsoleKernel
         $schedule->call(function () {
             (new CronController)->checkAndCancelPastApplications();
         })->daily();
+
+        $schedule->call(function () {
+            (new CronController)->closeCourseAuto();
+        })->daily();
     }
 
     /**

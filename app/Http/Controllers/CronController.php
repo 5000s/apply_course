@@ -37,4 +37,17 @@ class CronController extends Controller
             'date_threshold' => $twoWeeksAgo->toDateTimeString()
         ]);
     }
+    public function closeCourseAuto()
+    {
+        $today = \Carbon\Carbon::now()->toDateString();
+
+        $affectedRows = \App\Models\Course::where('state', 'เปิดรับสมัคร')
+            ->whereDate('date_start', '<=', $today)
+            ->update(['state' => 'ปิดรับสมัคร']);
+
+        return response()->json([
+            'message' => "Updated $affectedRows courses to 'ปิดรับสมัคร'",
+            'date_checked' => $today
+        ]);
+    }
 }
