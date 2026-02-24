@@ -270,14 +270,15 @@
                                 <div class="col-md-6" @if ($member_new == false) hidden @endif>
                                     <label class="form-label">{{ $txt['email'] }} *</label>
                                     <input type="text" name="email" class="form-control"
-                                        value="{{ old('email', $member->email) }}">
+                                        value="{{ old('email', $member->email) }}" required>
                                 </div>
 
                                 <div class="col-md-3" @if ($member_new == false) hidden @endif>
                                     <label class="form-label">{{ $txt['phone'] }} *</label>
                                     <input type="text" name="phone" class="form-control"
-                                        value="{{ old('phone', $member->phone) }}">
+                                        value="{{ old('phone', $member->phone) }}" required>
                                 </div>
+
                                 <div class="col-md-3" @if ($member_new == false) hidden @endif>
                                     <label class="form-label">{{ $txt['phone2'] }}</label>
                                     <input type="text" name="phone_2" class="form-control"
