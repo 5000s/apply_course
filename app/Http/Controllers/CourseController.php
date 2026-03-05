@@ -656,6 +656,7 @@ class CourseController extends Controller
 
         if ($status == 'ยกเลิกการสมัคร') {
             $apply = Apply::where("id", $apply_id)->first();
+            $apply->state = 'ยกเลิกการสมัคร';
             $apply->cancel = 1;
             $apply->cancel_at = now();
             $apply->updated_by = $admin->name;
