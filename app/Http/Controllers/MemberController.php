@@ -205,12 +205,14 @@ class MemberController extends Controller
         'Zimbabwean'
     );
 
-    public function index(Request $request){
+    public function index(Request $request)
+    {
         $member = Member::first();
 
         return $member;
     }
-    public function compareByNameTh($a, $b) {
+    public function compareByNameTh($a, $b)
+    {
         return strcmp($a['name_th'], $b['name_th']);
     }
 
@@ -227,7 +229,7 @@ class MemberController extends Controller
         $data["provinces"] = $provinceArray;
         $data["user"] = $user;
 
-        return view('members.create',$data); // Assumes you have a view at resources/views/members/create.blade.php
+        return view('members.create', $data); // Assumes you have a view at resources/views/members/create.blade.php
     }
 
 
@@ -300,7 +302,7 @@ class MemberController extends Controller
     public function storeAdmin(Request $request)
     {
         $user = Auth::user();
-        if( $user->admin != 1 || $user->editor != 1){
+        if ($user->admin != 1 || $user->editor != 1) {
             return back()->withErrors(['error' => 'You have no permission to create/edit']);
         }
 
@@ -434,20 +436,19 @@ class MemberController extends Controller
         $member_id = $request->member_id;
         $recheck_member_id = $request->rechecking_id;
 
-        if ($member_id != $recheck_member_id){
+        if ($member_id != $recheck_member_id) {
             return redirect()->route('profile')->with('success', 'Member edit failed');
         }
 
         $member = Member::findOrFail($member_id);
 
-        if (!$member){
+        if (!$member) {
             return redirect()->route('profile')->with('success', 'Member edit failed');
         }
 
         $member->update($request->input());
 
         return back()->with('success',  'Member updated successfully.');
-
     }
 
 
@@ -455,7 +456,7 @@ class MemberController extends Controller
     {
 
         $user = Auth::user();
-        if( $user->admin != 1 || $user->editor != 1){
+        if ($user->admin != 1 || $user->editor != 1) {
             return back()->withErrors(['error' => 'You have no permission to create/edit']);
         }
 
@@ -485,7 +486,7 @@ class MemberController extends Controller
             'techo_courses' => 'nullable|integer|min:0',
             'blacklist_release' => 'nullable|date',
             'blacklist_remark' => 'nullable',
-            'pseudo' => 'nullable|max:13',
+            'pseudo' => 'nullable|max:50',
             'url_apply' => 'nullable|max:1024',
             'url_history' => 'nullable|max:1024',
             'url_image' => 'nullable|max:1024',
@@ -503,7 +504,7 @@ class MemberController extends Controller
 
         $member_id = $request->member_id;
         $member = Member::findOrFail($member_id);
-        if (!$member){
+        if (!$member) {
             return redirect()->route('profile')->with('success', 'Member edit failed');
         }
 
@@ -512,6 +513,5 @@ class MemberController extends Controller
         $member->update($request->input());
 
         return back()->with('success',  'Member updated successfully.');
-
     }
 }
