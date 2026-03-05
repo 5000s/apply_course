@@ -50,4 +50,67 @@ class CronController extends Controller
             'date_checked' => $today
         ]);
     }
+
+    public function updateVipassanaMember()
+    {
+        $categoryIds = [1, 2, 3, 4, 6, 8, 10, 12];
+
+        // Find members who are not "ศิษย์เตโชวิปัสสนา" 
+        // and have at least one apply with state "ผ่านการอบรม" 
+        // for a course in the specified categories.
+        $affectedRows = \App\Models\Member::where(function ($query) {
+            // Ensure we only update those who are not already "ศิษย์เตโชวิปัสสนา"
+            $query->where('status', '!=', 'ศิษย์เตโชวิปัสสนา')
+                ->orWhereNull('status');
+        })
+            ->whereExists(function ($query) use ($categoryIds) {
+                $query->select(\Illuminate\Support\Facades\DB::raw(1))
+                    ->from('applies')
+                    ->join('courses', 'applies.course_id', '=', 'courses.id')
+                    ->whereColumn('applies.member_id', 'members.id')
+                    ->where('applies.state', 'ผ่านการอบรม')
+                    ->whereIn('courses.category_id', $categoryIds);
+            })
+            ->update(['status' => 'ศิษย์เตโชวิปัสสนา']);
+
+        // Update ผู้สมัครใหม่ to  ศิษย์อานาฯ ๑ วัน 
+        $categoryIdsAna = [9, 11, 18];
+
+        $affectedRowsAna = \App\Models\Member::where(function ($query) {
+            $query->where('status', 'ผู้สมัครใหม่')
+                ->orWhereNull('status');
+        })
+            ->whereExists(function ($query) use ($categoryIdsAna) {
+                $query->select(\Illuminate\Support\Facades\DB::raw(1))
+                    ->from('applies')
+                    ->join('courses', 'applies.course_id', '=', 'courses.id')
+                    ->whereColumn('applies.member_id', 'members.id')
+                    ->where('applies.state', 'ผ่านการอบรม')
+                    ->whereIn('courses.category_id', $categoryIdsAna);
+            })
+            ->update(['status' => 'ศิษย์อานาฯ ๑ วัน']);
+
+
+        // Update ผู้สมัครใหม่ or  ศิษย์อานาฯ ๑ วัน to ศิษย์อานาปานสติ
+        $categoryIdsAna2 = [5, 10, 13, 14, 17];
+
+        $affectedRowsAna2 = \App\Models\Member::where(function ($query) {
+            $query->where('status', 'ผู้สมัครใหม่')
+                ->orWhere('status', 'ศิษย์อานาฯ ๑ วัน');
+        })
+            ->whereExists(function ($query) use ($categoryIdsAna2) {
+                $query->select(\Illuminate\Support\Facades\DB::raw(1))
+                    ->from('applies')
+                    ->join('courses', 'applies.course_id', '=', 'courses.id')
+                    ->whereColumn('applies.member_id', 'members.id')
+                    ->where('applies.state', 'ผ่านการอบรม')
+                    ->whereIn('courses.category_id', $categoryIdsAna2);
+            })
+            ->update(['status' => 'ศิษย์อานาปานสติ']);
+
+
+        return response()->json([
+            'message' => "Updated $affectedRows members to 'ศิษย์เตโชวิปัสสนา' and $affectedRowsAna members to 'ศิษย์อานาฯ ๑ วัน' and $affectedRowsAna2 members to 'ศิษย์อานาปานสติ'"
+        ]);
+    }
 }
