@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Auth;
 use function Symfony\Component\String\b;
 use App\Models\ReportCase;
 use App\Models\CourseLocationLimit;
@@ -236,6 +237,14 @@ class CourseApplyController extends Controller
     public function applyConfirm($member_id, $course_id, $firstname, $lastname, $gender, $phone, $birth_date, $lang)
     {
 
+        $user = Auth::user();
+        $isAdmin = false;
+        if ($user) {
+            if ($user->admin == 1) {
+                $isAdmin = true;
+            }
+        }
+
         $code = $this->getApplyCode();
         $email = "";
         $member_new = false;
@@ -282,7 +291,7 @@ class CourseApplyController extends Controller
         }
 
 
-        if ($need_check_vipassana_history_apply) {
+        if ($need_check_vipassana_history_apply && $isAdmin == false) {
 
             $not_pass = false;
 
@@ -383,7 +392,7 @@ class CourseApplyController extends Controller
             }
         }
 
-        if ($need_check_onlynew_history_apply) {
+        if ($need_check_onlynew_history_apply && $isAdmin == false) {
 
 
             $not_pass = false;

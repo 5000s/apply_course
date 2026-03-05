@@ -413,8 +413,11 @@ class ApplyController extends Controller
 
     public function show($member_id, $course_id)
     {
-
-
+        $user = Auth::user();
+        $isAdmin = false;
+        if ($user && $user->admin == 1) {
+            $isAdmin = true;
+        }
 
         if (!$this->checkUserAccessMember($member_id)) {
             return redirect()->route('profile')->withErrors('The Member is not found.');
@@ -445,7 +448,7 @@ class ApplyController extends Controller
             $apply->application = "";
         }
 
-        if ($course->state != 'เปิดรับสมัคร') {
+        if ($course->state != 'เปิดรับสมัคร' && $isAdmin != true) {
             return redirect()->route('courses.index', $member_id)->withErrors('Course is not open for application.');
         }
         $CourseApplyController = new CourseApplyController();
