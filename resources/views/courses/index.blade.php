@@ -6,9 +6,20 @@
 
     <div class="container">
 
-        @if($user->admin == 1)
+        {{-- Display Validation Errors --}}
+        @if ($errors->any())
+            <div class="alert alert-danger mt-3">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
+        @if ($user->admin == 1)
             <h1>User สิทธิ Admin</h1>
-            <h2>จัดการ สมัครให้ ({{$member->id}})  {{$member->name}} {{$member->surname}}  </h2>
+            <h2>จัดการ สมัครให้ ({{ $member->id }}) {{ $member->name }} {{ $member->surname }} </h2>
         @endif
 
         {{-- Title + Back Button --}}
@@ -24,7 +35,7 @@
             @foreach ($course_locations as $location)
                 <div class="col-lg-3 col-md-4 col-sm-6 mb-3">
                     <a href="{{ route('courses.index', ['member_id' => $member_id, 'location' => $location->id]) }}"
-                       class="btn option_course w-100 text-center py-3 shadow-sm
+                        class="btn option_course w-100 text-center py-3 shadow-sm
                               {{ $location->id == $selected_location_id ? 'btn-success text-white' : 'btn-outline-success' }}">
                         <div class="fw-bold">
                             {{ app()->getLocale() === 'en' ? $location->show_name_en : $location->show_name }}
@@ -36,9 +47,9 @@
 
         {{-- Include Course Table --}}
         @include('partials.course_table_regis', [
-              'location' => $course_location,
-              'courses' => $courses,
-              'allow_types' => $allow_types,
+            'location' => $course_location,
+            'courses' => $courses,
+            'allow_types' => $allow_types,
         ])
     </div>
 
@@ -50,29 +61,36 @@
         .text-primary {
             color: #0d6efd;
         }
+
         .fw-bold {
             font-weight: bold;
         }
+
         .option_course {
             border-radius: 8px;
             font-size: 16px;
             transition: all 0.3s ease-in-out;
         }
+
         .option_course:hover {
             transform: translateY(-2px);
         }
+
         .btn-outline-success {
             border: 2px solid #198754;
             color: #198754;
         }
+
         .btn-outline-success:hover {
             background-color: #198754;
             color: white;
         }
+
         .btn-success {
             background-color: #198754 !important;
             border: none;
         }
+
         .shadow-sm {
             box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
         }
