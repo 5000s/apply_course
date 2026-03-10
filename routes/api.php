@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Models\Member;
+use App\Http\Controllers\CourseApplyController;
 
 /*
 |--------------------------------------------------------------------------
@@ -52,3 +53,5 @@ Route::get('/members/search', function (\Illuminate\Http\Request $request) {
 
     return $members;
 });
+
+Route::get('/courses/{location}/{type}/{month}', [CourseApplyController::class, 'courseTableAPI'])->name('course.table.api');

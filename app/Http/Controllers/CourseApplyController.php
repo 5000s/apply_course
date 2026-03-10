@@ -71,6 +71,35 @@ class CourseApplyController extends Controller
         return view('apply.course_table', compact('courses', 'category', 'lang', 'id', 'regis'));
     }
 
+    public function courseTableAPI(Request $request, $location, $type, $month)
+    {
+        $month_backward = $month;
+
+        if ($type == 1) {
+            $courses = Course::whereIn('category_id', [1, 3])
+                ->where('location_id', $location)
+                ->where('date_start', '>=', now()->subMonths($month_backward))
+                // ->where("state", "เปิดรับสมัคร")
+                ->orderBy('date_start', 'asc')
+                ->get();
+        } else {
+            $courses = Course::where('category_id', $type)
+                ->where('location_id', $location)
+                ->where('date_start', '>=', now()->subMonths($month_backward))
+                // ->where("state", "เปิดรับสมัคร")
+                ->orderBy('date_start', 'asc')
+                ->get();
+        }
+
+
+        $category = CourseCategory::where('id', $type)->first();
+
+        return response()->json([
+            'courses' => $courses,
+            'category' => $category
+        ]);
+    }
+
     public function directApply(Request $request)
     {
         $courseId = $request->input('course_id');
