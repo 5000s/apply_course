@@ -307,6 +307,8 @@ class CourseController extends Controller
                 'a.state',
                 'a.role',
                 'a.cancel',
+                'a.join_date',
+                'a.leave_date',
                 'a.updated_by'
             )
             ->join('applies as a', 'a.member_id', '=', 'm.id')
@@ -645,10 +647,35 @@ class CourseController extends Controller
         return view('admin.courser_apply_member', $data);
     }
 
+
+    public function updateJoinDate($apply_id)
+    {
+        $user = Auth::user();
+        if ($user->admin != 1 && $user->editor != 1) {
+            if (request()->ajax() || request()->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'You have no permission to create/edit'], 403);
+            }
+            return back()->withErrors(['error' => 'You have no permission to create/edit']);
+        }
+
+        $join_date = request()->input('join_date');
+        $leave_date = request()->input('leave_date');
+
+        $apply = Apply::where("id", $apply_id)->first();
+        $apply->join_date = $join_date;
+        $apply->leave_date = $leave_date;
+        $apply->save();
+
+        return response()->json(['success' => true, 'message' => 'Join date updated successfully!']);
+    }
+
     public function updateApplyStatus($course_id, $apply_id, $status)
     {
         $user = Auth::user();
-        if ($user->admin != 1 || $user->editor != 1) {
+        if ($user->admin != 1 && $user->editor != 1) {
+            if (request()->ajax() || request()->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'You have no permission to create/edit'], 403);
+            }
             return back()->withErrors(['error' => 'You have no permission to create/edit']);
         }
 
@@ -698,6 +725,15 @@ class CourseController extends Controller
             $apply->state = $status;
             $apply->updated_by = $admin->name;
             $apply->save();
+        }
+
+        if (request()->ajax() || request()->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'state' => $apply->state,
+                'role' => $apply->role,
+                'updated_by' => $apply->updated_by
+            ]);
         }
 
         return redirect()->route('admin.courseList', ['course_id' => $course_id]);

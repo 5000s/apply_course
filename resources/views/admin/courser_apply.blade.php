@@ -181,7 +181,8 @@
                         <td class="text-center " style="width: 145px;">ติดต่อ</td>
                         <td class="text-center eprint" style="width: 20px;">ห่างคอร์ส<br>(เดือน)</td>
                         <td class="text-center " style="width: 200px;">คอร์สล่าสุด</td>
-                        <td class="text-center remark-col eprint" style="max-width: 100px;">เพิ่มเติม</td>
+                        <td class="text-center remark-col " style="max-width: 100px;">เพิ่มเติม</td>
+                        <td class="text-center eprint" style="display: none;">เพิ่มเติม</td>
                         <td class="text-center ">สถานะ</td>
                         <td class="text-center ">ข้อมูล/status</td>
                     </tr>
@@ -190,8 +191,10 @@
                 <tbody>
                     @foreach ($members as $index => $member)
                         <tr>
-                            <td class="text-center">{{ $loop->iteration }}</td>
-                            <td class="text-center">{{ $member->uid }}</td>
+                            <td class="text-center">{{ $loop->iteration }}
+                            </td>
+                            <td class="text-center">{{ $member->uid }}
+                            </td>
                             @php
                                 $date = \Carbon\Carbon::parse($member->apply_date);
                             @endphp
@@ -223,7 +226,13 @@
                                 {{ $display }}
                             </td>
 
-                            <td class="text-left">{{ $member->name }}&nbsp;<br>{{ $member->surname }}</td>
+                            <td class="text-left">
+                                <a class="text-blue-500 hover:text-blue-700"
+                                    href="{{ route('admin.courseApplyForm', ['course_id' => $member->course_id, 'apply_id' => $member->apply_id]) }}"
+                                    target="_blank">
+                                    {{ $member->name }}&nbsp;<br>{{ $member->surname }}
+                                </a>
+                            </td>
                             <td class="text-center">{{ $member->age }}</td>
 
                             <td class="text-center" style="display: none;">{{ $member->medical_condition }}</td>
@@ -307,17 +316,79 @@
                             </td>
                             <td class="text-left align-center relative px-2 remark-col"
                                 data-order="{{ $member->remark ?? 0 }}">
-                                <div class="remark-display truncate pr-8 remark-display">
-                                    {{ $member->remark ?? '' }}
+                                <div class="remark-display truncate pr-8">
+
+
+                                    {{-- Show custom join/leave date here   --}}
+                                    @php
+                                        $cStartStr = \Carbon\Carbon::parse($course->date_start)->format('Y-m-d');
+                                        $cEndStr = \Carbon\Carbon::parse($course->date_end)->format('Y-m-d');
+
+                                        $mJoinStr = $member->join_date
+                                            ? \Carbon\Carbon::parse($member->join_date)->format('Y-m-d')
+                                            : $cStartStr;
+                                        $mLeaveStr = $member->leave_date
+                                            ? \Carbon\Carbon::parse($member->leave_date)->format('Y-m-d')
+                                            : $cEndStr;
+
+                                        $showDates = $mJoinStr !== $cStartStr || $mLeaveStr !== $cEndStr;
+                                        $joinDay = ltrim(\Carbon\Carbon::parse($mJoinStr)->format('d'), '0');
+                                        $leaveDay = ltrim(\Carbon\Carbon::parse($mLeaveStr)->format('d'), '0');
+                                    @endphp
+
+                                    <span data-course-start="{{ $cStartStr }}" data-course-end="{{ $cEndStr }}">
+                                        {{ $member->remark ?? '' }}
+                                        <label class="{{ !$showDates ? 'hidden' : '' }}"
+                                            style="color: #d97706; font-weight: bold;">
+                                            , เข้า: {{ $joinDay }}-{{ $leaveDay }}</label>
+                                    </span>
+
+
                                 </div>
                                 <button class="btn btn-sm btn-circle btn-outline absolute top-1 right-1 edit-remark"
                                     data-apply-id="{{ $member->apply_id }}" data-value="{{ e($member->remark) }}"
                                     title="แก้ไขข้อมูลเพิ่มเติม">✏️</button>
                             </td>
+                            <td class="text-left align-center relative px-2 remark-col" style="display: none;"
+                                data-order="{{ $member->remark ?? 0 }}">
+                                <div class="remark-display truncate pr-8 remark-display">
+                                    {{ $member->remark ?? '' }}
+                                </div>
+                            </td>
 
                             <td class="text-center" style="font-size: 12px">
-                                {{ $member->state }} <br>
-                                แก้ไขโดย: {{ $member->updated_by === 'Anonymous' ? 'NA' : $member->updated_by }}
+                                <span class="state-display">{{ $member->state }}</span>
+                                <div class="dropdown dropdown-hover">
+                                    <div tabindex="0" role="button" class="btn btn-sm btn-active">แก้ไข</div>
+                                    <ul tabindex="0"
+                                        class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
+                                        <li>
+                                            <a class="status-update-link"
+                                                href="{{ route('admin.courseApplyStatus', ['course_id' => $member->course_id, 'apply_id' => $member->apply_id, 'status' => 'ยื่นใบสมัคร']) }}">ยื่นใบสมัคร</a>
+                                        </li>
+                                        <li>
+                                            <a class="status-update-link"
+                                                href="{{ route('admin.courseApplyStatus', ['course_id' => $member->course_id, 'apply_id' => $member->apply_id, 'status' => 'ยืนยันแล้ว']) }}">ยืนยันแล้ว</a>
+                                        </li>
+                                        <li>
+                                            <a class="status-update-link"
+                                                href="{{ route('admin.courseApplyStatus', ['course_id' => $member->course_id, 'apply_id' => $member->apply_id, 'status' => 'ผ่านการอบรม']) }}">ผ่านการอบรม</a>
+                                        </li>
+                                        <li>
+                                            <a class="status-update-link"
+                                                href="{{ route('admin.courseApplyStatus', ['course_id' => $member->course_id, 'apply_id' => $member->apply_id, 'status' => 'ยุติกลางคัน']) }}">ยุติกลางคัน</a>
+                                        </li>
+                                        <li>
+                                            <a class="status-update-link"
+                                                href="{{ route('admin.courseApplyStatus', ['course_id' => $member->course_id, 'apply_id' => $member->apply_id, 'status' => 'ยกเลิกการสมัคร']) }}">ยกเลิกการสมัคร</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <br>
+                                แก้ไขโดย: <span
+                                    class="updated-by-display">{{ $member->updated_by === 'Anonymous' ? 'NA' : $member->updated_by }}</span>
+
+
                             </td>
 
                             <td class="text-center">
@@ -328,58 +399,37 @@
                                         <button class="btn btn-sm btn-active btn-in-table">ใบสมัคร</button>
                                     </a>
 
+                                    <button class="btn btn-sm btn-active btn-in-table btn-date-edit"
+                                        data-apply-id="{{ $member->apply_id }}"
+                                        data-join-date="{{ $member->join_date ? \Carbon\Carbon::parse($member->join_date)->format('Y-m-d') : \Carbon\Carbon::parse($course->date_start)->format('Y-m-d') }}"
+                                        data-leave-date="{{ $member->leave_date ? \Carbon\Carbon::parse($member->leave_date)->format('Y-m-d') : \Carbon\Carbon::parse($course->date_end)->format('Y-m-d') }}">
+                                        วันเข้าร่วม
+                                    </button>
 
-                                    <a href="{{ route('admin.courseApplyForm', ['course_id' => $member->course_id, 'apply_id' => $member->apply_id]) }}"
-                                        target="_blank">
-                                        <button class="btn btn-sm btn-active btn-in-table">ดูข้อมูล</button>
-                                    </a>
 
-                                    <div class="dropdown dropdown-hover">
-                                        <div tabindex="0" role="button" class="btn btn-sm btn-active">แก้ไข</div>
-                                        <ul tabindex="0"
-                                            class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
-                                            <li>
-                                                <a
-                                                    href="{{ route('admin.courseApplyStatus', ['course_id' => $member->course_id, 'apply_id' => $member->apply_id, 'status' => 'ยื่นใบสมัคร']) }}">ยื่นใบสมัคร</a>
-                                            </li>
-                                            <li>
-                                                <a
-                                                    href="{{ route('admin.courseApplyStatus', ['course_id' => $member->course_id, 'apply_id' => $member->apply_id, 'status' => 'ยืนยันแล้ว']) }}">ยืนยันแล้ว</a>
-                                            </li>
-                                            <li>
-                                                <a
-                                                    href="{{ route('admin.courseApplyStatus', ['course_id' => $member->course_id, 'apply_id' => $member->apply_id, 'status' => 'ผ่านการอบรม']) }}">ผ่านการอบรม</a>
-                                            </li>
-                                            <li>
-                                                <a
-                                                    href="{{ route('admin.courseApplyStatus', ['course_id' => $member->course_id, 'apply_id' => $member->apply_id, 'status' => 'ยุติกลางคัน']) }}">ยุติกลางคัน</a>
-                                            </li>
-                                            <li>
-                                                <a
-                                                    href="{{ route('admin.courseApplyStatus', ['course_id' => $member->course_id, 'apply_id' => $member->apply_id, 'status' => 'ยกเลิกการสมัคร']) }}">ยกเลิกการสมัคร</a>
-                                            </li>
-                                        </ul>
-                                    </div>
+
+
+
 
                                     <div class="dropdown dropdown-hover">
                                         <div tabindex="0" role="button" class="btn btn-sm btn-active">สมัครอื่นๆ</div>
                                         <ul tabindex="0"
                                             class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
                                             <li>
-                                                <a
+                                                <a class="status-update-link"
                                                     href="{{ route('admin.courseApplyStatus', ['course_id' => $member->course_id, 'apply_id' => $member->apply_id, 'status' => 'volunteer']) }}">ธรรมบริกร</a>
                                             </li>
                                             <li>
-                                                <a
+                                                <a class="status-update-link"
                                                     href="{{ route('admin.courseApplyStatus', ['course_id' => $member->course_id, 'apply_id' => $member->apply_id, 'status' => 'cook']) }}">แม่ครัว</a>
                                             </li>
                                             <li>
-                                                <a
+                                                <a class="status-update-link"
                                                     href="{{ route('admin.courseApplyStatus', ['course_id' => $member->course_id, 'apply_id' => $member->apply_id, 'status' => 'walk_in']) }}">walk
                                                     in</a>
                                             </li>
                                             <li>
-                                                <a
+                                                <a class="status-update-link"
                                                     href="{{ route('admin.courseApplyStatus', ['course_id' => $member->course_id, 'apply_id' => $member->apply_id, 'status' => 'normal']) }}">ผู้เข้าอบรม</a>
                                             </li>
                                         </ul>
@@ -409,6 +459,39 @@
                 <div class="flex justify-end space-x-2">
                     <label for="modal-remark" class="btn btn-ghost btn-sm">ยกเลิก</label>
                     <button type="submit" class="btn btn-primary btn-sm">บันทึก</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {{-- Modal: Edit Join / Leave Date --}}
+    <input type="checkbox" id="modal-date-edit" class="modal-toggle" />
+    <div class="modal">
+        <div class="modal-box max-w-sm p-4 relative">
+            <label for="modal-date-edit" class="btn btn-sm btn-circle absolute right-2 top-2">✕</label>
+            <h3 class="text-xl font-medium mb-4">แก้ไขวันเข้าร่วม</h3>
+
+            <form id="form-date-edit">
+                @csrf
+                <input type="hidden" name="apply_id" id="date-edit-apply-id" />
+
+                <div class="form-control w-full mb-3">
+                    <label class="label"><span class="label-text">วันเริ่มเข้าร่วม (Join Date)</span></label>
+                    <input type="date" id="date-edit-join" name="join_date" class="input input-bordered w-full"
+                        min="{{ \Carbon\Carbon::parse($course->date_start)->format('Y-m-d') }}"
+                        max="{{ \Carbon\Carbon::parse($course->date_end)->format('Y-m-d') }}" required />
+                </div>
+
+                <div class="form-control w-full mb-4">
+                    <label class="label"><span class="label-text">วันจบการเข้าร่วม (Leave Date)</span></label>
+                    <input type="date" id="date-edit-leave" name="leave_date" class="input input-bordered w-full"
+                        min="{{ \Carbon\Carbon::parse($course->date_start)->format('Y-m-d') }}"
+                        max="{{ \Carbon\Carbon::parse($course->date_end)->format('Y-m-d') }}" required />
+                </div>
+
+                <div class="flex justify-end space-x-2 border-t pt-4 mt-2">
+                    <label for="modal-date-edit" class="btn btn-ghost">ยกเลิก</label>
+                    <button type="submit" class="btn btn-primary">ยืนยัน</button>
                 </div>
             </form>
         </div>
@@ -684,6 +767,125 @@
                         }
                         alert(msg);
                     });
+            });
+
+            // --- DATE EDIT MODAL LOGIC ---
+            $('#myTable').on('click', '.btn-date-edit', function() {
+                var btn = $(this);
+                $('#date-edit-apply-id').val(btn.data('apply-id'));
+                $('#date-edit-join').val(btn.data('join-date'));
+                $('#date-edit-leave').val(btn.data('leave-date'));
+                $('#modal-date-edit').prop('checked', true);
+            });
+
+            // --- DATE EDIT AJAX UPDATE ---
+            $('#form-date-edit').on('submit', function(e) {
+                e.preventDefault();
+
+                var applyId = $('#date-edit-apply-id').val();
+                var joinDate = $('#date-edit-join').val();
+                var leaveDate = $('#date-edit-leave').val();
+
+                if (joinDate > leaveDate) {
+                    alert('วันเริ่มเข้าร่วมต้องไม่มากกว่าวันจบการเข้าร่วม');
+                    return;
+                }
+
+                $.ajax({
+                    url: '/admin/courses/applylist/' + applyId + '/update-join-date',
+                    method: 'POST',
+                    data: {
+                        _token: $('meta[name="csrf-token"]').attr('content'),
+                        join_date: joinDate,
+                        leave_date: leaveDate
+                    },
+                    success: function(res) {
+                        if (res.success) {
+                            // Update the button's data attributes so next time it opens it has the latest value
+                            var $btn = $('#myTable button.btn-date-edit[data-apply-id="' +
+                                applyId + '"]');
+                            $btn.data('join-date', joinDate);
+                            $btn.data('leave-date', leaveDate);
+
+                            // Update the custom date display text under remark
+                            var $customDisplay = $btn.closest('tr').find(
+                                '.custom-date-display');
+                            var cStart = $customDisplay.data('course-start');
+                            var cEnd = $customDisplay.data('course-end');
+
+                            var jsJoinDate = joinDate ? joinDate : cStart;
+                            var jsLeaveDate = leaveDate ? leaveDate : cEnd;
+
+                            if (jsJoinDate !== cStart || jsLeaveDate !== cEnd) {
+                                // Ex: "2026-03-21" -> "21"
+                                var dJoinMatch = jsJoinDate.split('-')[2];
+                                var dLeaveMatch = jsLeaveDate.split('-')[2];
+
+                                // remove leading zero
+                                var dJoin = dJoinMatch.replace(/^0+/, '');
+                                var dLeave = dLeaveMatch.replace(/^0+/, '');
+
+                                $customDisplay.find('.custom-date-text').text(dJoin + '-' +
+                                    dLeave);
+                                $customDisplay.removeClass('hidden');
+                            } else {
+                                $customDisplay.addClass('hidden');
+                            }
+
+                            // Close modal and show small success visual (or reload if user prefers, but requested ajax)
+                            $('#modal-date-edit').prop('checked', false);
+
+                            // Optional flash or alert
+                            // alert(res.message);
+                        } else {
+                            alert('ผิดพลาด: ' + (res.message || 'ไม่ทราบสาเหตุ'));
+                        }
+                    },
+                    error: function(xhr) {
+                        var msg = 'เกิดข้อผิดพลาดในการอัพเดทวันที่';
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            msg += ': ' + xhr.responseJSON.message;
+                        }
+                        alert(msg);
+                    }
+                });
+            });
+
+            // --- AJAX STATUS UPDATE LOGIC ---
+            $('#myTable').on('click', '.status-update-link', function(e) {
+                e.preventDefault();
+                var $btn = $(this);
+                var url = $btn.attr('href');
+                var $tr = $btn.closest('tr');
+
+                $.ajax({
+                    url: url,
+                    method: 'GET',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    },
+                    success: function(res) {
+                        if (res.success) {
+                            $tr.find('.state-display').text(res.state);
+                            $tr.find('.updated-by-display').text(res.updated_by ===
+                                'Anonymous' ? 'NA' : res.updated_by);
+                            // Also drop the menu
+                            if (document.activeElement) {
+                                document.activeElement.blur();
+                            }
+                        } else {
+                            alert('ผิดพลาด: ' + (res.message || 'ไม่ทราบสาเหตุ'));
+                        }
+                    },
+                    error: function(xhr) {
+                        var msg = 'เกิดข้อผิดพลาดในการอัพเดทสถานะ';
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            msg += ': ' + xhr.responseJSON.message;
+                        }
+                        alert(msg);
+                    }
+                });
             });
 
         });

@@ -101,6 +101,7 @@ Route::prefix('admin')->middleware('auth', 'admin')->group(function () {
     Route::post('courses/add-member', [CourseController::class, 'adminAddExistingMember'])->name('admin.courses.addExistingMember');
 
     Route::get('courses/applylist/{course_id}/{apply_id}/update/{status}', [CourseController::class, 'updateApplyStatus'])->name("admin.courseApplyStatus");
+    Route::post('courses/applylist/{apply_id}/update-join-date', [CourseController::class, 'updateJoinDate'])->name("admin.courseApplyJoinDate");
 
 
     Route::get('member/ajax', [AdminMemberController::class, 'getMembersAjax'])->name("admin.members.ajax");
