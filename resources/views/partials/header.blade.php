@@ -32,6 +32,35 @@
                                         Google Sheet</a></li>
                                 <li><a class="dropdown-item" href="{{ route('calendar.index') }}">จัดการปฏิทิน</a></li>
                             </ul>
+
+                            <!-- Fallback script for early click before Bootstrap JS is fully loaded -->
+                            <script>
+                                document.addEventListener("DOMContentLoaded", function() {
+                                    var adminBtn = document.getElementById("adminMenu");
+                                    var adminMenuDrop = adminBtn ? adminBtn.nextElementSibling : null;
+
+                                    if (adminBtn && adminMenuDrop) {
+                                        adminBtn.addEventListener("click", function(e) {
+                                            if (typeof bootstrap === "undefined" || !window.bootstrap) {
+                                                e.preventDefault();
+                                                adminMenuDrop.classList.toggle("show");
+                                                adminBtn.classList.toggle("show");
+                                                adminBtn.setAttribute("aria-expanded", adminMenuDrop.classList.contains("show"));
+                                            }
+                                        });
+
+                                        document.addEventListener("click", function(e) {
+                                            if (typeof bootstrap === "undefined" || !window.bootstrap) {
+                                                if (!adminBtn.contains(e.target) && !adminMenuDrop.contains(e.target)) {
+                                                    adminMenuDrop.classList.remove("show");
+                                                    adminBtn.classList.remove("show");
+                                                    adminBtn.setAttribute("aria-expanded", "false");
+                                                }
+                                            }
+                                        });
+                                    }
+                                });
+                            </script>
                         </li>
                     @endif
 
