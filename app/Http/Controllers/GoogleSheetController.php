@@ -501,7 +501,9 @@ class GoogleSheetController extends Controller
                             });
                         }
                     })
-                    ->whereNull('is_delete')->orWhere('is_delete', 0)
+                    ->where(function ($q) {
+                        $q->whereNull('is_delete')->orWhere('is_delete', 0);
+                    })
                     ->first();
 
                 if ($matchedMember) {
@@ -862,7 +864,9 @@ class GoogleSheetController extends Controller
                     });
                 }
             })
-            ->whereNull('is_delete')->orWhere('is_delete', 0)
+            ->where(function ($q) {
+                $q->whereNull('is_delete')->orWhere('is_delete', 0);
+            })
             ->first();
     }
 

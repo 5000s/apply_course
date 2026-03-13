@@ -17,7 +17,9 @@ class TeamController extends Controller
 
     public function create()
     {
-        $members = Member::whereNull('is_delete')->orWhere('is_delete', 0)->get();
+        $members = Member::where(function ($q) {
+            $q->whereNull('is_delete')->orWhere('is_delete', 0);
+        })->get();
         return view('teams.create', compact('members'));
     }
 
@@ -36,7 +38,9 @@ class TeamController extends Controller
     public function edit($id)
     {
         $team = Team::findOrFail($id);
-        $members = Member::whereNull('is_delete')->orWhere('is_delete', 0)->get();
+        $members = Member::where(function ($q) {
+            $q->whereNull('is_delete')->orWhere('is_delete', 0);
+        })->get();
         return view('teams.edit', compact('team', 'members'));
     }
 

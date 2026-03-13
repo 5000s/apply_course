@@ -154,7 +154,9 @@ class Member extends Model
             ->where('gender', $gender)
             ->whereRaw('LOWER(name) = ?', [mb_strtolower($firstname)])
             ->whereRaw('LOWER(surname) = ?', [mb_strtolower($lastname)])
-            ->whereNull('is_delete')->orWhere('is_delete', 0)
+            ->where(function ($q) {
+                $q->whereNull('is_delete')->orWhere('is_delete', 0);
+            })
             ->first();
 
         if ($candidate) {

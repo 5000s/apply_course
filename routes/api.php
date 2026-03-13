@@ -43,7 +43,9 @@ Route::get('/members/search', function (\Illuminate\Http\Request $request) {
     } else if (count($keywords) > 1) {
         $query->where('name', 'like', "%$name%")->where('surname', 'like', "%$surname%");
     }
-    $query = $query->whereNull('is_delete')->orWhere('is_delete', 0);
+    $query = $query->where(function ($q) {
+        $q->whereNull('is_delete')->orWhere('is_delete', 0);
+    });
 
     $members = $query->limit(10)->get();
 
