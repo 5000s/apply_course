@@ -17,7 +17,7 @@ class TeamController extends Controller
 
     public function create()
     {
-        $members = Member::all();
+        $members = Member::whereNull('is_delete')->orWhere('is_delete', 0)->get();
         return view('teams.create', compact('members'));
     }
 
@@ -36,7 +36,7 @@ class TeamController extends Controller
     public function edit($id)
     {
         $team = Team::findOrFail($id);
-        $members = Member::all();
+        $members = Member::whereNull('is_delete')->orWhere('is_delete', 0)->get();
         return view('teams.edit', compact('team', 'members'));
     }
 
@@ -87,12 +87,12 @@ class TeamController extends Controller
         ]);
 
         $member = TeamMember::findOrFail($memberId);
-        $member->update($request->only('position','join_at','leave_at'));
+        $member->update($request->only('position', 'join_at', 'leave_at'));
 
         // redirect to the members LIST, not the “show” URL
         return redirect()
             ->route('teammembers.index', $teamId)
-            ->with('success','Team member updated');
+            ->with('success', 'Team member updated');
     }
 
 
@@ -102,7 +102,7 @@ class TeamController extends Controller
 
         return redirect()
             ->route('teammembers.index', $teamId)
-            ->with('success','Team member removed');
+            ->with('success', 'Team member removed');
     }
 
 
@@ -114,22 +114,22 @@ class TeamController extends Controller
             ->where('team_id', $teamId)
             ->get();
 
-        return view('teammembers.index', compact('team','teamMembers'));
+        return view('teammembers.index', compact('team', 'teamMembers'));
     }
 
-// GET  /teams/{team}/members/create
+    // GET  /teams/{team}/members/create
     public function createMember($teamId)
     {
         $team = Team::findOrFail($teamId);
         return view('teammembers.create', compact('team'));
     }
 
-// GET  /teams/{team}/members/{member}/edit
+    // GET  /teams/{team}/members/{member}/edit
     public function editMemberForm($teamId, $memberId)
     {
         $team   = Team::findOrFail($teamId);
         $member = TeamMember::with('member')->findOrFail($memberId);
 
-        return view('teammembers.edit', compact('team','member'));
+        return view('teammembers.edit', compact('team', 'member'));
     }
 }

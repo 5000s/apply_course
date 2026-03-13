@@ -230,7 +230,9 @@ class AdminMemberController extends Controller
     public function senior()
     {
         ini_set('memory_limit', '256M');
-        $members = Member::where("surname", "!=", "")->where('current_level', '!=', '0')->get();
+        $members = Member::where("surname", "!=", "")->where('current_level', '!=', '0')
+            ->whereNull('is_delete')->orWhere('is_delete', 0)
+            ->get();
         return view('admin.senior_member_list', ['members' => $members, 'title' => 'ตารางศิษย์อาวุโส (senior level)']);
     }
 

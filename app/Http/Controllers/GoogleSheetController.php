@@ -355,10 +355,18 @@ class GoogleSheetController extends Controller
     {
         // Month mappings
         $thaiMonths = [
-            'มกราคม'   => '01', 'กุมภาพันธ์' => '02', 'มีนาคม'   => '03',
-            'เมษายน'   => '04', 'พฤษภาคม'   => '05', 'มิถุนายน'  => '06',
-            'กรกฎาคม'  => '07', 'สิงหาคม'    => '08', 'กันยายน'   => '09',
-            'ตุลาคม'   => '10', 'พฤศจิกายน' => '11', 'ธันวาคม'   => '12',
+            'มกราคม'   => '01',
+            'กุมภาพันธ์' => '02',
+            'มีนาคม'   => '03',
+            'เมษายน'   => '04',
+            'พฤษภาคม'   => '05',
+            'มิถุนายน'  => '06',
+            'กรกฎาคม'  => '07',
+            'สิงหาคม'    => '08',
+            'กันยายน'   => '09',
+            'ตุลาคม'   => '10',
+            'พฤศจิกายน' => '11',
+            'ธันวาคม'   => '12',
         ];
 
         $dates = [];
@@ -411,7 +419,7 @@ class GoogleSheetController extends Controller
 
         $location = Location::find($locationId);
 
-        if ($force_check == "1"){
+        if ($force_check == "1") {
             $memberIdSet = Member::pluck('id')->flip();
         }
 
@@ -433,8 +441,8 @@ class GoogleSheetController extends Controller
             ->get()
             ->map(function ($app) use ($force_check, $memberIdSet) {
                 if ($app->member_id) {
-                    if ($force_check == "1" ) {
-                        if (isset($memberIdSet[$app->member_id])){
+                    if ($force_check == "1") {
+                        if (isset($memberIdSet[$app->member_id])) {
                             $app->is_synced = true;
                             return $app;
                         }
@@ -493,13 +501,14 @@ class GoogleSheetController extends Controller
                             });
                         }
                     })
+                    ->whereNull('is_delete')->orWhere('is_delete', 0)
                     ->first();
 
-                if ($matchedMember){
+                if ($matchedMember) {
                     $app->member_id = $matchedMember->id;
                 }
 
-                if ($app->is_synced != ($matchedMember !== null)){
+                if ($app->is_synced != ($matchedMember !== null)) {
                     $app->is_synced = $matchedMember !== null;
                     $app->save();
                 }
@@ -517,7 +526,7 @@ class GoogleSheetController extends Controller
             $courseDates = $this->extractCourseDatesFromPreference($app->course_preference);
 
             foreach ($courseDates as $date) {
-                if (!isset($courseListDates[$date])){
+                if (!isset($courseListDates[$date])) {
                     $courseListDates[$date] = $date;
                 }
             }
@@ -526,10 +535,10 @@ class GoogleSheetController extends Controller
             $notMemberApplyDates = [];
             foreach ($courseDates as $date) {
                 if (!empty($dateCheck)) {
-                    if ($dateCheck == $date){
+                    if ($dateCheck == $date) {
                         $notMemberApplyDates[$date] = Carbon::parse($date)->addYear("543")->format('d-m-Y');
                     }
-                }else{
+                } else {
                     $notMemberApplyDates[$date] = Carbon::parse($date)->addYear("543")->format('d-m-Y');
                 }
             }
@@ -538,9 +547,9 @@ class GoogleSheetController extends Controller
 
             if ($app->member_id && $app->course_preference) {
 
-//                if ($app->member_id == 12323 && $app->id == 3759)
-//                    dd($courseDates, $app->course_preference, $app->id);
-//
+                //                if ($app->member_id == 12323 && $app->id == 3759)
+                //                    dd($courseDates, $app->course_preference, $app->id);
+                //
                 foreach ($courseDates as $date) {
 
                     if (isset($courseArray[$date])) {
@@ -553,10 +562,10 @@ class GoogleSheetController extends Controller
 
                         $isCheckApplyMore = true;
                         if (!empty($dateCheck)) {
-                            if ($dateCheck == $date){
-                                if ($apply){
+                            if ($dateCheck == $date) {
+                                if ($apply) {
                                     $app->has_apply = true;
-                                }else{
+                                } else {
                                     $app->has_apply = false;
                                 }
                                 $isCheckApplyMore = false;
@@ -566,12 +575,12 @@ class GoogleSheetController extends Controller
                             }
                         }
 
-                        if ($isCheckApplyMore){
+                        if ($isCheckApplyMore) {
 
                             if ($apply) {
 
                                 $app->has_apply = true;
-                            }else{
+                            } else {
                                 $app->has_apply = false;
                                 if (empty($dateCheck)) {
                                     break;
@@ -580,11 +589,11 @@ class GoogleSheetController extends Controller
                         }
 
 
-//                        if ($app->member_id == 12323 && $app->id == 3759 && $course->id == 684)
-//                            dd($courseDates, $app->course_preference, $app->id, $course, $app->has_apply, $apply,  $app->member_id);
+                        //                        if ($app->member_id == 12323 && $app->id == 3759 && $course->id == 684)
+                        //                            dd($courseDates, $app->course_preference, $app->id, $course, $app->has_apply, $apply,  $app->member_id);
 
 
-                    }else{
+                    } else {
                         $app->has_apply = false;
                     }
                 }
@@ -654,7 +663,7 @@ class GoogleSheetController extends Controller
 
         foreach ($applications as $app) {
 
-            $member = Member::find( $app->member_id);
+            $member = Member::find($app->member_id);
 
             $normalizedGender = null;
             if (str_contains($app->gender, 'ชาย')) {
@@ -663,17 +672,17 @@ class GoogleSheetController extends Controller
                 $normalizedGender = 'หญิง';
             }
 
-            if (str_contains($app->status, 'แม่ชี')){
+            if (str_contains($app->status, 'แม่ชี')) {
                 $app->status = 'แม่ชี';
-            }else if (str_contains($app->status, 'พระ') || str_contains($app->status, 'ภิกษุ')){
+            } else if (str_contains($app->status, 'พระ') || str_contains($app->status, 'ภิกษุ')) {
                 $app->status = 'ภิกษุ';
-            }else{
+            } else {
                 $app->status = 'ฆราวาส';
             }
 
-            if(!$member){
+            if (!$member) {
                 $member = $this->findMatchingMember($app);
-                if ($member){
+                if ($member) {
                     $app->member_id = $member->id;
                     $app->save();
                 }
@@ -681,7 +690,7 @@ class GoogleSheetController extends Controller
 
             if (!$member) {
 
-                if ($import == "all"){
+                if ($import == "all") {
                     $member = Member::create([
                         'gender' => $normalizedGender,
                         'name' => $app->first_name,
@@ -710,10 +719,8 @@ class GoogleSheetController extends Controller
                     $app->is_synced = 1;
                     $imported++;
                 }
-
-
             }
-            if (!$member){
+            if (!$member) {
                 $member = new Member();
             }
 
@@ -721,24 +728,24 @@ class GoogleSheetController extends Controller
             $courseDateList = $this->extractCourseDatesFromPreference($app->course_preference);
 
 
-            if (count($courseDateList) > 0){
+            if (count($courseDateList) > 0) {
 
                 foreach ($courseDateList as $date) {
 
                     $isPassDateCheck = true;
 
-                    if (!empty($dateCheck)){
-                        if ($dateCheck != $date){
+                    if (!empty($dateCheck)) {
+                        if ($dateCheck != $date) {
                             $isPassDateCheck = false;
                         }
                     }
 
-                    if ($isPassDateCheck){
+                    if ($isPassDateCheck) {
                         $courseDate = Carbon::parse($date);
 
                         if (isset($courseArray[$date])) {
                             $course = $courseArray[$date];
-                        }else{
+                        } else {
 
 
                             $course = new Course();
@@ -765,7 +772,7 @@ class GoogleSheetController extends Controller
                         $apply = Apply::where("course_id", $course->id)->where("member_id", $member->id)->first();
 
 
-                        if (!$apply && $import == "all"){
+                        if (!$apply && $import == "all") {
 
                             $apply = new Apply();
                             $apply->member_id = $member->id;
@@ -790,11 +797,9 @@ class GoogleSheetController extends Controller
                     }
                 }
             }
-
         }
 
         return redirect()->back()->with('success', "นำเข้าข้อมูลสมาชิกใหม่จำนวน $imported คน, เพิ่มคอร์ส $courseImported และเพิ่มข้อมูลสมัคร $applyImported รายการ");
-
     }
 
 
@@ -857,6 +862,7 @@ class GoogleSheetController extends Controller
                     });
                 }
             })
+            ->whereNull('is_delete')->orWhere('is_delete', 0)
             ->first();
     }
 
@@ -874,13 +880,13 @@ class GoogleSheetController extends Controller
         $members = Member::query()
             ->where(function ($q) use ($first, $last, $email, $phone) {
                 if ($first !== '') {
-                    $q->orWhere('name', 'LIKE', $first.'%');
+                    $q->orWhere('name', 'LIKE', $first . '%');
                 }
                 if ($last !== '') {
-                    $q->orWhere('surname', 'LIKE', $last.'%');
+                    $q->orWhere('surname', 'LIKE', $last . '%');
                 }
                 if ($email !== '') {
-                    $q->orWhere('email', 'LIKE', '%'.$email.'%');
+                    $q->orWhere('email', 'LIKE', '%' . $email . '%');
                 }
                 if ($phone !== '') {
                     // normalize phone in SQL compare: strip non-digits
@@ -890,16 +896,17 @@ class GoogleSheetController extends Controller
                                 REGEXP_REPLACE(COALESCE(phone,''), '[^0-9]', ''),
                             '^(66)', '0'),
                         '^(0{2,})', '0') LIKE ?
-                    ", ['%'.$phone.'%']);
+                    ", ['%' . $phone . '%']);
                 }
             })
+            ->whereNull('is_delete')->orWhere('is_delete', 0)
             ->orderByDesc('updated_at')
             ->limit(30)
             ->get()
             ->map(function ($m) {
                 return [
                     'id'      => $m->id,
-                    'name'    => trim($m->name.' '.$m->surname),
+                    'name'    => trim($m->name . ' ' . $m->surname),
                     'gender'  => $m->gender,
                     'age'     => $m->birthdate ? Carbon::parse($m->birthdate)->age : null,
                     'phone'   => $m->phone,
@@ -923,7 +930,7 @@ class GoogleSheetController extends Controller
         if ($digits === null) return '';
         // convert leading 66 to 0 for Thai pattern equivalence
         if (Str::startsWith($digits, '66')) {
-            $digits = '0'.substr($digits, 2);
+            $digits = '0' . substr($digits, 2);
         }
         // collapse multiple leading zeros to single 0
         $digits = preg_replace('/^0+/', '0', $digits);
@@ -933,7 +940,7 @@ class GoogleSheetController extends Controller
     public function linkMember(Request $request,  $application_id): \Illuminate\Http\JsonResponse
     {
         $validated = $request->validate([
-            'member_id' => ['required','integer','exists:members,id'],
+            'member_id' => ['required', 'integer', 'exists:members,id'],
         ]);
 
         $application = Application::find($application_id);
@@ -951,5 +958,4 @@ class GoogleSheetController extends Controller
             'member_id' => $application->member_id,
         ]);
     }
-
 }

@@ -404,7 +404,9 @@ class ApplyController extends Controller
 
         $email = Auth::user()->email;
 
-        $members = Member::where("email", $email)->where("id", $member_id)->first();
+        $members = Member::where("email", $email)->where("id", $member_id)
+            ->whereNull('is_delete')->orWhere('is_delete', 0)
+            ->first();
         if ($members) {
             return true;
         }

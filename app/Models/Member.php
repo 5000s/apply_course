@@ -154,6 +154,7 @@ class Member extends Model
             ->where('gender', $gender)
             ->whereRaw('LOWER(name) = ?', [mb_strtolower($firstname)])
             ->whereRaw('LOWER(surname) = ?', [mb_strtolower($lastname)])
+            ->whereNull('is_delete')->orWhere('is_delete', 0)
             ->first();
 
         if ($candidate) {
@@ -286,6 +287,7 @@ class Member extends Model
                     $q->orWhere('name', 'LIKE', "$c1%");
                 }
             })
+            ->whereNull('is_delete')->orWhere('is_delete', 0)
             ->get();
 
         return $candidates->filter(function ($m) use ($first, $last, $day, $month, $year) {

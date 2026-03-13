@@ -181,7 +181,7 @@
                 if (isViewingDeleted) {
                     $(this).text('กลับไปดูรายชื่อปกติ');
                     $(this).removeClass('btn-warning').addClass('btn-secondary');
-                    $('#member_table thead th:last-child').text('กู้คืน');
+                    $('#member_table thead th:last-child').text('คืน');
                 } else {
                     $(this).text('เปิดดูรายชื่อที่ถูกลบ');
                     $(this).removeClass('btn-secondary').addClass('btn-warning');
