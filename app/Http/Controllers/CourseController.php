@@ -314,7 +314,9 @@ class CourseController extends Controller
             ->join('applies as a', 'a.member_id', '=', 'm.id')
             ->join('courses as c', 'c.id', '=', 'a.course_id')
             ->where('a.course_id', $course_id)
-            ->whereNull('m.is_delete')->orWhere('m.is_delete', 0)
+            ->where(function ($q) {
+                $q->whereNull('m.is_delete')->orWhere('m.is_delete', 0);
+            })
 
             ->orderByRaw("DATE_FORMAT(a.created_at, '%Y-%m-%d %H:%i:%s')");
 
@@ -752,7 +754,9 @@ class CourseController extends Controller
         //        }
 
         $members = Member::select("id as i", "name as n", "surname as s", "phone_slug as p")
-            ->whereNull('is_delete')->orWhere('is_delete', 0)
+            ->where(function ($q) {
+                $q->whereNull('is_delete')->orWhere('is_delete', 0);
+            })
             ->get();
         return view('admin.courser_admin_member', ['members' => $members]);
     }
@@ -818,7 +822,9 @@ class CourseController extends Controller
         $now = Carbon::now();
         $course = Course::where("id", $course)->where("date_start", ">=", $now)->first();
         $member = Member::where('name', $name)->where('surname', $lastname)->where('birthdate', $birthDate)
-            ->whereNull('is_delete')->orWhere('is_delete', 0)
+            ->where(function ($q) {
+                $q->whereNull('is_delete')->orWhere('is_delete', 0);
+            })
             ->first();
 
 

@@ -903,7 +903,9 @@ class GoogleSheetController extends Controller
                     ", ['%' . $phone . '%']);
                 }
             })
-            ->whereNull('is_delete')->orWhere('is_delete', 0)
+            ->where(function ($q) {
+                $q->whereNull('is_delete')->orWhere('is_delete', 0);
+            })
             ->orderByDesc('updated_at')
             ->limit(30)
             ->get()
