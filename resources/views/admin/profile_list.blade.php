@@ -1,10 +1,14 @@
 @extends('layouts.master')
 
 @section('content')
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <div class="container-lg px-0">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h1>{{ $title ?? __('messages.applicant_list') }}</h1>
-            <a href="{{ route('member.create') }}" class="btn btn-primary">{{ __('messages.add_applicant') }}</a>
+            <div>
+                <button id="toggleDeletedBtn" class="btn btn-warning me-2">เปิดดูรายชื่อที่ถูกลบ</button>
+                <a href="{{ route('member.create') }}" class="btn btn-primary">{{ __('messages.add_applicant') }}</a>
+            </div>
         </div>
         <table class="table" id="member_table">
             <thead>
@@ -21,9 +25,10 @@
                     {{--                <th> จังหวัด </th> --}}
                     {{-- Hidden column for phone slug (index 9) --}}
                     <th style="display: none"> phone </th>
-                    <th style="text-align: center">{{ __('messages.edit_info') }}</th>
-                    <th style="text-align: center">{{ __('messages.register_course') }}</th>
-                    <th style="text-align: center">{{ __('messages.history') }}</th>
+                    <th style="text-align: center">แก้ไข</th>
+                    <th style="text-align: center">สมัคร</th>
+                    <th style="text-align: center">ประวัติ</th>
+                    <th style="text-align: center">ลบ</th>
                 </tr>
             </thead>
             <tbody>
@@ -38,6 +43,56 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script>
 
     <script>
+        var isViewingDeleted = false;
+
+        function deleteMember(id, name) {
+            if (confirm("คุณแน่ใจที่จะลบ " + name + " หรือไม่?")) {
+                $.ajax({
+                    url: '/admin/member/soft-delete/' + id,
+                    type: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            alert(response.message);
+                            $('#member_table').DataTable().ajax.reload(null, false);
+                        } else {
+                            alert('ไม่สามารถลบได้');
+                        }
+                    },
+                    error: function(err) {
+                        console.error('Error deleting member', err);
+                        alert('เกิดข้อผิดพลาดในการเชื่อมต่อกับเซิร์ฟเวอร์');
+                    }
+                });
+            }
+        }
+
+        function restoreMember(id, name) {
+            if (confirm("คุณแน่ใจที่จะกู้คืนสมาชิก " + name + " หรือไม่?")) {
+                $.ajax({
+                    url: '/admin/member/restore/' + id,
+                    type: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            alert(response.message);
+                            $('#member_table').DataTable().ajax.reload(null, false);
+                        } else {
+                            alert('ไม่สามารถกู้คืนได้');
+                        }
+                    },
+                    error: function(err) {
+                        console.error('Error restoring member', err);
+                        alert('เกิดข้อผิดพลาดในการเชื่อมต่อกับเซิร์ฟเวอร์');
+                    }
+                });
+            }
+        }
+
         $(document).ready(function() {
             var table = $('#member_table').DataTable({
                 processing: true,
@@ -45,8 +100,7 @@
                 ajax: {
                     url: "{{ route('admin.members.ajax') }}", // Ensure this route exists
                     data: function(d) {
-                        // Add custom search parameter if needed
-                        // DataTables sends 'search[value]' automatically
+                        d.show_deleted = isViewingDeleted ? 1 : 0;
                     }
                 },
                 columns: [{
@@ -96,6 +150,11 @@
                         orderable: false,
                         searchable: false
                     }, // History Action
+                    {
+                        data: 13,
+                        orderable: false,
+                        searchable: false
+                    }, // Delete Action
                 ],
                 order: [
                     [0, 'desc']
@@ -115,6 +174,20 @@
                         previous: "ก่อนหน้า"
                     }
                 }
+            });
+
+            $('#toggleDeletedBtn').click(function() {
+                isViewingDeleted = !isViewingDeleted;
+                if (isViewingDeleted) {
+                    $(this).text('กลับไปดูรายชื่อปกติ');
+                    $(this).removeClass('btn-warning').addClass('btn-secondary');
+                    $('#member_table thead th:last-child').text('กู้คืน');
+                } else {
+                    $(this).text('เปิดดูรายชื่อที่ถูกลบ');
+                    $(this).removeClass('btn-secondary').addClass('btn-warning');
+                    $('#member_table thead th:last-child').text('ลบ');
+                }
+                table.ajax.reload();
             });
         });
     </script>

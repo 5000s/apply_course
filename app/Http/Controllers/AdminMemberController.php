@@ -33,6 +33,16 @@ class AdminMemberController extends Controller
         // Base Query
         $query = Member::query()->where("surname", "!=", "")->where("name", "!=", "");
 
+        // Soft delete toggle
+        $showDeleted = $request->input('show_deleted', 0);
+        if ($showDeleted == 1) {
+            $query->where('is_delete', 1);
+        } else {
+            $query->where(function ($q) {
+                $q->whereNull('is_delete')->orWhere('is_delete', 0);
+            });
+        }
+
         // Total Records (before filtering)
         $totalRecords = $query->count();
 
@@ -114,6 +124,9 @@ class AdminMemberController extends Controller
                 '<div style="text-align: center"><a target="_blank" href="' . $editUrl . '" class="btn btn-secondary">' . __('messages.edit') . '</a></div>',
                 '<div style="text-align: center"><a target="_blank" href="' . $registerUrl . '" class="btn btn-secondary">' . __('messages.register') . '</a></div>',
                 '<div style="text-align: center"><a target="_blank" href="' . $historyUrl . '" class="btn btn-secondary">' . __('messages.history') . '</a></div>',
+                $showDeleted == 1
+                    ? '<div style="text-align: center"><a href="javascript:void(0)" onclick="restoreMember(' . $member->id . ', \'' . addslashes($member->name . ' ' . $member->surname) . '\');" class="btn btn-success"> คืน </a></div>'
+                    : '<div style="text-align: center"><a href="javascript:void(0)" onclick="deleteMember(' . $member->id . ', \'' . addslashes($member->name . ' ' . $member->surname) . '\');" class="btn btn-danger"> ลบ </a></div>',
             ];
         }
 
@@ -242,6 +255,32 @@ class AdminMemberController extends Controller
             'success' => true,
             'is_solve' => $case->is_solve,
             'message' => 'อัพเดทสถานะสำเร็จ'
+        ]);
+    }
+
+    public function softDelete(Request $request, $id)
+    {
+        $member = Member::findOrFail($id);
+        $member->is_delete = 1;
+        $member->deleted_at = now();
+        $member->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'ลบสมาชิกเรียบร้อยแล้ว'
+        ]);
+    }
+
+    public function restoreMember(Request $request, $id)
+    {
+        $member = Member::findOrFail($id);
+        $member->is_delete = 0;
+        $member->deleted_at = null;
+        $member->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'กู้คืนสมาชิกเรียบร้อยแล้ว'
         ]);
     }
 
