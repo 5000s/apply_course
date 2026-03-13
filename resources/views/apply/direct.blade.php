@@ -102,6 +102,8 @@
                                         'js_not_found_header' => 'ไม่พบข้อมูลเดิม',
                                         'js_new_member_msg' =>
                                             '<u> หากท่านเป็นสมาชิกใหม่ </u> สามารถกดสมัครได้ทันที <br><u> หากท่านเป็นศิษย์เก่า </u> แต่หาข้อมูลไม่พบ กรุณากดปุ่ม',
+                                        'js_new_member_msg_2' =>
+                                            '<u> หากท่านเป็นสมาชิกใหม่ </u> สามารถกด "ฉันเป็นผู้สมัครใหม่" เพื่อสมัครได้ทันที <br><u> หากท่านเป็นศิษย์เก่า </u> แต่หาข้อมูลไม่พบ กรุณากดปุ่ม',
                                         'js_btn_not_found' => 'แจ้งไม่พบข้อมูล',
                                         'js_found_header' => 'พบข้อมูลที่อาจเป็นท่าน :count รายการ',
                                         'js_vipassana' => 'ศิษย์วิปัสสนา',
@@ -179,6 +181,8 @@
                                         'js_not_found_header' => 'No existing data found',
                                         'js_new_member_msg' =>
                                             '<u>If you are a new member</u>, you can apply immediately. <br><u>If you are an old student</u> but cannot find data, please click',
+                                        'js_new_member_msg_2' =>
+                                            '<u>If you are a new member</u>, you can click "I am a new applicant" to apply immediately. <br><u>If you are an old student</u> but cannot find data, please click',
                                         'js_btn_not_found' => 'Report Not Found',
                                         'js_found_header' => 'Found :count possible matches',
                                         'js_vipassana' => 'Vipassana Student',
@@ -576,7 +580,7 @@
                         </ul>
                     </div>
 
-                    {{-- <form id="notFoundForm">
+                    <form id="notFoundForm">
                         <div class="mb-3">
                             <label for="modal-phone" class="form-label">{{ $txt['modal_phone'] }} <span
                                     class="text-danger">*</span></label>
@@ -586,7 +590,7 @@
                             <label for="modal-email" class="form-label">{{ $txt['modal_email'] }}</label>
                             <input type="email" class="form-control" id="modal-email" placeholder="name@example.com">
                         </div>
-                    </form> --}}
+                    </form>
                 </div>
                 <div class="modal-footer" id="notFoundModalFooter">
                     <button type="button" class="btn btn-secondary"
@@ -789,7 +793,8 @@
                                                 <h5 class="mb-1">${m.name} ${m.surname} ${TRANS.js_age_format.replace(':age', m.age_years)}</h5>
                                                 <small>${TRANS.status_map[m.status] || m.status}</small>
                                             </div>
-                                         </button>`;
+                                         </button>
+                                         `;
                             });
 
                             html += `<button type="button" class="list-group-item list-group-item-action list-group-item-light fw-bold text-primary" onclick="selectNewMember()">
@@ -799,6 +804,17 @@
                             html += `</div></div>`;
                             html +=
                                 `<div class="mt-2 text-muted small">${TRANS.js_select_guide}</div>`;
+
+                            html += `<div class="alert alert-success d-flex align-items-center">
+                                        <i class="bi bi-person-check-fill fs-3 me-3"></i>
+                                        <div>
+            
+                                           ${TRANS.js_new_member_msg_2}
+                                           <button type="button" class="btn btn-primary" onclick="showNotFoundModal()">${TRANS.js_btn_not_found}</button>
+
+                                        </div>
+                                    </div>`;
+
                         }
 
                         $('#search-result-area').html(html);
@@ -806,7 +822,9 @@
                     error: function(err) {
                         console.error(err);
                         $('#search-result-area').html(
-                            `<div class="alert alert-danger">${TRANS.js_error_check}</div>`
+                            ` < div class = "alert alert-danger" > $ {
+                                TRANS.js_error_check
+                            } < /div>`
                         );
                     }
                 });
@@ -817,27 +835,27 @@
             $('#member_id').val(id);
             // Visual feedback
             $('#search-result-area').html(`<div class="alert alert-success">
-                                            <i class="bi bi-check-circle-fill"></i> ${TRANS.js_selected.replace(':name', name).replace(':surname', surname).replace(':age', age)}
-                                           </div>`);
+                                                <i class="bi bi-check-circle-fill"></i> ${TRANS.js_selected.replace(':name', name).replace(':surname', surname).replace(':age', age)}
+                                               </div>`);
             if (window.setMemberChecked) window.setMemberChecked(true);
         }
 
         function selectNewMember() {
             $('#member_id').val('');
             $('#search-result-area').html(`<div class="alert alert-success">
-                                            <i class="bi bi-check-circle-fill"></i> ${TRANS.js_selected_new}
-                                           </div>`);
+                                                <i class="bi bi-check-circle-fill"></i> ${TRANS.js_selected_new}
+                                               </div>`);
             if (window.setMemberChecked) window.setMemberChecked(true);
         }
 
         function showNotFoundModal() {
             // Reset Footer
             $('#notFoundModalFooter').html(`
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">${TRANS.modal_cancel}</button>
-                <button type="button" class="btn btn-primary" onclick="submitNotFoundReport()">
-                    ${TRANS.modal_submit}
-                </button>
-            `);
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">${TRANS.modal_cancel}</button>
+                    <button type="button" class="btn btn-primary" onclick="submitNotFoundReport()">
+                        ${TRANS.modal_submit}
+                    </button>
+                `);
 
             // ดึงค่าจากฟอร์มหลัก
             let gender = $('#gender').val();
@@ -846,23 +864,32 @@
             let birthDate = $('#birth_date').val();
             // let phone = $('#phone').val();
 
+            let displayDob = birthDate;
+            if (birthDate) {
+                let parts = birthDate.split('-');
+                if (parts.length === 3) {
+                    let yearBE = parseInt(parts[0], 10) + 543;
+                    displayDob = parts[2] + '/' + parts[1] + '/' + yearBE;
+                }
+            }
+
             // แสดงใน Modal
             $('#modal-name').text(firstName + ' ' + lastName);
             $('#modal-gender').text(gender);
-            $('#modal-dob').text(birthDate);
+            $('#modal-dob').text(displayDob);
             // $('#modal-phone').val(phone); // Pre-fill phone
 
             $('#notFoundModal').modal('show');
         }
 
         function submitNotFoundReport() {
-            // let phone = $('#modal-phone').val();
-            // let email = $('#modal-email').val();
+            let phone = $('#modal-phone').val();
+            let email = $('#modal-email').val();
 
-            // if (!phone) {
-            //     alert(TRANS.modal_phone_req);
-            //     return;
-            // }
+            if (!phone) {
+                alert(TRANS.modal_phone_req);
+                return;
+            }
 
             // Disable button
             let btn = $('#notFoundModal .btn-primary');
@@ -875,8 +902,8 @@
                 last_name: $('input[name="last_name"]').val(),
                 birth_date: $('#birth_date').val(),
                 lang: $('#lang').val(),
-                // phone: "",
-                // email: "",
+                phone: phone,
+                email: email,
             };
 
             // Fetch location data
@@ -906,14 +933,14 @@
                 data: data,
                 success: function(res) {
                     $('#notFoundModalFooter').html(`
-                        <div class="d-flex flex-column align-items-center w-100">
-                            <span class="text-success fw-bold mb-2">
-                                <i class="bi bi-check-circle-fill me-1"></i> ${TRANS.modal_success}
-                            </span>
-                            <small class="text-muted mb-3">${TRANS.modal_contact_soon}</small>
-                            <button type="button" class="btn btn-secondary w-100" data-bs-dismiss="modal">${TRANS.modal_close}</button>
-                        </div>
-                    `);
+                            <div class="d-flex flex-column align-items-center w-100">
+                                <span class="text-success fw-bold mb-2">
+                                    <i class="bi bi-check-circle-fill me-1"></i> ${TRANS.modal_success}
+                                </span>
+                                <small class="text-muted mb-3">${TRANS.modal_contact_soon}</small>
+                                <button type="button" class="btn btn-secondary w-100" data-bs-dismiss="modal">${TRANS.modal_close}</button>
+                            </div>
+                        `);
                 },
                 error: function(err) {
                     console.error(err);

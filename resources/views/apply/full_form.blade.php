@@ -548,6 +548,7 @@
                 form.addEventListener('submit', function(e) {
                     const lang = "{{ $lang ?? 'th' }}"; // 'th' or 'en'
                     let missingFields = [];
+                    let invalidFields = [];
 
                     // Define field names for display
                     const fieldNames = {
@@ -578,19 +579,46 @@
                     fields.forEach(field => {
                         const input = form.querySelector(`[name="${field}"]`);
                         if (input && isVisible(input)) {
-                            if (!input.value.trim()) {
+                            const val = input.value.trim();
+                            if (!val) {
                                 missingFields.push(currentNames[field]);
+                            } else {
+                                if (field === 'email') {
+                                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                                    if (!emailRegex.test(val)) {
+                                        invalidFields.push(currentNames[field]);
+                                    }
+                                }
+                                if (field === 'phone') {
+                                    const phoneVal = val.replace(/[-\s]/g, '');
+                                    const phoneRegex = /^\d{9,10}$/; // 9-10 digits without space/-
+                                    if (!phoneRegex.test(phoneVal)) {
+                                        invalidFields.push(currentNames[field]);
+                                    }
+                                }
                             }
                         }
                     });
 
-                    if (missingFields.length > 0) {
+                    if (missingFields.length > 0 || invalidFields.length > 0) {
                         e.preventDefault(); // Stop submission
 
-                        let title = lang === 'en' ? 'Incomplete Information' : 'ข้อมูลไม่ครบถ้วน';
-                        let text = lang === 'en' ?
-                            'Please fill in the following required fields:\n' + missingFields.join(', ') :
-                            'กรุณากรอกข้อมูลดังต่อไปนี้ให้ครบถ้วน:\n' + missingFields.join(', ');
+                        let title = lang === 'en' ? 'Information Error' : 'ข้อมูลไม่ถูกต้อง';
+
+                        let textMsgs = [];
+                        if (missingFields.length > 0) {
+                            textMsgs.push((lang === 'en' ?
+                                'Please fill in the following required fields:\n' :
+                                'กรุณากรอกข้อมูลดังต่อไปนี้ให้ครบถ้วน:\n') + missingFields.join(
+                                ', '));
+                        }
+                        if (invalidFields.length > 0) {
+                            textMsgs.push((lang === 'en' ?
+                                'Please enter correct format for:\n' :
+                                'กรุณากรอกข้อมูลให้ถูกต้องสำหรับ:\n') + invalidFields.join(', '));
+                        }
+
+                        let text = textMsgs.join('\n\n');
                         let confirmBtn = lang === 'en' ? 'OK' : 'ตกลง';
 
                         Swal.fire({

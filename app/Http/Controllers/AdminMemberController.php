@@ -221,6 +221,30 @@ class AdminMemberController extends Controller
         return view('admin.senior_member_list', ['members' => $members, 'title' => 'ตารางศิษย์อาวุโส (senior level)']);
     }
 
+    public function reportCases()
+    {
+        // Fetch all report cases. Ordered by latest first.
+        $cases = \App\Models\ReportCase::orderBy('created_at', 'desc')->get();
+        return view('admin.report_case_list', [
+            'cases' => $cases,
+            'title' => 'ตารางเรื่องไม่พบสมาชิก (Report Cases)'
+        ]);
+    }
+
+    public function toggleReportCaseSolve(Request $request)
+    {
+        $id = $request->input('id');
+        $case = \App\Models\ReportCase::findOrFail($id);
+        $case->is_solve = $request->input('is_solve');
+        $case->save();
+
+        return response()->json([
+            'success' => true,
+            'is_solve' => $case->is_solve,
+            'message' => 'อัพเดทสถานะสำเร็จ'
+        ]);
+    }
+
     public function editSenior($id)
     {
         $member = Member::findOrFail($id);

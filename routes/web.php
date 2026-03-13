@@ -111,6 +111,8 @@ Route::prefix('admin')->middleware('auth', 'admin')->group(function () {
     Route::put('member/senior/{id}', [AdminMemberController::class, 'updateSenior'])->name("admin.members.senior.update");
     Route::get('member/type', [AdminMemberController::class, 'getMemberType'])->name("admin.membersType");
     Route::get('member/course', [AdminMemberController::class, 'adminMemberCourse']);
+    Route::get('report-cases', [AdminMemberController::class, 'reportCases'])->name('admin.members.report_cases');
+    Route::post('report-cases/toggle', [AdminMemberController::class, 'toggleReportCaseSolve'])->name('admin.members.report_cases.toggle');
 
 
     Route::get('gap/course/{course_id}', [CourseController::class, 'calculateGap']);

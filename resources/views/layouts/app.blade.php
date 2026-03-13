@@ -89,6 +89,19 @@
                                     <li>
                                         <a class="dropdown-item" href="{{ route('admin.members') }}">รายการสมาชิก</a>
                                     </li>
+                                    @php
+                                        $reportCaseCount = \App\Models\ReportCase::whereNull('is_solve')
+                                            ->orWhere('is_solve', 0)
+                                            ->count();
+                                    @endphp
+                                    <li>
+                                        <a class="dropdown-item" href="{{ route('admin.members.report_cases') }}">
+                                            เรื่องไม่พบสมาชิก @if ($reportCaseCount > 0)
+                                                <span class="badge bg-danger ms-1">{{ $reportCaseCount }}</span>
+                                            @else({{ $reportCaseCount }})
+                                            @endif
+                                        </a>
+                                    </li>
                                     <li>
                                         <a class="dropdown-item" href="{{ route('teams.index') }}">จัดการทีม</a>
                                     </li>
