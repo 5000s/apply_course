@@ -363,7 +363,7 @@ class CourseApplyController extends Controller
                         $q->whereIn('category_id', $passVipassanaSaraburyCourseCategoryID);
                         $q->where('location_id', 1);
                     })
-                    ->where('state', '!=', 'ยกเลิกสมัคร')
+                    ->where('state', 'ผ่านการอบรม')
                     ->get();
 
                 $date_start_limit = Carbon::parse($course->date_start)->subDays(365);
