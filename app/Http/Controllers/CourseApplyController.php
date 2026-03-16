@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Auth;
 use function Symfony\Component\String\b;
 use App\Models\ReportCase;
 use App\Models\CourseLocationLimit;
+use App\Models\Shelter;
 
 class CourseApplyController extends Controller
 {
@@ -400,8 +401,18 @@ class CourseApplyController extends Controller
                         $is_range_course_more_than_4 = false;
                     }
                 }
+                $is_special_shelter = false;
 
-                if (!$is_range_course_more_than_4) {
+                $shelter = Shelter::where('member_id', $member->id)->first();
+                if ($shelter) {
+                    $is_special_shelter = true;
+                }
+
+                if (!$is_range_course_more_than_4 && $is_special_shelter == false) {
+
+
+
+
                     $message_eng =  "You have registered for less than 4 consecutive Vipassana meditation courses. Please take a break of at least 4 courses.";
                     $message_eng .= "<br>If you need to attend the course, please contact the staff.";
 
