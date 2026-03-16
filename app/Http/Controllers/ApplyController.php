@@ -646,4 +646,32 @@ class ApplyController extends Controller
             return response()->json(['status' => 'error']);
         }
     }
+
+    public function updateShelter(Request $request, int $apply_id)
+    {
+        $apply = Apply::find($apply_id);
+
+        if ($apply) {
+            $shelterType = $request->input('shelter', 'ทั่วไป');
+            $roomNumber = $request->input('room_number');
+            $apply->shelter = $shelterType;
+
+            if ($shelterType === 'กุฏิพิเศษ' && !empty($roomNumber)) {
+                $prefix = "กุฏิ" . $roomNumber . " ";
+                if (strpos((string)$apply->remark, $prefix) === false) {
+                    $apply->remark = $prefix . $apply->remark;
+                }
+            }
+
+            $apply->save();
+            return response()->json([
+                'status' => 'ok',
+                'shelter' => $apply->shelter,
+                'room_number' => $roomNumber,
+                'remark' => $apply->remark
+            ]);
+        } else {
+            return response()->json(['status' => 'error']);
+        }
+    }
 }

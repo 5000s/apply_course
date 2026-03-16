@@ -177,7 +177,8 @@
                         <td class="text-center eprint" style="display: none;">โทร</td>
                         <td class="text-center " style="display: none;">อีเมล</td>
                         {{-- <td class="text-center eprint">role</td> --}}
-                        <td class="text-center eprint">ที่พัก</td>
+                        <td class="text-center">ที่พัก</td>
+                        <td class="text-center eprint" style="display: none;">ที่พัก</td>
                         <td class="text-center " style="width: 145px;">ติดต่อ</td>
                         <td class="text-center eprint" style="width: 20px;">ห่างคอร์ส<br>(เดือน)</td>
                         <td class="text-center " style="width: 200px;">คอร์สล่าสุด</td>
@@ -274,10 +275,21 @@
 
                             {{-- <td class="text-center">{{ $member->role }}</td> --}}
 
-                            <td class="text-center">
-                                {{ $member->shelter }} @if ($member->shelter == 'กุฏิพิเศษ')
-                                    ({{ $member->shelter_number }})
-                                @endif
+                            <td class="text-center relative px-2 shelter-col">
+                                <span class="shelter-display">
+                                    {{ $member->shelter }}
+
+                                </span>
+                                <button class="btn btn-sm btn-circle btn-outline absolute top-1 right-1 edit-shelter"
+                                    data-apply-id="{{ $member->apply_id }}" data-shelter="{{ $member->shelter }}"
+                                    title="แก้ไขที่พัก">✏️</button>
+                            </td>
+
+                            <td class="text-left align-center relative px-2 shelter-col" style="display: none;"
+                                data-order="{{ $member->shelter ?? 0 }}">
+                                <div class="remark-display truncate pr-8 shelter-display">
+                                    {{ $member->shelter }}
+                                </div>
                             </td>
 
 
@@ -464,6 +476,39 @@
         </div>
     </div>
 
+    {{-- Modal: Edit Shelter --}}
+    <input type="checkbox" id="modal-shelter" class="modal-toggle" />
+    <div class="modal">
+        <div class="modal-box max-w-md p-4 relative">
+            <label for="modal-shelter" class="btn btn-sm btn-circle absolute right-2 top-2">✕</label>
+            <h3 class="text-xl font-medium mb-2">แก้ไขที่พัก</h3>
+
+            <form id="form-shelter">
+                @csrf
+                <input type="hidden" name="apply_id" id="shelter-apply-id" />
+
+                <div class="form-control w-full mb-3">
+                    <label class="label"><span class="label-text">ประเภทที่พัก</span></label>
+                    <select id="shelter-type" name="shelter" class="select select-bordered w-full">
+                        <option value="ทั่วไป">ทั่วไป</option>
+                        <option value="กุฏิพิเศษ">กุฏิพิเศษ</option>
+                    </select>
+                </div>
+
+                <div class="form-control w-full mb-4" id="shelter-room-container" style="display: none;">
+                    <label class="label"><span class="label-text">หมายเลขห้อง (กุฏิ)</span></label>
+                    <input type="text" id="shelter-room-number" name="room_number"
+                        class="input input-bordered w-full" placeholder="ตัวอย่าง: 1, 2, 3..." />
+                </div>
+
+                <div class="flex justify-end space-x-2 border-t pt-4 mt-2">
+                    <label for="modal-shelter" class="btn btn-ghost btn-sm">ยกเลิก</label>
+                    <button type="submit" class="btn btn-primary btn-sm">บันทึก</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     {{-- Modal: Edit Join / Leave Date --}}
     <input type="checkbox" id="modal-date-edit" class="modal-toggle" />
     <div class="modal">
@@ -612,7 +657,7 @@
                 $('#modal-remark').prop('checked', true);
             });
 
-            // 3) AJAX submit
+            // 3) AJAX submit remark
             $('#form-remark').on('submit', function(e) {
                 e.preventDefault();
 
@@ -625,12 +670,18 @@
                     })
                     .done(function() {
                         // locate the row and its <td>
-                        var $btn = $('#myTable button[data-apply-id="' + applyId + '"]'),
+                        var $btn = $('#myTable button[data-apply-id="' + applyId + '"].edit-remark'),
                             $tr = $btn.closest('tr'),
                             $td = $tr.children('td').eq(remarkColIndex);
 
                         // 1️⃣ update the displayed text
-                        $td.find('.remark-display').text(newVal);
+                        var $oldDisp = $td.find('span[data-course-start]');
+                        if ($oldDisp.length) {
+                            var labelHtml = $oldDisp.find('label')[0]?.outerHTML || '';
+                            $oldDisp.html(newVal + ' ' + labelHtml);
+                        } else {
+                            $td.find('.remark-display').text(newVal);
+                        }
 
                         // 2️⃣ update the data-order (for sorting/export)
                         $td.attr('data-order', newVal === '—' ? 0 : newVal);
@@ -647,6 +698,82 @@
                     .fail(function(xhr) {
                         alert('บันทึกไม่สำเร็จ: ' + xhr.responseText);
                     });
+            });
+
+            // --- SHELTER EDIT LOGIC ---
+            $('#myTable').on('click', '.edit-shelter', function() {
+                var btn = $(this);
+                $('#shelter-apply-id').val(btn.data('apply-id'));
+
+                var shelter = btn.data('shelter') || 'ทั่วไป';
+                if (shelter !== 'กุฏิพิเศษ') shelter = 'ทั่วไป';
+
+                $('#shelter-type').val(shelter).trigger('change');
+                $('#shelter-room-number').val('');
+
+                $('#modal-shelter').prop('checked', true);
+            });
+
+            $('#shelter-type').on('change', function() {
+                if ($(this).val() === 'กุฏิพิเศษ') {
+                    $('#shelter-room-container').show();
+                } else {
+                    $('#shelter-room-container').hide();
+                }
+            });
+
+            $('#form-shelter').on('submit', function(e) {
+                e.preventDefault();
+
+                var applyId = $('#shelter-apply-id').val();
+                var shelterType = $('#shelter-type').val();
+                var roomNumber = $('#shelter-room-number').val().trim();
+
+                $.post('/admin/apply/' + applyId + '/shelter', {
+                    _token: $('meta[name="csrf-token"]').attr('content'),
+                    shelter: shelterType,
+                    room_number: roomNumber
+                }).done(function(res) {
+                    if (res.status === 'ok') {
+                        var $btn = $('#myTable button[data-apply-id="' + applyId +
+                            '"].edit-shelter');
+                        var $tr = $btn.closest('tr');
+
+                        var newDisplayText = res.shelter;
+                        if (res.shelter === 'กุฏิพิเศษ') {
+                            //reload page
+                            location.reload();
+                        }
+
+                        $tr.find('.shelter-display').text(newDisplayText);
+                        $btn.data('shelter', res.shelter);
+
+                        // If remark was updated, update it in DOM too
+                        if (res.remark) {
+                            var $remarkBtn = $('#myTable button[data-apply-id="' + applyId +
+                                '"].edit-remark');
+                            $remarkBtn.data('value', res.remark);
+
+                            var $td = $tr.children('td').eq(remarkColIndex);
+                            var $oldDisp = $td.find('span[data-course-start]');
+                            if ($oldDisp.length) {
+                                var labelHtml = $oldDisp.find('label')[0]?.outerHTML || '';
+                                $oldDisp.html(res.remark + ' ' + labelHtml);
+                            } else {
+                                $td.find('.remark-display').text(res.remark);
+                            }
+                            $td.attr('data-order', res.remark);
+                        }
+
+                        table.row($tr).invalidate().draw(false);
+
+                        $('#modal-shelter').prop('checked', false);
+                    } else {
+                        alert('ผิดพลาดในการบันทึกข้อมูลที่พัก');
+                    }
+                }).fail(function(xhr) {
+                    alert('บันทึกไม่สำเร็จ: ' + xhr.responseText);
+                });
             });
 
 

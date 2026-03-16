@@ -109,6 +109,9 @@
                                         <a class="dropdown-item" href="{{ route('dashboard.index') }}">สถิติ</a>
                                     </li>
                                     <li>
+                                        <a class="dropdown-item" href="{{ route('shelters.index') }}">จัดการกุฏิ</a>
+                                    </li>
+                                    <li>
                                         <a class="dropdown-item"
                                             href="{{ route('admin.import.sheet.buttons') }}">นำเข้าจาก Google Sheet</a>
                                     </li>

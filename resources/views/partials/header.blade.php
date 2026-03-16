@@ -26,6 +26,8 @@
                                         senior</a></li>
                                 <li><a class="dropdown-item" href="{{ route('admin.membersType') }}">รายการสมาชิก</a>
                                 </li>
+                                <li><a class="dropdown-item" href="{{ route('shelters.index') }}">จัดการ Shelters</a>
+                                </li>
                                 @php
                                     $reportCaseCount = \App\Models\ReportCase::whereNull('is_solve')
                                         ->orWhere('is_solve', 0)

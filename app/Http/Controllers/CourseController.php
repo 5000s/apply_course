@@ -8,6 +8,7 @@ use App\Models\Course;
 use App\Models\CourseCategory;
 use App\Models\Location;
 use App\Models\Member;
+use App\Models\Shelter;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Google\Service\Drive\Label;
@@ -273,10 +274,63 @@ class CourseController extends Controller
     }
 
 
+    public function updateShelterApply($course_id)
+    {
+
+        $course = Course::where("id", $course_id)->first();
+
+        if ($course->location_id != 1) {
+            return;
+        }
+
+        $course_category = CourseCategory::where("id", $course->category_id)->first();
+
+        if ($course_category->days == 0) {
+            return;
+        }
+
+        $applies = Apply::where("course_id", $course_id)->get();
+        if ($applies->isEmpty()) {
+            return;
+        }
+
+        // Get all member IDs for the applying users
+        $memberIds = $applies->pluck('member_id')->toArray();
+
+        // Fetch all shelters in a single query and group by member_id
+        $shelters = Shelter::whereIn("member_id", $memberIds)->get()->keyBy('member_id');
+
+        foreach ($applies as $apply) {
+            if ($shelters->has($apply->member_id)) {
+                $shelter = $shelters->get($apply->member_id);
+                $prefix = "กุฏิ" . $shelter->number . " ";
+                $needsUpdate = false;
+
+                if ($apply->shelter !== "กุฏิพิเศษ") {
+                    $apply->shelter = "กุฏิพิเศษ";
+                    $needsUpdate = true;
+                }
+
+                // Prevent appending the remark again if someone reloads the page
+                if (strpos((string)$apply->remark, $prefix) === false) {
+                    $apply->remark = $prefix . $apply->remark;
+                    $needsUpdate = true;
+                }
+
+                if ($needsUpdate) {
+                    $apply->save();
+                }
+            }
+        }
+    }
+
+
     public function courseApplyList(Request $request, $course_id)
     {
         $group = $request->input('group', "all");
         $currentCourse = Course::findOrFail($course_id);
+
+        $this->updateShelterApply($course_id);
 
         $base = DB::table('members as m')
             ->select(

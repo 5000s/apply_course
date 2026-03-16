@@ -12,6 +12,7 @@
 */
 
 use App\Http\Controllers\AdminMemberController;
+use App\Http\Controllers\SheltersController;
 use App\Http\Controllers\ApplyController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CourseApplyController;
@@ -121,6 +122,8 @@ Route::prefix('admin')->middleware('auth', 'admin')->group(function () {
 
     Route::post('/apply/{apply_id}/remark', [ApplyController::class, 'updateRemark'])
         ->name('admin.apply.remark');
+    Route::post('/apply/{apply_id}/shelter', [ApplyController::class, 'updateShelter'])
+        ->name('admin.apply.shelter');
 
 
 
@@ -140,6 +143,9 @@ Route::prefix('admin')->middleware('auth', 'admin')->group(function () {
 
 
     Route::resource('teams', TeamController::class);
+
+    Route::get('shelters/auto-set-member', [SheltersController::class, 'autoSetMemberID'])->name('shelters.autoSetMemberID');
+    Route::resource('shelters', SheltersController::class)->except(['show']);
 
     // Team-Member CRUD (all in TeamController)
     Route::prefix('teams/{team}')->name('teammembers.')->group(function () {
