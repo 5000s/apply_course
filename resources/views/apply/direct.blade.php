@@ -107,7 +107,8 @@
                                         'js_btn_not_found' => 'แจ้งไม่พบข้อมูล',
                                         'js_found_header' => 'พบข้อมูลที่อาจเป็นท่าน :count รายการ',
                                         'js_vipassana' => 'ศิษย์วิปัสสนา',
-                                        'js_new_applicant' => 'ฉันเป็นผู้สมัครใหม่',
+                                        'js_new_applicant' => 'ฉันเป็นผู้สมัครใหม่ (ไม่เคยสมัครมาก่อน)',
+                                        'js_click_to_select' => 'คลิกเพื่อเลือก',
                                         'js_select_guide' =>
                                             'โปรดเลือกชื่อของท่าน หรือเลือก "ฉันผู้สมัครใหม่" แล้วกดปุ่มยืนยันด้านล่าง',
                                         'js_error_check' => 'เกิดข้อผิดพลาดในการตรวจสอบข้อมูล',
@@ -186,7 +187,8 @@
                                         'js_btn_not_found' => 'Report Not Found',
                                         'js_found_header' => 'Found :count possible matches',
                                         'js_vipassana' => 'Vipassana Student',
-                                        'js_new_applicant' => 'I am a new applicant',
+                                        'js_new_applicant' => 'I am a new applicant (never applied before)',
+                                        'js_click_to_select' => 'Click to select',
                                         'js_select_guide' =>
                                             'Please select your name or "I am a new applicant" then click confirm below.',
                                         'js_error_check' => 'Error checking information.',
@@ -781,29 +783,47 @@
 
                         } else {
                             // count >= 1 (Found 1 or more)
-                            html = `<div class="card border-info">
-                                        <div class="card-header bg-info text-white">
+                            html = `<div class="card border-info shadow-sm mb-4">
+                                        <div class="card-header bg-info text-white fw-bold py-2 fs-5">
                                             ${TRANS.js_found_header.replace(':count', res.count)}
+                                        </div>
+                                        <div class="card-body bg-white border-bottom p-3 text-muted">
+                                            ${TRANS.js_select_guide}
                                         </div>
                                         <div class="list-group list-group-flush">`;
 
                             res.members.forEach(m => {
-                                html += `<button type="button" class="list-group-item list-group-item-action" onclick="selectMember(${m.id}, '${m.name}', '${m.surname}', ${m.age_years})">
-                                            <div class="d-flex w-100 justify-content-between">
-                                                <h5 class="mb-1">${m.name} ${m.surname} ${TRANS.js_age_format.replace(':age', m.age_years)}</h5>
-                                                <small>${TRANS.status_map[m.status] || m.status}</small>
+                                html += `<button type="button" class="list-group-item list-group-item-action py-3 px-3" onclick="selectMember(${m.id}, '${m.name}', '${m.surname}', ${m.age_years})">
+                                            <div class="d-flex w-100 justify-content-between align-items-center">
+                                                <div>
+                                                    <h5 class="mb-1 text-primary fs-5">${m.name} ${m.surname} <span class="fw-normal">${TRANS.js_age_format.replace(':age', m.age_years)}</span></h5>
+                                                    <div class="text-muted small">${TRANS.status_map[m.status] || m.status}</div>
+                                                </div>
+                                                <div class="text-end ms-3">
+                                                    <span class="btn btn-primary rounded-pill px-3 py-1 fw-bold shadow-sm">
+                                                        ${TRANS.js_click_to_select}
+                                                    </span>
+                                                </div>
                                             </div>
                                          </button>
                                          `;
                             });
 
-                            html += `<button type="button" class="list-group-item list-group-item-action list-group-item-light fw-bold text-primary" onclick="selectNewMember()">
-                                        <i class="bi bi-plus-circle"></i> ${TRANS.js_new_applicant}
+                            html += `<button type="button" class="list-group-item list-group-item-action list-group-item-light bg-light py-3 px-3 mt-1" style="border-top: 1px solid #dee2e6;" onclick="selectNewMember()">
+                                        <div class="d-flex w-100 justify-content-between align-items-center">
+                                            <div>
+                                                <h5 class="mb-0 text-primary fs-5">${TRANS.js_new_applicant}</h5>
+                                            </div>
+                                            <div class="text-end ms-3">
+                                                <span class="btn btn-primary rounded-pill px-3 py-1 fw-bold shadow-sm">
+                                                    ${TRANS.js_click_to_select}
+                                                </span>
+                                            </div>
+                                        </div>
                                      </button>`;
 
                             html += `</div></div>`;
-                            html +=
-                                `<div class="mt-2 text-muted small">${TRANS.js_select_guide}</div>`;
+
 
                             html += `<div class="alert alert-success d-flex align-items-center">
                                         <i class="bi bi-person-check-fill fs-3 me-3"></i>
