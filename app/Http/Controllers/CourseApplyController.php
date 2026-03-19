@@ -356,14 +356,12 @@ class CourseApplyController extends Controller
             if ($course->location_id == 1) {
                 $passVipassanaSaraburyCourseCategoryID = [1, 3, 4, 8, 12, 15, 16];
 
-
-
-
                 $vipassanaSaraburyCoursesApply = Apply::where('member_id', $member->id)
                     ->whereHas('course', function ($q) use ($passVipassanaSaraburyCourseCategoryID) {
                         $q->whereIn('category_id', $passVipassanaSaraburyCourseCategoryID);
                         $q->where('location_id', 1);
                     })
+                    ->where('rold', "ผู้เข้าอบรม")
                     ->where('state', 'ผ่านการอบรม')
                     ->get();
 
