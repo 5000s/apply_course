@@ -90,6 +90,7 @@ Route::prefix('admin')->middleware('auth', 'admin')->group(function () {
     Route::post('courses/save', [CourseController::class, 'courseSave'])->name("admin.courses.save");
 
     Route::put('courses/update/{course_id}', [CourseController::class, 'courseUpdate'])->name("admin.courses.update");
+    Route::delete('courses/delete/{course_id}', [CourseController::class, 'courseDelete'])->name("admin.courses.delete");
 
     Route::get('courses/applylist/{course_id}', [CourseController::class, 'courseApplyList'])->name("admin.courseList");
     Route::get('courses/applylist/{course_id}/download', [CourseController::class, 'courseApplyListDownload'])->name('admin.applylist.download');

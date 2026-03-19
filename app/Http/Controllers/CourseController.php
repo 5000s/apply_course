@@ -175,6 +175,25 @@ class CourseController extends Controller
         return   redirect()->route('admin.courses.edit', ['course_id' => $course->id])->with('success', 'Course updated successfully!');
     }
 
+    public function courseDelete($id)
+    {
+        $user = Auth::user();
+        if ($user->admin != 1 && $user->editor != 1) {
+            return back()->withErrors(['error' => 'You have no permission to delete']);
+        }
+
+        $course = Course::findOrFail($id);
+
+        $applyCount = \App\Models\Apply::where('course_id', $course->id)->count();
+        if ($applyCount > 0) {
+            return back()->withErrors(['error' => 'Cannot delete course with existing applications']);
+        }
+
+        $course->delete();
+
+        return redirect()->route('admin.courses')->with('success', 'Course deleted successfully!');
+    }
+
 
 
     public function courseList(Request $request)
