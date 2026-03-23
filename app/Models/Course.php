@@ -6,9 +6,11 @@ use App\Helper\ThaiLocal;
 use App\Services\ThaiDate;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Course extends Model
 {
+    use SoftDeletes;
     //
     protected $dates = ['date_start', 'date_end', 'listed_date'];
 

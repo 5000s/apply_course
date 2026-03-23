@@ -184,12 +184,15 @@ class CourseController extends Controller
 
         $course = Course::findOrFail($id);
 
-        $applyCount = \App\Models\Apply::where('course_id', $course->id)->count();
+        $applyCount = \App\Models\Apply::where('course_id', $course->id)->where('state', '!= ', 'ยกเลิกสมัคร')->count();
         if ($applyCount > 0) {
             return back()->withErrors(['error' => 'Cannot delete course with existing applications']);
         }
 
         $course->delete();
+
+        // delete all apply of this course
+        \App\Models\Apply::where('course_id', $course->id)->delete();
 
         return redirect()->route('admin.courses')->with('success', 'Course deleted successfully!');
     }
