@@ -252,23 +252,25 @@
                                 <button type="submit" class="btn btn-primary">
                                     {{ isset($course) ? 'Update Course' : 'Create Course' }}
                                 </button>
-                                @if (isset($course) && \App\Models\Apply::where('course_id', $course->id)->count() == 0)
+                                @if (isset($course) &&
+                                        \App\Models\Apply::where('course_id', $course->id)->where('state', '!= ', 'ยกเลิกสมัคร')->count() == 0)
                                     <button type="button" class="btn btn-danger ms-2"
                                         onclick="if(confirm('คุณต้องการลบคอร์สนี้ใช่หรือไม่?')) { document.getElementById('delete-course-form').submit(); }">
                                         Delete Course
                                     </button>
+                                @else
+                                    <p>ไม่สามารถลบคอร์สได้ เนื่องจากมีผู้สมัครแล้ว</p>
                                 @endif
                             </div>
                         </form>
 
-                        @if (\App\Models\Apply::where('course_id', $course->id)->where('state', '!= ', 'ยกเลิกสมัคร')->count() == 0)
+                        @if (isset($course) &&
+                                \App\Models\Apply::where('course_id', $course->id)->where('state', '!= ', 'ยกเลิกสมัคร')->count() == 0)
                             <form id="delete-course-form" action="{{ route('admin.courses.delete', $course->id) }}"
-                                method="POST">
+                                method="POST" style="display: none;">
                                 @csrf
                                 @method('DELETE')
                             </form>
-                        @else
-                            <p>ไม่สามารถลบคอร์สได้ เนื่องจากมีผู้สมัครแล้ว</p>
                         @endif
 
                     </div>
