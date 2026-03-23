@@ -261,8 +261,7 @@
                             </div>
                         </form>
 
-                        @if (isset($course) &&
-                                \App\Models\Apply::where('course_id', $course->id)->where('state', '!= ', 'ยกเลิกสมัคร')->count() == 0)
+                        @if (\App\Models\Apply::where('course_id', $course->id)->where('state', '!= ', 'ยกเลิกสมัคร')->count() == 0)
                             <form id="delete-course-form" action="{{ route('admin.courses.delete', $course->id) }}"
                                 method="POST">
                                 @csrf
