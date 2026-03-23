@@ -261,12 +261,15 @@
                             </div>
                         </form>
 
-                        @if (isset($course) && \App\Models\Apply::where('course_id', $course->id)->count() == 0)
+                        @if (isset($course) &&
+                                \App\Models\Apply::where('course_id', $course->id)->where('state', '!= ', 'ยกเลิกสมัคร')->count() == 0)
                             <form id="delete-course-form" action="{{ route('admin.courses.delete', $course->id) }}"
                                 method="POST" style="display: none;">
                                 @csrf
                                 @method('DELETE')
                             </form>
+                        @else
+                            <p>ไม่สามารถลบคอร์สได้ เนื่องจากมีผู้สมัครแล้ว</p>
                         @endif
 
                     </div>
