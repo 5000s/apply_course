@@ -759,7 +759,31 @@ class CourseApplyController extends Controller
 
 
 
+
         if ($full_form && !$no_update) {
+
+            //Check  Require Input are fill correct
+            // name, gender ,birthdate, email, phone 
+            $lang = $request->input('lang');
+            $messages = [
+                'name.required' => $lang == 'en' ? 'First name is required.' : 'กรุณากรอกชื่อ',
+                'surname.required' => $lang == 'en' ? 'Last name is required.' : 'กรุณากรอกนามสกุล',
+                'gender.required' => $lang == 'en' ? 'Gender is required.' : 'กรุณาเลือกเพศ',
+                'birthdate.required' => $lang == 'en' ? 'Birthdate is required.' : 'กรุณากรอกวันเกิด',
+                'email.required' => $lang == 'en' ? 'Email is required.' : 'กรุณากรอกอีเมล',
+                'email.email' => $lang == 'en' ? 'Invalid email format.' : 'รูปแบบอีเมลไม่ถูกต้อง',
+                'phone.required' => $lang == 'en' ? 'Phone number is required.' : 'กรุณากรอกเบอร์โทรศัพท์',
+                'phone.regex' => $lang == 'en' ? 'Invalid phone number format.' : 'รูปแบบเบอร์โทรศัพท์ไม่ถูกต้อง',
+            ];
+
+            $request->validate([
+                'name' => 'required|string|max:100',
+                'surname' => 'required|string|max:100',
+                'gender' => 'required|string',
+                'birthdate' => 'required|date',
+                'email' => 'required|email|max:190',
+                'phone' => ['required', 'string', 'regex:/^0[0-9]{8,9}$/'],
+            ], $messages);
 
             $member = Member::find($member_id);
             $member->gender = $request->input('gender');
