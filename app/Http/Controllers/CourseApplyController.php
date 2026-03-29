@@ -361,7 +361,7 @@ class CourseApplyController extends Controller
                         $q->whereIn('category_id', $passVipassanaSaraburyCourseCategoryID);
                         $q->where('location_id', 1);
                     })
-                    ->where('rold', "ผู้เข้าอบรม")
+                    ->where('role', "ผู้เข้าอบรม")
                     ->where('state', 'ผ่านการอบรม')
                     ->get();
 
@@ -854,7 +854,7 @@ class CourseApplyController extends Controller
 
         $isNeedConfirm = false;
 
-        if (str_contains($course->category, "วิปัสสนา")) {
+        if (str_contains($course->category, "วิปัสสนา") || $courseCategory->day >= 1) {
             $isNeedConfirm = true;
         } else {
             $courseLimit = $this->getCourseLimit($course->category_id, $location->id);

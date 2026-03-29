@@ -229,7 +229,6 @@ Route::get('/admin/members/similar', [GoogleSheetController::class, 'similar'])
 Route::post('/admin/applications/{application}/link-member', [GoogleSheetController::class, 'linkMember'])
     ->name('admin.applications.linkMember');
 
-Route::get('/send-test-email', [EmailTestController::class, 'sendTestEmail']);
 
 
 
@@ -275,3 +274,10 @@ Route::get('/search/member', [CourseApplyController::class, 'searchMember'])->na
 Route::post('/search/member/report', [CourseApplyController::class, 'reportMemberNotFound'])->name('report.member');
 
 Route::get('/cron/cancel-past-applications', [CronController::class, 'checkAndCancelPastApplications']);
+
+
+
+Route::prefix('email')->group(function () {
+    Route::get('/test1', [EmailTestController::class, 'sendTestEmail']);
+    Route::get('/test2', [EmailTestController::class, 'testEmail'])->name('testEmail');
+});
