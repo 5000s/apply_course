@@ -1145,16 +1145,17 @@ class CourseApplyController extends Controller
 
         $html = "<p>Report Case (แจ้งข้อมูลไม่พบในระบบ)</p>";
         $html .= "<p>Gender: " . $reportCase->gender . "</p>";
-        $html .= "<p>First Name: " . $reportCase->first_name . "</p>";
-        $html .= "<p>Last Name: " . $reportCase->last_name . "</p>";
-        $html .= "<p>Birth Date: " . $reportCase->birth_date . "</p>";
+        $html .= "<p>First Name: " . $reportCase->name . "</p>";
+        $html .= "<p>Last Name: " . $reportCase->surname . "</p>";
+        $html .= "<p>Birth Date: " . $reportCase->birthdate . "</p>";
         $html .= "<p>Phone: " . $reportCase->phone . "</p>";
         $html .= "<p>Email: " . $reportCase->email . "</p>";
 
-        $subject = "แจ้งข้อมูลไม่พบในระบบ (" . $reportCase->first_name . " " . $reportCase->last_name . ")";
+        $subject = "แจ้งข้อมูลไม่พบในระบบ (" . $reportCase->name . " " . $reportCase->surname . ")";
 
         $emailService = new EmailService();
-        $emailService->sendemail($html, "arttioz@gmail.com", $subject);
+        $emailTo = env('EMAIL_ADMIN');
+        $emailService->sendemail($html, $emailTo, $subject);
 
         return response()->json([
             'status' => 'success',
