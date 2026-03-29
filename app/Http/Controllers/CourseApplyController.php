@@ -785,6 +785,7 @@ class CourseApplyController extends Controller
                 'phone' => ['required', 'string', 'regex:/^0[0-9]{8,9}$/'],
             ], $messages);
 
+
             $member = Member::find($member_id);
             $member->gender = $request->input('gender');
             $member->name = $request->input('name');
