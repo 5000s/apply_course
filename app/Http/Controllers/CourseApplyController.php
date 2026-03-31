@@ -290,19 +290,23 @@ class CourseApplyController extends Controller
         }
 
         if (!$member) {
-            $member = $this->createMember($gender, $firstname, $lastname, $birth_date, $phone, $email, $code);
+            $member = $this->createMember($gender, $firstname, $lastname, $birth_date, $phone, $email, $code, true);
             $member->save();
             $member_new = true;
         } else {
             // update เบา ๆ เผื่อข้อมูลใหม่กว่า
-            if (strlen($phone) > 80) {
-                $phone = substr($phone, 0, 80);
-            }
 
-            $member->phone_new = $phone;
-            $member->updated_by = 'web-direct';
-            $member->save();
-            $member_new = false;
+            if ($member->is_temp) {
+                $member_new = true;
+            } else {
+                if (strlen($phone) > 80) {
+                    $phone = substr($phone, 0, 80);
+                }
+
+                $member->phone_new = $phone;
+                $member->updated_by = 'web-direct';
+                $member->save();
+            }
         }
 
         $apply = $this->newApply($member->id, $course->id, 0, "ทั่วไป");
@@ -562,6 +566,28 @@ class CourseApplyController extends Controller
             $need_more_info = true;
         }
 
+        if ($member) {
+            // validate email and phone 
+            $email = $member->email;
+            $phone = $member->phone;
+
+            if ($email == null || $phone == null) {
+                $need_more_info = true;
+            }
+
+            if (!$this->checkEmailCorrect($email)) {
+                $need_more_info = true;
+            }
+
+            if (!$this->checkPhoneCorrect($phone)) {
+                $need_more_info = true;
+            }
+        }
+
+        if ($member->is_temp) {
+            $need_more_info = true;
+        }
+
         if ($need_more_info) {
             // 5) redirect ไปหน้าแบบฟอร์มเต็ม (Step 2)
             return  view('apply.full_form', $data);
@@ -577,6 +603,34 @@ class CourseApplyController extends Controller
 
             return $this->directConfirm($request, $course_id, $member_id);
         }
+    }
+
+    private function checkEmailCorrect($email)
+    {
+
+        if ($email == null) {
+            return false;
+        }
+
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private function checkPhoneCorrect($phone)
+    {
+
+        if ($phone == null) {
+            return false;
+        }
+
+        if (!preg_match('/^[0-9]{9}$/', $phone)) {
+            return false;
+        }
+
+        return true;
     }
 
     public function newApply($member_id, $course_id, $van, $shelter)
@@ -709,7 +763,7 @@ class CourseApplyController extends Controller
         return $code;
     }
 
-    public function createMember($gender, $firstname, $lastname, $birthDate, $phone, $email, $applyCode)
+    public function createMember($gender, $firstname, $lastname, $birthDate, $phone, $email, $applyCode, $temp = false)
     {
         $member = Member::findCandidate($gender, $firstname, $lastname, $birthDate);
 
@@ -736,6 +790,7 @@ class CourseApplyController extends Controller
         $member->applycode = "$applyCode";
         $member->created_by = "DIRECT-APPLY";
         $member->updated_by = "DIRECT-APPLY";
+        $member->is_temp = $temp;
 
         $member->save();
 
@@ -759,33 +814,10 @@ class CourseApplyController extends Controller
         }
 
 
-
-
         if ($full_form && !$no_update) {
 
-            //Check  Require Input are fill correct
-            // name, gender ,birthdate, email, phone 
+
             $lang = $request->input('lang');
-            $messages = [
-                'name.required' => $lang == 'en' ? 'First name is required.' : 'กรุณากรอกชื่อ',
-                'surname.required' => $lang == 'en' ? 'Last name is required.' : 'กรุณากรอกนามสกุล',
-                'gender.required' => $lang == 'en' ? 'Gender is required.' : 'กรุณาเลือกเพศ',
-                'birthdate.required' => $lang == 'en' ? 'Birthdate is required.' : 'กรุณากรอกวันเกิด',
-                'email.required' => $lang == 'en' ? 'Email is required.' : 'กรุณากรอกอีเมล',
-                'email.email' => $lang == 'en' ? 'Invalid email format.' : 'รูปแบบอีเมลไม่ถูกต้อง',
-                'phone.required' => $lang == 'en' ? 'Phone number is required.' : 'กรุณากรอกเบอร์โทรศัพท์',
-                'phone.regex' => $lang == 'en' ? 'Invalid phone number format.' : 'รูปแบบเบอร์โทรศัพท์ไม่ถูกต้อง',
-            ];
-
-            $request->validate([
-                'name' => 'required|string|max:100',
-                'surname' => 'required|string|max:100',
-                'gender' => 'required|string',
-                'birthdate' => 'required|date',
-                'email' => 'required|email|max:190',
-                'phone' => ['required', 'string', 'regex:/^0[0-9]{8,9}$/'],
-            ], $messages);
-
 
             $member = Member::find($member_id);
             $member->gender = $request->input('gender');
@@ -808,6 +840,7 @@ class CourseApplyController extends Controller
             $member->surname_emergency = $request->input('surname_emergency');
             $member->phone_emergency = $request->input('phone_emergency');
             $member->relation_emergency = $request->input('relation_emergency');
+            $member->is_temp = false;
             $member->save();
         }
 
