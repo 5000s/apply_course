@@ -51,7 +51,7 @@ class CronController extends Controller
         ]);
     }
 
-    public function updateVipassanaMember()
+    public function updateMemberStatus()
     {
         $categoryIds = [1, 2, 3, 4, 6, 8, 10, 12];
 
