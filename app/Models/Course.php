@@ -41,13 +41,13 @@ class Course extends Model
         $start = $this->date_start;
         $day = $start->day;
         $month = $start->month;
-        $miniMonth = ThaiLocal::miniMonth($month);
+        $miniMonth = ThaiLocal::miniMonth($month - 1);
         $year = $start->year + 543;
 
         $end = $this->date_end;
         $dayEnd = $end->day;
         $monthEnd = $end->month;
-        $miniMonthENd = ThaiLocal::miniMonth($monthEnd);
+        $miniMonthENd = ThaiLocal::miniMonth($monthEnd - 1);
 
         if ($month == $monthEnd) {
             if ($day == $dayEnd) {
