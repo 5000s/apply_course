@@ -181,7 +181,7 @@
                         <td class="text-center eprint" style="display: none;">ที่พัก</td>
                         <td class="text-center " style="width: 145px;">ติดต่อ</td>
                         <td class="text-center eprint" style="width: 20px;">ห่างคอร์ส<br>(เดือน)</td>
-                        <td class="text-center " style="width: 200px;">คอร์สล่าสุด</td>
+                        <td class="text-center eprint" style="width: 200px;">คอร์สล่าสุด</td>
                         <td class="text-center remark-col " style="max-width: 100px;">เพิ่มเติม</td>
                         <td class="text-center eprint" style="display: none;">เพิ่มเติม</td>
                         <td class="text-center ">สถานะ</td>
@@ -312,17 +312,15 @@
                                 @endphp
 
                                 @foreach ($courses as $co)
-                                    {{ str_replace('คอร์ส', '', $co->category) }}
-                                    ({{ \Carbon\Carbon::parse($co->date_start)->format('d/m/y') }})
-                                    <br>
+                                    <div class="whitespace-nowrap">{{ str_replace('คอร์ส', '', $co->category) }}
+                                        ({{ \Carbon\Carbon::parse($co->date_start)->format('d/m/y') }})</div>
                                 @endforeach
 
                                 @if (count($coursesService) > 0)
-                                    <div style="font-weight: bolder;">ธรรมบริกร</div>
+                                    <div style="font-weight: bolder; margin-top: 4px;">ธรรมบริกร</div>
                                     @foreach ($coursesService as $co)
-                                        {{ str_replace('คอร์ส', '', $co->category) }}
-                                        ({{ \Carbon\Carbon::parse($co->date_start)->format('d/m/y') }})
-                                        <br>
+                                        <div class="whitespace-nowrap">{{ str_replace('คอร์ส', '', $co->category) }}
+                                            ({{ \Carbon\Carbon::parse($co->date_start)->format('d/m/y') }})</div>
                                     @endforeach
                                 @endif
                             </td>
@@ -629,6 +627,7 @@
                     title: '{{ $course->category }} ({{ $course->date_start }})',
                     exportOptions: {
                         columns: '.eprint',
+                        stripNewlines: false,
                         format: {
                             body: function(data, row, col, node) {
                                 var $cell = $(node);
@@ -637,11 +636,29 @@
                                 if ($disp.length) {
                                     return $disp.text().trim();
                                 }
-                                // otherwise fall back to the cell’s plain text
-                                return $cell.text().trim();
+
+                                // preserve line breaks for Excel export
+                                var $clone = $cell.clone();
+                                
+                                // Strip accidental newlines from Blade HTML indentation BEFORE adding our own
+                                $clone.html($clone.html().replace(/\n/g, ' '));
+                                
+                                $clone.find('br').replaceWith('\n');
+                                $clone.find('div').each(function() {
+                                    $(this).append('\n');
+                                });
+
+                                var text = $clone.text();
+                                // clean up extra whitespace but preserve newlines
+                                text = text.replace(/[ \t]+/g, ' ')
+                                    .replace(/\n\s+/g, '\n')
+                                    .replace(/\s+\n/g, '\n')
+                                    .trim();
+
+                                return text.replace(/\n{2,}/g, '\n');
                             }
                         }
-                    },
+                    }
 
                 }]
             });
