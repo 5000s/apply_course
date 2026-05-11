@@ -164,7 +164,9 @@
                         <td class="text-center eprint" style="width: 30px;">uid</td>
                         <td class="text-center eprint" style="width: 60px;">สมัครเมื่อ</td>
                         <td class="text-center eprint">เพศ</td>
-                        <td class="text-center eprint" style="width: 100px;">ชื่อ</td>
+                        <td class="text-center" style="width: 100px;">ชื่อ</td>
+                        <td class="text-center eprint" style="display: none;">ชื่อจริง</td>
+                        <td class="text-center eprint" style="display: none;">นามกสุล</td>
                         <td class="text-center eprint">อายุ</td>
                         <td class="text-center eprint" style="display: none;">โรคประจำตัว</td>
                         <td class="text-center " style="width: 120px;">การศึกษา/อาชีพ</td>
@@ -234,6 +236,8 @@
                                     {{ $member->name }}&nbsp;<br>{{ $member->surname }}
                                 </a>
                             </td>
+                            <td class="text-center" style="display: none;">{{ $member->name }}</td>
+                            <td class="text-center" style="display: none;">{{ $member->surname }}</td>
                             <td class="text-center">{{ $member->age }}</td>
 
                             <td class="text-center" style="display: none;">{{ $member->medical_condition }}</td>
@@ -313,14 +317,16 @@
 
                                 @foreach ($courses as $co)
                                     <div class="whitespace-nowrap">{{ str_replace('คอร์ส', '', $co->category) }}
-                                        ({{ \Carbon\Carbon::parse($co->date_start)->format('d/m/y') }})</div>
+                                        ({{ \Carbon\Carbon::parse($co->date_start)->format('d/m/y') }})
+                                    </div>
                                 @endforeach
 
                                 @if (count($coursesService) > 0)
                                     <div style="font-weight: bolder; margin-top: 4px;">ธรรมบริกร</div>
                                     @foreach ($coursesService as $co)
                                         <div class="whitespace-nowrap">{{ str_replace('คอร์ส', '', $co->category) }}
-                                            ({{ \Carbon\Carbon::parse($co->date_start)->format('d/m/y') }})</div>
+                                            ({{ \Carbon\Carbon::parse($co->date_start)->format('d/m/y') }})
+                                        </div>
                                     @endforeach
                                 @endif
                             </td>
@@ -639,10 +645,10 @@
 
                                 // preserve line breaks for Excel export
                                 var $clone = $cell.clone();
-                                
+
                                 // Strip accidental newlines from Blade HTML indentation BEFORE adding our own
                                 $clone.html($clone.html().replace(/\n/g, ' '));
-                                
+
                                 $clone.find('br').replaceWith('\n');
                                 $clone.find('div').each(function() {
                                     $(this).append('\n');
