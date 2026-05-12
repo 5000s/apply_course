@@ -145,20 +145,50 @@ class AuthController extends Controller
                 $emails = self::getValidEmails($user->email);
                 $emailList = explode(',', $emails);
                 $sendEmail = trim($emailList[0]);
-                // ส่งอีเมลเพื่อสร้างรหัสผ่านใหม่
-                $status = Password::sendResetLink(['email' => $sendEmail]);
 
-                if ($status === Password::RESET_LINK_SENT) {
-                    $maskedEmail = $this->maskEmail($sendEmail);
-                    return view('members.password-reset-sent', ['maskedEmail' => $maskedEmail]);
-                } else {
-                    $most_matched_member = [
-                        'id' => $member->id,
-                        'email' => $this->maskEmail($member->email),
-                        'similarity' => 0
-                    ];
-                    return back()->withErrors(['email' => __($status)])->with('most_matched_member', $most_matched_member);
-                }
+                // ตั้งค่าภาษาตามที่ส่งมาจากฟอร์ม UI
+                $locale = $request->input('locale', app()->getLocale());
+                \Illuminate\Support\Facades\App::setLocale($locale);
+
+                // สร้างรหัสผ่าน 4 หลักแบบสุ่ม
+                $newPassword = sprintf("%04d", mt_rand(0, 9999));
+
+                // อัปเดตรหัสผ่านใหม่ให้กับผู้ใช้
+                $user->password = Hash::make($newPassword);
+                $user->save();
+
+                // สร้างเนื้อหา HTML สำหรับอีเมล
+                $html = view('emails.new_password', [
+                    'name' => $member->name,
+                    'password' => $newPassword,
+                    'email' => $sendEmail,
+                    'locale' => $locale
+                ])->render();
+
+                // ส่งอีเมลผ่าน EmailService
+                $emailService = new \App\Services\EmailService();
+                $subject = __('mail.new_password.subject');
+                $emailService->sendemail($html, $sendEmail, $subject);
+
+                $maskedEmail = $this->maskEmail($sendEmail);
+                return redirect()->route('new-password-sent')->with('maskedEmail', $maskedEmail);
+
+
+                // ส่งอีเมลเพื่อสร้างรหัสผ่านใหม่
+                // $status = Password::sendResetLink(['email' => $sendEmail]);
+
+
+                // if ($status === Password::RESET_LINK_SENT) {
+                //     $maskedEmail = $this->maskEmail($sendEmail);
+                //     return view('members.password-reset-sent', ['maskedEmail' => $maskedEmail]);
+                // } else {
+                //     $most_matched_member = [
+                //         'id' => $member->id,
+                //         'email' => $this->maskEmail($member->email),
+                //         'similarity' => 0
+                //     ];
+                //     return back()->withErrors(['email' => __($status)])->with('most_matched_member', $most_matched_member);
+                // }
             } catch (\Exception $e) {
                 $most_matched_member = [
                     'id' => $member->id,
@@ -172,7 +202,16 @@ class AuthController extends Controller
         return back()->with('error', 'ไม่พบข้อมูลสมาชิก');
     }
 
+    public function newPasswordSent()
+    {
+        $maskedEmail = session('maskedEmail');
 
+        if (!$maskedEmail) {
+            return redirect()->route('login');
+        }
+
+        return view('members.new-password-sent', compact('maskedEmail'));
+    }
 
     public function updatePhone()
     {

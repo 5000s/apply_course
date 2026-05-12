@@ -27,6 +27,19 @@ return [
     ],
 
 
+    'new_password' => [
+        'subject'   => 'Your New Password',
+        'greeting'  => 'Dear :name,',
+        'intro'     => 'Your new password has been generated. Please use the password below to login:',
+        'warning'   => 'For security reasons, please change your password after your next login.',
+        'button'    => 'Login Here',
+        'closing'   => 'Sincerely,',
+        'team'      => 'Bodhidhammayan Apply Course System',
+        'footer'    => 'All rights reserved.',
+        'visit'     => 'Visit Our Website',
+        'contact'   => 'Contact Support',
+    ],
+
     'verify' => [
         'subject'         => 'Verify Your Email Address',
         'title'           => 'Verify Your Email Address',

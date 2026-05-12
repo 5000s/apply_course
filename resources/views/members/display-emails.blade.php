@@ -16,6 +16,7 @@
                             <form method="POST" action="{{ route('request-password-reset') }}">
                                 @csrf
                                 <input type="hidden" name="member_id" value="{{ $most_matched_member['id'] }}">
+                                <input type="hidden" name="locale" value="{{ app()->getLocale() }}">
                                 <p>{{ $most_matched_member['email'] }}</p>
                                 <button type="submit" class="btn btn-primary mt-3">
                                     {{ __('messages.send_request') }}
