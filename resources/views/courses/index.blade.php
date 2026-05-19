@@ -33,7 +33,7 @@
         {{-- Location Selection --}}
         <div class="row justify-content-center">
             @foreach ($course_locations as $location)
-                <div class="col-lg-3 col-md-4 col-sm-6 mb-3">
+                <div class="col-lg-2 col-md-2 col-sm-2 mb-2">
                     <a href="{{ route('courses.index', ['member_id' => $member_id, 'location' => $location->id]) }}"
                         class="btn option_course w-100 text-center py-3 shadow-sm
                               {{ $location->id == $selected_location_id ? 'btn-success text-white' : 'btn-outline-success' }}">

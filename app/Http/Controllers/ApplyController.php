@@ -274,7 +274,7 @@ class ApplyController extends Controller
         $location = Location::where("id", $location_id)->first();
         $member = Member::where("id", $member_id)->first();
 
-        $customOrder = [4, 1, 3, 5]; // IDs in the order you want
+        $customOrder = [4, 1, 3, 5, 6]; // IDs in the order you want
         $locations = Location::whereIn("id", $customOrder)
             ->orderByRaw("FIELD(id, " . implode(",", $customOrder) . ")")
             ->get();
