@@ -187,6 +187,7 @@
                         <td class="text-center remark-col " style="max-width: 100px;">เพิ่มเติม</td>
                         <td class="text-center eprint" style="display: none;">เพิ่มเติม</td>
                         <td class="text-center ">สถานะ</td>
+                        <td class="text-center eprint" style="display: none;">สถานะ</td>
                         <td class="text-center ">ข้อมูล/status</td>
                     </tr>
                 </thead>
@@ -404,7 +405,10 @@
                                 แก้ไขโดย: <span
                                     class="updated-by-display">{{ $member->updated_by === 'Anonymous' ? 'NA' : $member->updated_by }}</span>
 
+                            </td>
 
+                            <td class="text-left" style="display: none">
+                                {{ $member->role }}
                             </td>
 
                             <td class="text-center">
