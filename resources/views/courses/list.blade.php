@@ -30,6 +30,7 @@
                 ['key' => 'hadyai', 'location' => $location_hadyai, 'courses' => $courses_hadyai],
                 ['key' => 'phuket', 'location' => $location_phuket, 'courses' => $courses_phuket],
                 ['key' => 'surin', 'location' => $location_surin, 'courses' => $courses_surin],
+                ['key' => 'khonkaen', 'location' => $location_khonkaen, 'courses' => $courses_khonkaen],
             ];
 
             // pick the first location that actually has courses as default (fallback to first card)
@@ -37,6 +38,7 @@
                 collect($blocks)->first(fn($b) => isset($b['courses']) && count($b['courses']) > 0) ?? $blocks[0];
             $queryDefault = request('loc'); // allow ?loc=bangkok etc.
             $defaultKey = $queryDefault ?: $firstWithCourses['key'];
+
         @endphp
 
         {{-- Location cards --}}

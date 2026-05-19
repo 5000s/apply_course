@@ -29,6 +29,7 @@ class ApplyController extends Controller
         $courses_hadyai = self::getCourses(3, $now);
         $courses_bangkok = self::getCourses(4, $now);
         $courses_phuket = self::getCourses(5, $now);
+        $courses_khonkaen = self::getCourses(6, $now);
 
         $data = [];
 
@@ -46,6 +47,9 @@ class ApplyController extends Controller
 
         $data['courses_phuket'] = $courses_phuket;
         $data['location_phuket'] = Location::where("id", 5)->first();
+
+        $data['courses_khonkaen'] = $courses_khonkaen;
+        $data['location_khonkaen'] = Location::where("id", 6)->first();
 
 
 
