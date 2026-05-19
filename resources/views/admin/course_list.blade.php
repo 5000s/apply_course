@@ -108,6 +108,9 @@
                                     อ่อนนุช-มูลนิธิโรงเรียนแห่งชีวิต </option>
                                 <option @if ($location == 5) selected @endif value="5">
                                     ภูเก็ต-โพธิธรรมญาณรีทรีต</option>
+                                <option @if ($location == 6) selected @endif value="6">
+                                    ขอนแก่น-วัดวงกฏคีรี </option>
+
                             </select>
                         </div>
 
@@ -144,7 +147,8 @@
                             <h4>สถานะ</h4>
                             <select class="form-select" name="status" id="status">
                                 @php $status = request()->query('status', 'open') @endphp
-                                <option @if ($status == 'เปิดรับสมัคร') selected @endif value="เปิดรับสมัคร">เปิดรับสมัคร
+                                <option @if ($status == 'เปิดรับสมัคร') selected @endif value="เปิดรับสมัคร">
+                                    เปิดรับสมัคร
                                 </option>
                                 <option @if ($status == 'ปิดรับสมัคร') selected @endif value="ปิดรับสมัคร">ปิดรับสมัคร
                                 </option>
@@ -251,10 +255,10 @@
 
 
     <!-- $(document).ready(function() {
-            $('#yourTableId').DataTable({
-                "searching": false // This disables the search box
-            });
-        }); -->
+                    $('#yourTableId').DataTable({
+                        "searching": false // This disables the search box
+                    });
+                }); -->
 
     <script type="text/javascript">
         $(document).ready(function() {
