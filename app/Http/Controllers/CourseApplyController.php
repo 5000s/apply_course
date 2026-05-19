@@ -326,8 +326,8 @@ class CourseApplyController extends Controller
         }
 
 
-        if ($need_check_vipassana_history_apply && $isAdmin == false) {
-
+        if ($need_check_vipassana_history_apply) {
+            //&& $isAdmin == false
             $not_pass = false;
 
             if ($member_new) {
@@ -367,7 +367,7 @@ class CourseApplyController extends Controller
                         $q->where('location_id', 1);
                     })
                     ->where('role', "ผู้เข้าอบรม")
-                    ->where('state', 'ผ่านการอบรม')
+                    ->whereIn('state', ['ผ่านการอบรม', 'ยื่นใบสมัคร'])
                     ->get();
 
                 $date_start_limit = Carbon::parse($course->date_start)->subDays(365);
