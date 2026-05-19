@@ -177,6 +177,12 @@ Route::prefix('admin')->middleware('auth', 'admin')->group(function () {
     Route::get('/dashboard/data', [DashboardController::class, 'data'])->name('dashboard.data');
     Route::get('/dashboard/course-types', [DashboardController::class, 'typesByLocation'])
         ->name('dashboard.course-types');
+
+    // Admin Cron Routes
+    Route::get('/cron/setCourseData', [CourseController::class, 'setCourseData'])->name('admin.cron.setCourseData');
+    Route::get('/cron/checkAndCancelPastApplications', [CronController::class, 'checkAndCancelPastApplications'])->name('admin.cron.checkAndCancelPastApplications');
+    Route::get('/cron/closeCourseAuto', [CronController::class, 'closeCourseAuto'])->name('admin.cron.closeCourseAuto');
+    Route::get('/cron/updateMemberStatus', [CronController::class, 'updateMemberStatus'])->name('admin.cron.updateMemberStatus');
 });
 
 
@@ -245,8 +251,8 @@ Route::get('lang/{locale}', function ($locale) {
 
 
 
-Route::get('/setCourseData', [CourseController::class, 'setCourseData'])->name('admin.course.sync');
-Route::get('/setCoursePastApply', [CronController::class, 'checkAndCancelPastApplications'])->name('admin.course.past.sync');
+// Route::get('/setCourseData', [CourseController::class, 'setCourseData'])->name('admin.course.sync');
+// Route::get('/setCoursePastApply', [CronController::class, 'checkAndCancelPastApplications'])->name('admin.course.past.sync');
 
 
 
