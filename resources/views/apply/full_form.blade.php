@@ -89,6 +89,11 @@
                                         'submit' => 'ยืนยันการสมัครเข้าคอร์ส',
                                         'female' => 'หญิง',
                                         'male' => 'ชาย',
+                                        'buddhism' => 'พุทธบริษัท / สถานะทางธรรม',
+                                        'monk' => 'ภิกษุ',
+                                        'novice' => 'สามเณร',
+                                        'nun' => 'แม่ชี',
+                                        'secular' => 'ฆราวาส',
                                     ],
                                     'en' => [
                                         'place' => 'Location',
@@ -134,6 +139,11 @@
                                         'submit' => 'Confirm Application',
                                         'female' => 'Female',
                                         'male' => 'Male',
+                                        'buddhism' => 'Buddhist Status',
+                                        'monk' => 'Monk',
+                                        'novice' => 'Novice',
+                                        'nun' => 'Nun',
+                                        'secular' => 'Layperson (Secular)',
                                     ],
                                 ];
                                 $txt = $t[$lang];
@@ -294,6 +304,24 @@
                                         <option value="ชาย"
                                             {{ old('gender', $member->gender) == 'ชาย' ? 'selected' : '' }}>
                                             {{ $txt['male'] }}</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-6" @if ($member_new == false) hidden @endif>
+                                    <label class="form-label">{{ $txt['buddhism'] }}</label>
+                                    <select name="buddhism" class="form-select">
+                                        <option value="ฆราวาส"
+                                            {{ old('buddhism', $member->buddhism) == 'ฆราวาส' ? 'selected' : '' }}>
+                                            {{ $txt['secular'] }}</option>
+                                        <option value="ภิกษุ"
+                                            {{ old('buddhism', $member->buddhism) == 'ภิกษุ' ? 'selected' : '' }}>
+                                            {{ $txt['monk'] }}</option>
+                                        <option value="สามเณร"
+                                            {{ old('buddhism', $member->buddhism) == 'สามเณร' ? 'selected' : '' }}>
+                                            {{ $txt['novice'] }}</option>
+                                        <option value="แม่ชี"
+                                            {{ old('buddhism', $member->buddhism) == 'แม่ชี' ? 'selected' : '' }}>
+                                            {{ $txt['nun'] }}</option>
                                     </select>
                                 </div>
 

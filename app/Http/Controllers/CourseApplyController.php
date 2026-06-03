@@ -265,7 +265,7 @@ class CourseApplyController extends Controller
         return $this->applyConfirm($member_id, $course_id, $firstname, $lastname, $gender, $phone, $birth_date, $lang);
     }
 
-    public function applyConfirm($member_id, $course_id, $firstname, $lastname, $gender, $phone, $birth_date, $lang)
+    public function applyConfirm($member_id, $course_id, $firstname, $lastname, $gender, $phone, $birth_date, $lang, $buddhism = 'ฆราวาส')
     {
 
         $user = Auth::user();
@@ -291,6 +291,7 @@ class CourseApplyController extends Controller
 
         if (!$member) {
             $member = $this->createMember($gender, $firstname, $lastname, $birth_date, $phone, $email, $code, true);
+            $member->buddhism = $buddhism;
             $member->save();
             $member_new = true;
         } else {
@@ -298,6 +299,8 @@ class CourseApplyController extends Controller
 
             if ($member->is_temp) {
                 $member_new = true;
+                $member->buddhism = $buddhism;
+                $member->save();
             } else {
                 if (strlen($phone) > 80) {
                     $phone = substr($phone, 0, 80);
@@ -305,6 +308,7 @@ class CourseApplyController extends Controller
 
                 $member->phone_new = $phone;
                 $member->updated_by = 'web-direct';
+                $member->buddhism = $buddhism;
                 $member->save();
             }
         }
@@ -821,6 +825,7 @@ class CourseApplyController extends Controller
 
             $member = Member::find($member_id);
             $member->gender = trim($request->input('gender')) != "" ? $request->input('gender') : $member->gender;
+            $member->buddhism = trim($request->input('buddhism')) != "" ? $request->input('buddhism') : $member->buddhism;
             $member->name = trim($request->input('name')) != "" ? $request->input('name') : $member->name;
             $member->surname = trim($request->input('surname')) != "" ? $request->input('surname') : $member->surname;
             $member->birthdate = trim($request->input('birthdate')) != "" ? $request->input('birthdate') : $member->birthdate;
