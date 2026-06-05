@@ -578,6 +578,7 @@ class ApplyController extends Controller
             $applys = Apply::where("course_id", $course_id)->where("member_id", $member_id)->get();
             foreach ($applys as $apply) {
                 $apply->cancel = 1;
+                $apply->state = "ยกเลิกสมัคร";
                 $apply->cancel_at = Carbon::now();
                 $apply->updated_by = "USER";
                 $apply->application = null;
@@ -607,6 +608,7 @@ class ApplyController extends Controller
 
         foreach ($applys as $apply) {
             $apply->cancel = 1;
+            $apply->state = "ยกเลิกสมัคร";
             $apply->cancel_at = Carbon::now();
             $apply->updated_by = "USER";
             $apply->application = null;
