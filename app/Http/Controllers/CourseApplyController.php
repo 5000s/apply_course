@@ -348,13 +348,13 @@ class CourseApplyController extends Controller
                 ->with('course')
                 ->get();
 
-            if (count($applyHistory) == 0) {
+            if (count($applyHistory) == 0 && $course->location_id == 1) {
                 $not_pass = true;
             }
 
             if ($not_pass) {
-                $message_eng =  "New applicants must have attended at least one Anapanasati meditation course (3-4 days course) at Bodhidhammayan before registering for Vipassana meditation.";
-                $message_th = "ผู้สมัครศิษย์ใหม่ที่จะเข้าอบรมวิปัสสนากรรมฐานได้ “ต้องผ่านการอบรมสมาธิอานาปานสติ (3-4 วัน) ของโพธิธรรมญาณ ก่อนอย่างน้อย 1 ครั้ง";
+                $message_eng =  "New applicants must have attended at least one Anapanasati meditation course (3-4 days course) at Bodhidhammayan before registering for Vipassana meditation course in Kaeng Khoi, Saraburi.";
+                $message_th = "ผู้สมัครศิษย์ใหม่ที่จะเข้าอบรมวิปัสสนากรรมฐานที่ โพธิธรรมญาณสถาน อ. แก่งคอย จ. สระบุรี ต้องผ่านการอบรมสมาธิอานาปานสติ (3-4 วัน) ของโพธิธรรมญาณ ก่อนอย่างน้อย 1 ครั้ง";
 
                 return back()
                     ->withErrors(['course_id' => $lang == 'en' ? $message_eng : $message_th])  // หรือข้อความอื่น
