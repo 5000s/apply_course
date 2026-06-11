@@ -10,12 +10,10 @@
             'th' => [
                 'header_success' => 'ยืนยันสมัครคอร์สเรียบร้อย',
                 'dear_applicant' => 'เรียนท่านผู้สมัครหรือตัวแทน ที่นับถือ',
-                'warning_msg' => 'ท่านได้รับการยื่นการสมัครแล้ว <br>
-                                และได้รับ การยืนยันว่าท่านได้รับการอบรม <br><br>
-                                หากท่านต้องการยกเลิกการสมัคร โปรดติดต่อ <br>
+                'warning_msg' => 'ทางมูลนิธิฯ ได้รับข้อมูลการสมัครของท่านเรียบร้อยแล้ว <br>
+                                โดยจะมีเจ้าหน้าที่โทรแจ้งยืนยันอีกครั้งด้วยหมายเลข <br>
                                 <strong>02-117-4063 ถึง 64</strong> <br>
-                                ราว 1-3 สัปดาห์ก่อนเข้าคอร์ส <br>
-                                เพื่อยกเลิกการสมัคร',
+                                ราว 1-3 สัปดาห์ก่อนวันเริ่มคอร์ส',
                 'read_rules' => '*** กรุณาอ่านหลักเกณฑ์เกี่ยวกับการรับสมัคร กฎ และ ระเบียบของธรรมสถานโดยละเอียด ได้ที่',
                 'strict_follow' => 'และปฏิบัติตามโดยเคร่งครัด *',
                 'rule_clothing' =>
@@ -41,12 +39,10 @@
             'en' => [
                 'header_success' => 'Application Confirmed',
                 'dear_applicant' => 'Dear Applicant',
-                'warning_msg' => 'Your application has been submitted <br>
-                                and you are confirmed for the training. <br><br>
-                                If you wish to cancel your application, please contact <br>
+                'warning_msg' => 'The Foundation has received your application. <br>
+                                An officer will contact you by phone from <br>
                                 <strong>02-117-4063 to 64</strong> <br>
-                                about 1-3 weeks before the course starts <br>
-                                to cancel your application.',
+                                approximately 1-3 weeks before the course starts.',
                 'read_rules' => '*** Please read the rules and regulations details at',
                 'strict_follow' => 'and follow strictly *',
                 'rule_clothing' =>
