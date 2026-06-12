@@ -108,6 +108,22 @@
         $locationName = $lang === 'th' ? $location->show_name : $location->show_name_en ?? $location->show_name;
         $courseTitle =
             $lang === 'th' ? $courseCategory->show_name : $courseCategory->show_name_en ?? $courseCategory->show_name;
+
+        $location = $course->location;
+        $url = '';
+
+        //'แก่งคอย','ลานหิน','หาดใหญ่','มูลนิธิ อ่อนนุช','ภูเก็ต','ขอนแก่น'
+        if ($location == 'มูลนิธิ อ่อนนุช') {
+            $url = 'https://bodhidhammayan.org/th/course-bangkok-th/';
+        } elseif ($location == 'หาดใหญ่') {
+            $url = 'https://bodhidhammayan.org/th/course-hatyai-th/';
+        } elseif ($location == 'ภูเก็ต') {
+            $url = 'https://bodhidhammayan.org/th/course-phuket-th/';
+        } elseif ($location == 'แก่งคอย') {
+            $url = 'https://bodhidhammayan.org/th/course-saraburi-th/';
+        } else {
+            $url = 'https://bodhidhammayan.org/th/';
+        }
     @endphp
 
     <div class="container py-5">
@@ -137,8 +153,7 @@
                         <div class="mb-4">
                             <p>
                                 <strong>{{ $txt['read_rules'] }}</strong>
-                                <a href="https://bodhidhammayan.org/th/course-saraburi-th/#Anapanasati"
-                                    target="_blank">https://bodhidhammayan.org/th/course-saraburi-th/#Anapanasati</a>
+                                <a href="{{ $url }}" target="_blank">{{ $url }}</a>
                                 <strong>{{ $txt['strict_follow'] }}</strong>
                             </p>
                             <ul class="mb-3">
@@ -190,15 +205,17 @@
                             </p>
                         </div>
 
-                        <div class="text-center mt-5">
-                            <p class="mb-1">{{ $txt['regards'] }}</p>
-                            <p class="fw-bold">{{ $txt['team'] }}</p>
-                            <a href="https://bodhidhammayan.org/" target="_self"
-                                class="btn btn-outline-secondary mt-3">{{ $txt['back_home'] }}</a>
+                        @if (!isset($is_email))
+                            <div class="text-center mt-5">
+                                <p class="mb-1">{{ $txt['regards'] }}</p>
+                                <p class="fw-bold">{{ $txt['team'] }}</p>
+                                <a href="https://bodhidhammayan.org/" target="_self"
+                                    class="btn btn-outline-secondary mt-3">{{ $txt['back_home'] }}</a>
 
-                            <a href="{{ route('apply.direct') }}?lang={{ $lang }}&course_id={{ $course->id }}"
-                                target="_self" class="btn btn-outline-secondary mt-3">{{ $txt['back_apply'] }}</a>
-                        </div>
+                                <a href="{{ route('apply.direct') }}?lang={{ $lang }}&course_id={{ $course->id }}"
+                                    target="_self" class="btn btn-outline-secondary mt-3">{{ $txt['back_apply'] }}</a>
+                            </div>
+                        @endif
 
                     </div>
                 </div>

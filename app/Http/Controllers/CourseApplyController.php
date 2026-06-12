@@ -23,6 +23,7 @@ use App\Models\ReportCase;
 use App\Models\CourseLocationLimit;
 use App\Models\Shelter;
 use App\Services\EmailService;
+use App\Services\GmailApiService;
 
 class CourseApplyController extends Controller
 {
@@ -912,15 +913,81 @@ class CourseApplyController extends Controller
             }
         }
 
+
+        // Write sendemail process here
         if ($isNeedConfirm) {
+            $this->sendApplyCourseImformationToEmail($member_id, $course_id, false);
             return view('apply.complete_non_confirm', ['apply' => $apply, 'course' => $course, 'location' => $location, 'courseCategory' => $courseCategory, 'lang' => $lang]);
         }
+
+        $this->sendApplyCourseImformationToEmail($member_id, $course_id, true);
 
         $apply->state = "ยืนยันแล้ว";
         $apply->remark = "ระบบยืนยันการสมัคร";
         $apply->save();
 
         return view('apply.complete_ana', ['apply' => $apply, 'course' => $course, 'location' => $location, 'courseCategory' => $courseCategory, 'lang' => $lang]);
+    }
+
+    public function sendApplyCourseImformationToEmail($member_id, $course_id, $isConfirmed = false)
+    {
+        try {
+            $member = Member::find($member_id);
+            if (!$member || trim((string) $member->email) === '') {
+                Log::warning("Apply email skipped: member {$member_id} not found or has no email");
+                return false;
+            }
+
+            $course = Course::find($course_id);
+            if (!$course) {
+                Log::warning("Apply email skipped: course {$course_id} not found");
+                return false;
+            }
+
+            $apply = Apply::where('course_id', $course_id)
+                ->where('member_id', $member_id)
+                ->where(function ($query) {
+                    $query->where('cancel', '!=', 1)
+                        ->orWhereNull('cancel');
+                })
+                ->first();
+
+            if (!$apply) {
+                Log::warning("Apply email skipped: no active apply for member {$member_id} course {$course_id}");
+                return false;
+            }
+
+            $location = Location::find($course->location_id);
+            $courseCategory = CourseCategory::find($course->category_id);
+            $lang = request()->input('lang', 'th');
+
+            $view = $isConfirmed ? 'apply.complete_ana' : 'apply.complete_non_confirm';
+
+            $courseTitle = $lang === 'th'
+                ? ($courseCategory->show_name ?? $course->category)
+                : ($courseCategory->show_name_en ?? $courseCategory->show_name ?? $course->category);
+
+            $subject = ($isConfirmed
+                ? ($lang === 'th' ? 'ยืนยันสมัครคอร์สเรียบร้อย' : 'Application Confirmed')
+                : ($lang === 'th' ? 'ได้รับใบสมัครของท่านแล้ว' : 'Application Received'))
+                . ' - ' . $courseTitle;
+
+            $gmailService = new GmailApiService();
+            $gmailService->sendEmail($member->email, $subject, $view, [
+                'apply' => $apply,
+                'course' => $course,
+                'location' => $location,
+                'courseCategory' => $courseCategory,
+                'lang' => $lang,
+                'is_email' => true
+            ]);
+
+            return true;
+        } catch (\Throwable $e) {
+            // Email failure must not break the apply flow
+            Log::error("Failed to send apply email to member {$member_id} course {$course_id}: " . $e->getMessage());
+            return false;
+        }
     }
 
     public function getCourseLimit($course_category_id, $location_id)
