@@ -182,8 +182,8 @@
                             alt="Knowing Buddha" style="width: 100px; height: auto;">
                     </a>
                     <a href="https://www.schooloflifethailand.org/" target="_blank">
-                        <img src="https://bodhidhammayan.org/wp-content/uploads/2025/02/Logo-SchoolOfLife-1024x1024.webp"
-                            alt="School of Life" style="width: 120px; height: auto;">
+                        <img src="{{ asset('images/school_of_life.png') }}" alt="School of Life"
+                            style="width: 120px; height: auto;">
                     </a>
                 </div>
 
