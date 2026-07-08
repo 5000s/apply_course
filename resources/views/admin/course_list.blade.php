@@ -110,6 +110,8 @@
                                     ภูเก็ต-โพธิธรรมญาณรีทรีต</option>
                                 <option @if ($location == 6) selected @endif value="6">
                                     ขอนแก่น-วัดวงกฏคีรี </option>
+                                <option @if ($location == 7) selected @endif value="7">
+                                    ขอนแก่น-วัดป่าอรัญญวิเวก</option>
 
                             </select>
                         </div>
@@ -255,10 +257,10 @@
 
 
     <!-- $(document).ready(function() {
-                    $('#yourTableId').DataTable({
-                        "searching": false // This disables the search box
-                    });
-                }); -->
+                            $('#yourTableId').DataTable({
+                                "searching": false // This disables the search box
+                            });
+                        }); -->
 
     <script type="text/javascript">
         $(document).ready(function() {
