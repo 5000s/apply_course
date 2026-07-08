@@ -30,6 +30,7 @@ class ApplyController extends Controller
         $courses_bangkok = self::getCourses(4, $now);
         $courses_phuket = self::getCourses(5, $now);
         $courses_khonkaen = self::getCourses(6, $now);
+        $courses_khonkaen_aranya_wiwek = self::getCourses(7, $now);
 
         $data = [];
 
@@ -51,7 +52,8 @@ class ApplyController extends Controller
         $data['courses_khonkaen'] = $courses_khonkaen;
         $data['location_khonkaen'] = Location::where("id", 6)->first();
 
-
+        $data['courses_khonkaen_aranya_wiwek'] = $courses_khonkaen_aranya_wiwek;
+        $data['location_khonkaen_aranya_wiwek'] = Location::where("id", 7)->first();
 
 
         return view('courses.list', $data); // Return the view with the courses list
@@ -274,7 +276,7 @@ class ApplyController extends Controller
         $location = Location::where("id", $location_id)->first();
         $member = Member::where("id", $member_id)->first();
 
-        $customOrder = [4, 1, 3, 5, 6]; // IDs in the order you want
+        $customOrder = [4, 1, 3, 5, 6, 7]; // IDs in the order you want
         $locations = Location::whereIn("id", $customOrder)
             ->orderByRaw("FIELD(id, " . implode(",", $customOrder) . ")")
             ->get();

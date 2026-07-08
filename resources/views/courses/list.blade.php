@@ -31,6 +31,7 @@
                 ['key' => 'phuket', 'location' => $location_phuket, 'courses' => $courses_phuket],
                 ['key' => 'surin', 'location' => $location_surin, 'courses' => $courses_surin],
                 ['key' => 'khonkaen', 'location' => $location_khonkaen, 'courses' => $courses_khonkaen],
+                ['key' => 'aranya_wiwek', 'location' => $location_aranya_wiwek, 'courses' => $courses_aranya_wiwek],
             ];
 
             // pick the first location that actually has courses as default (fallback to first card)
