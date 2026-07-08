@@ -456,7 +456,7 @@
 
                                 <div class="col-md-12" @if ($member_new == false) hidden @endif>
                                     <label class="form-label">{{ $txt['disease'] }}</label>
-                                    <textarea name="disease" class="form-control" rows="2">{{ old('disease', $member->blacklist_remark) }}</textarea>
+                                    <textarea name="disease" class="form-control" rows="2">{{ old('disease', $member->medical_condition) }}</textarea>
                                     {{-- ถ้าคุณใช้ column อื่นสำหรับโรคประจำตัว ให้ปรับตรงนี้ --}}
                                 </div>
                             </div>
@@ -619,7 +619,8 @@
                                 }
                                 if (field === 'phone') {
                                     const phoneVal = val.replace(/[-\s]/g, '');
-                                    const phoneRegex = /^\d{9,10}$/; // 9-10 digits without space/-
+                                    const phoneRegex =
+                                        /^\+?\d{9,15}$/; // optional leading +, 9-15 digits
                                     if (!phoneRegex.test(phoneVal)) {
                                         invalidFields.push(currentNames[field]);
                                     }

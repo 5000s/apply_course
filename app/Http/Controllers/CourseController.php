@@ -1402,6 +1402,7 @@ class CourseController extends Controller
             'มูลนิธิ อ่อนนุช' => 4,
             'ภูเก็ต' => 5,
             'ขอนแก่น' => 6,
+            'วัดป่าอรัญญวิเวก' => 7,
         ];
 
         foreach ($courses as $course) {
