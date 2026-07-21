@@ -106,6 +106,21 @@
             .mobile-text {
                 display: block;
             }
+
+            /* Left-align the date and let the button sit beside it
+               instead of overlapping the centered text */
+            .course-item {
+                justify-content: space-between;
+                text-align: left;
+                gap: 10px;
+            }
+
+            .btn-register {
+                position: static;
+                right: auto;
+                flex-shrink: 0;
+                white-space: nowrap;
+            }
         }
     </style>
 </head>
