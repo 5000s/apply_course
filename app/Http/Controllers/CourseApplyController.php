@@ -349,7 +349,7 @@ class CourseApplyController extends Controller
                 ->with('course')
                 ->get();
 
-            if (count($applyHistory) == 0 && $course->location_id == 1) {
+            if (count($applyHistory) == 0) {  // if (count($applyHistory) == 0 && $course->location_id == 1) {
                 $not_pass = true;
             }
 
