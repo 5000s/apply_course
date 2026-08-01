@@ -172,6 +172,60 @@ class Course extends Model
         return $this->belongsTo(Location::class, "location_id", "id");
     }
 
+    // Location IDs (see ApplyController::showCourseForStudent)
+    const LOCATION_SARABURI = 1; // สระบุรี
+    const LOCATION_HADYAI   = 3; // หาดใหญ่
+    const LOCATION_ONNUT    = 4; // อ่อนนุช (กรุงเทพ)
+    const LOCATION_PHUKET   = 5; // ภูเก็ต
+
+    /**
+     * เวลาเริ่มคอร์สตามสถานที่และจำนวนวัน
+     * Course start time by location and duration.
+     *
+     *  - อ่อนนุช            : 8.00 น. ทุกคอร์ส
+     *  - สระบุรี / หาดใหญ่   : 1-3 วัน 8.30 น. | 4 วัน 9.00 น. | 7/8 วัน 9.30 น.
+     *  - ภูเก็ต             : 8.30 น. ทุกคอร์ส
+     *
+     * @param  string  $lang  ภาษาผลลัพธ์ "th" (ค่าเริ่มต้น) หรือ "en"
+     * @return string|null  เวลาเริ่ม เช่น "8:00 น." / "8:00 a.m." (null หากไม่ได้กำหนดไว้)
+     */
+    public function getCourseStartTime(string $lang = "th"): ?string
+    {
+        // จำนวนวันแบบนับรวมวันเริ่มและวันจบ (inclusive)
+        $days = $this->date_start->diffInDays($this->date_end) + 1;
+
+        $locationId = (int) $this->location_id;
+
+        // เวลาในรูปแบบ "H.MM" (null = ไม่ได้กำหนดไว้)
+        $time = null;
+
+        if ($locationId === self::LOCATION_ONNUT) {
+            $time = '8:00';
+        } elseif ($locationId === self::LOCATION_PHUKET) {
+            $time = '8:30'; // ทุกคอร์ส
+        } elseif ($locationId === self::LOCATION_SARABURI || $locationId === self::LOCATION_HADYAI) {
+            if ($days <= 3) {
+                $time = '8:30';
+            } elseif ($days === 4) {
+                $time = '9:00';
+            } elseif ($days > 4) {
+                $time = '9:30';
+            }
+        }
+
+        if ($time === null) {
+            return null;
+        }
+
+
+
+        if ($lang === 'en') {
+            return $time . ' a.m.';
+        }
+
+        return $time . ' น.';
+    }
+
 
     public static function generateCourseName($start_date, $end_date)
     {

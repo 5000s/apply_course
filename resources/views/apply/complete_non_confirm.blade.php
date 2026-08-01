@@ -28,6 +28,10 @@
                 'phone' => 'เบอร์โทรศัพท์ :',
                 'course_label' => 'คอร์สที่สมัคร :',
                 'date_prefix' => 'วันที่',
+                'time_label' => 'เวลา:',
+                'time_punctual' => '(กรุณาตรงต่อเวลา)',
+                'emergency_notice' =>
+                    'กรณีเกิดเหตุฉุกเฉินจนไม่สามารถเข้าร่วมคอร์สได้ กรุณาแจ้งเจ้าหน้าที่มูลนิธิฯ ที่หมายเลข :phone ทั้งนี้ มูลนิธิฯ ขอสงวนสิทธิ์งดรับสมัครเข้าร่วมคอร์สในอนาคต หากไม่มาเข้าคอร์สโดยไม่แจ้งล่วงหน้า',
                 'note_header' => 'หมายเหตุ :',
                 'note_cancel' =>
                     'หากท่านได้รับการสัมภาษณ์และได้ตอบรับการอบรมแล้ว แต่ไม่สามารถมาเข้าคอร์สได้ <strong>*กรุณาแจ้งยกเลิกล่วงหน้าไม่น้อยกว่า 10 วัน</strong> การไม่มาเข้ารับการอบรมโดยไม่แจ้ง หรือ การออกจากคอร์สก่อนโดยไม่ได้รับอนุญาต <strong>**ถือเป็นการขัดขวางทางธรรมของผู้อื่นและจะถูกตัดสิทธิ์ไม่ให้เข้ารับการอบรมไม่น้อยกว่า 2 ปี</strong>',
@@ -59,6 +63,10 @@
                 'phone' => 'Phone :',
                 'course_label' => 'Applied Course :',
                 'date_prefix' => 'Date',
+                'time_label' => 'Time:',
+                'time_punctual' => '(Please be on time)',
+                'emergency_notice' =>
+                    'In the event of an emergency that prevents attendance, please notify the staff at :phone The Foundation reserves the right to deny course registration in the future to those who fail to attend without prior notice.',
                 'note_header' => 'Note :',
                 'note_cancel' =>
                     'If you are accepted but cannot attend, <strong>*Please cancel at least 10 days in advance.</strong> Failure to attend without notice or leaving early without permission <strong>**is considered obstructing others and will be banned for at least 2 years.</strong>',
@@ -109,21 +117,16 @@
         $courseTitle =
             $lang === 'th' ? $courseCategory->show_name : $courseCategory->show_name_en ?? $courseCategory->show_name;
 
-        $location = $course->location;
-        $url = '';
 
-        //'แก่งคอย','ลานหิน','หาดใหญ่','มูลนิธิ อ่อนนุช','ภูเก็ต','ขอนแก่น'
-        if ($location == 'มูลนิธิ อ่อนนุช') {
-            $url = 'https://bodhidhammayan.org/th/course-bangkok-th/';
-        } elseif ($location == 'หาดใหญ่') {
-            $url = 'https://bodhidhammayan.org/th/course-hatyai-th/';
-        } elseif ($location == 'ภูเก็ต') {
-            $url = 'https://bodhidhammayan.org/th/course-phuket-th/';
-        } elseif ($location == 'แก่งคอย') {
-            $url = 'https://bodhidhammayan.org/th/course-saraburi-th/';
-        } else {
-            $url = 'https://bodhidhammayan.org/th/';
-        }
+        // URL หลักเกณฑ์/กฎระเบียบของแต่ละสถานที่ ดึงจากฐานข้อมูล (locations.url_th / url_en)
+        $defaultUrl =
+            $lang === 'en'
+                ? 'https://bodhidhammayan.org/en/type-of-courseand-schedule-en/'
+                : 'https://bodhidhammayan.org/th/type-of-courseand-schedule-th/';
+        $url =
+            $lang === 'en'
+                ? $location->url_en ?: ($location->url_th ?: $defaultUrl)
+                : ($location->url_th ?: ($location->url_en ?: $defaultUrl));
     @endphp
 
     <div class="container py-5">
@@ -182,12 +185,20 @@
                                         <tr>
                                             <th scope="row">{{ $txt['course_label'] }}</th>
                                             <td>
-
+                                                @php $startTime = $course->getCourseStartTime($lang); @endphp
                                                 {{ $courseTitle }} <br>
-                                                {{ $txt['date_prefix'] }} {{ $dateStr }} <br>
-                                                {{ $locationName }}
-
-
+                                                {{ $locationName }}<br>
+                                                {{ $txt['date_prefix'] }} {{ $dateStr }}
+                                                @if ($startTime)
+                                                    <br>
+                                                    {{ $txt['time_label'] }} {{ $startTime }} {{ $txt['time_punctual'] }}
+                                                @endif
+                                                @php $emergencyPhone = $location->phone ?? null; @endphp
+                                                @if ($emergencyPhone)
+                                                    <div class="mt-2 text-muted small">
+                                                        {{ str_replace(':phone', $emergencyPhone, $txt['emergency_notice']) }}
+                                                    </div>
+                                                @endif
                                             </td>
                                         </tr>
                                     </tbody>
