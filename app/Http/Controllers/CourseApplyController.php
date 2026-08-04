@@ -435,22 +435,35 @@ class CourseApplyController extends Controller
                     $is_special_shelter = true;
                 }
 
-                if (!$is_range_course_more_than_4 && $is_special_shelter == false) {
+                if (!$is_range_course_more_than_4 && $is_special_shelter == false && $isAdmin == false) {
+
+                    $lineButton = '<br><a href="https://lin.ee/NrJTIDn" target="_blank" class="btn btn-success btn-lg mt-2">'
+                        . '<i class="bi bi-chat-dots-fill me-2"></i> LINE @bodhidhammayan'
+                        . '</a>';
 
                     $message_eng =  "You have registered for less than 4 consecutive Vipassana meditation courses. Please take a break of at least 4 courses.";
-                    $message_eng .= "<br>If you need to attend the course, please contact the staff.";
+                    $message_eng .= "<br>If you need to attend the course, please register via Line.";
+                    $message_eng .= $lineButton;
 
+                    $index = 1;
                     foreach ($courseInRangeApplyCourses as $courseInRangeApplyCourse) {
-                        $message_eng .= "<br> > " . $courseInRangeApplyCourse->getCourseLongDateTxtEnAttribute();
+                        $message_eng .= "<br> " . $index++ . ". " . $courseInRangeApplyCourse->getCourseLongDateTxtEnAttribute();
                     }
+
+
                     $message_th = "คุณได้มีการลงสมัครคอร์ส วิปัสสนากรรมฐาน ติดกันน้อยกว่า 4 คอร์ส กรุณาเว้นระยะห่างอย่างน้อย 4 คอร์ส";
-                    $message_th .= "<br>ถ้ามีความจำเป็นต้องเข้าคอร์สให้ติดต่อเจ้าหน้าที่";
+                    $message_th .= "<br>ถ้ามีความจำเป็นต้องเข้าคอร์ส โปรดสมัครผ่าน Line";
+                    $message_th .= $lineButton;
+
+                    $index = 1;
                     foreach ($courseInRangeApplyCourses as $courseInRangeApplyCourse) {
-                        $message_th .= "<br> > " . $courseInRangeApplyCourse->getCourseLongDateTxtAttribute();
+                        $message_th .= "<br> " . $index++ . ". " . $courseInRangeApplyCourse->getCourseLongDateTxtAttribute();
                     }
+
+                    $message = $lang == 'en' ? $message_eng : $message_th;
 
                     return back()
-                        ->withErrors(['course_id' => $lang == 'en' ? $message_eng : $message_th])  // หรือข้อความอื่น
+                        ->withErrors(['course_id' => $message])  // หรือข้อความอื่น
                         ->withInput();
                 }
             }
