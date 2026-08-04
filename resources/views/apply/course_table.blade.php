@@ -1,3 +1,7 @@
+@php
+    // เมื่อถึงวันปิดรับสมัครในระบบ ให้สมัครทางไลน์ (LINE OA) แทน
+    $lineOaUrl = 'https://lin.ee/NrJTIDn';
+@endphp
 <!DOCTYPE html>
 <html lang="th">
 
@@ -163,21 +167,44 @@
                     @if (isset($regis) &&
                             $regis == 1 &&
                             $course->date_start->copy()->addDays(1)->gte(now()->startOfDay()))
-                        @if ($course->state != 'เปิดรับสมัคร')
-                            <span class="btn-register" style="background-color: #6c757d; cursor: not-allowed;">
-                                @if ($lang == 'th')
-                                    ปิดรับสมัคร
-                                @else
-                                    Close for register
-                                @endif
-                            </span>
-                        @else
+                        @php
+                            // อ่อนนุช (id 4) ปิดรับสมัครก่อนถึงคอร์ส 2 วัน ที่อื่น 1 วัน
+                            $closeBefore = $course->location_id == 4 ? 2 : 1;
+                            $nowDate = now()->startOfDay();
+                            $daysToStart = $nowDate->diffInDays($course->date_start, false);
+                            $isClose = $daysToStart <= 0;
+                            $isEarlyClose = $course->date_start->gt(now()) && $daysToStart <= $closeBefore;
+                            $canRegister = $course->state === 'เปิดรับสมัคร' && !$isEarlyClose;
+
+                            // dd(
+                            //     $isClose,
+                            //     $isEarlyClose,
+                            //     $canRegister,
+                            //     now()->diffInDays($course->date_start, false),
+                            //     $course->date_start,
+                            //     now(),
+                            // );
+
+                        @endphp
+                        @if ($isClose)
+                        @elseif ($canRegister && !$isClose)
                             <a href="{{ route('apply.direct', ['course_id' => $course->id]) }}&lang={{ $lang }}"
                                 target="_blank" class="btn-register">
                                 @if ($lang == 'th')
                                     สมัคร
                                 @else
                                     Register
+                                @endif
+                            </a>
+                        @elseif ($isEarlyClose)
+                            {{-- ถึงวันปิดรับสมัครในระบบ → สมัครทางไลน์ (LINE OA) --}}
+                            <a href="{{ $lineOaUrl }}" target="_blank" class="btn-register"
+                                style="background-color: #06C755;">
+                                <i class="fab fa-line"></i>
+                                @if ($lang == 'th')
+                                    สมัครทางไลน์
+                                @else
+                                    Apply via LINE
                                 @endif
                             </a>
                         @endif

@@ -1,3 +1,11 @@
+@php
+    use Carbon\Carbon;
+    $now = Carbon::now();
+
+    // เมื่อถึงวันปิดรับสมัครในระบบ ให้สมัครทางไลน์ (LINE OA) แทน
+    $lineOaUrl = 'https://lin.ee/NrJTIDn';
+@endphp
+
 <div class="card shadow-lg border-0" >
     <div class="card-header bg-primary text-white text-center fw-bold py-3">
         <h4 class="mb-0">
@@ -34,14 +42,29 @@
                         </td>
                         <td>
                             @php
-                                  $state =  app()->getLocale() === 'en' ? $course->state_en : $course->state;
+                                $start = Carbon::parse($course->date_start);
+                                // อ่อนนุช (id 4) ปิดรับสมัครก่อนถึงคอร์ส 2 วัน ที่อื่น 1 วัน
+                                $closeBefore = $loc->id == 4 ? 2 : 1;
+                                $nowDate = $now->copy()->startOfDay();
+                                $daysToStart = $nowDate->diffInDays($start, false);
+                                $isClose = $daysToStart <= 0;
+                                $isEarlyClose = $start->gt($now) && $daysToStart <= $closeBefore;
+
+                                $state = app()->getLocale() === 'en' ? $course->state_en : $course->state;
                             @endphp
-                            @if ($course->state == 'เปิดรับสมัคร')
+                            @if ($isClose)
+                                <span class="badge bg-danger"><i class="fas fa-times-circle"></i> {{ $state }}</span>
+                            @elseif ($isEarlyClose)
+                                <a href="{{ $lineOaUrl }}" target="_blank"
+                                    class="badge bg-success text-decoration-none">
+                                    <i class="fab fa-line"></i> {{ __('messages.notice.apply_via_line') }}
+                                </a>
+                            @elseif ($course->state === 'เปิดรับสมัคร')
                                 <span class="badge bg-success"><i class="fas fa-check-circle"></i> {{ $state }}</span>
-                            @elseif ($course->state == 'เต็มแล้ว')
+                            @elseif ($course->state === 'ปิดรับสมัคร')
                                 <span class="badge bg-danger"><i class="fas fa-times-circle"></i> {{ $state }}</span>
                             @else
-                                <span class="badge bg-warning text-dark"><i class="fas fa-clock"></i> {{ $state }}</span>
+                                <span class="badge bg-secondary"><i class="fas fa-clock"></i> {{ $state }}</span>
                             @endif
                         </td>
                     </tr>

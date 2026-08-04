@@ -110,6 +110,7 @@ return [
 
     'notice' => [
         'close_30days' => 'ปิดรับสมัคร',
+        'apply_via_line' => 'สมัครทางไลน์',
     ],
 
 

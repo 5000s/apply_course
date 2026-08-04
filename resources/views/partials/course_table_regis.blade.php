@@ -1,6 +1,9 @@
 @php
     use Carbon\Carbon;
     $now = Carbon::now();
+
+    // เมื่อถึงวันปิดรับสมัครในระบบ ให้สมัครทางไลน์ (LINE OA) แทน
+    $lineOaUrl = 'https://lin.ee/NrJTIDn';
 @endphp
 
 <div class="container">
@@ -34,8 +37,13 @@
                         @foreach ($courses as $course)
                             @php
                                 $start = Carbon::parse($course->date_start);
-                                $daysToStart = $now->diffInDays($start, false);
-                                $isEarlyClose = $start->gt($now) && $daysToStart <= 0;
+                                // อ่อนนุช (id 4) ปิดรับสมัครก่อนถึงคอร์ส 2 วัน ที่อื่น 1 วัน
+                                $closeBefore = $location->id == 4 ? 2 : 1;
+                                $nowDate = $now->copy()->startOfDay();
+                                $daysToStart = $nowDate->diffInDays($start, false);
+                                $isClose = $daysToStart <= 0;
+                                $isEarlyClose = $start->gt($now) && $daysToStart <= $closeBefore;
+                                $canRegister = $course->state === 'เปิดรับสมัคร' && !$isEarlyClose && !$isClose;
                             @endphp
                             <tr class="align-middle text-center">
                                 <td>{{ app()->getLocale() === 'en' ? $course->date_range_en : $course->date_range }}
@@ -45,11 +53,17 @@
                                     @php
                                         $state = app()->getLocale() === 'en' ? $course->state_en : $course->state;
                                     @endphp
-                                    @if ($isEarlyClose)
-                                        <span class="badge bg-secondary">
-                                            <i class="fas fa-lock"></i>
-                                            {{ __('messages.notice.close_30days') }}
+                                    @if ($isClose)
+                                        <span class="badge bg-danger">
+                                            <i class="fas fa-times-circle"></i>
+                                            {{ $state }}
                                         </span>
+                                    @elseif ($isEarlyClose)
+                                        <a href="{{ $lineOaUrl }}" target="_blank"
+                                            class="badge bg-success text-decoration-none">
+                                            <i class="fab fa-line"></i>
+                                            {{ __('messages.notice.apply_via_line') }}
+                                        </a>
                                     @elseif($course->state === 'เปิดรับสมัคร')
                                         <span class="badge bg-success">
                                             <i class="fas fa-check-circle"></i>
@@ -70,8 +84,8 @@
 
 
                                 <td>
-                                    {{-- ปุ่มสมัครจะแสดงเฉพาะเมื่อเปิดรับสมัครและยังไม่อยู่ในช่วงปิดก่อนเปิด 0 วัน --}}
-                                    @if (!$isEarlyClose && $course->state === 'เปิดรับสมัคร' && in_array($course->category_id, $allow_types, true))
+                                    {{-- ปุ่มสมัครจะแสดงเฉพาะเมื่อเปิดรับสมัครและยังไม่ถึงวันปิดรับสมัครในระบบ (อ่อนนุชปิดก่อน 2 วัน) --}}
+                                    @if ($canRegister && in_array($course->category_id, $allow_types, true))
                                         @if (is_null($course->apply_id))
                                             <a target="_blank"
                                                 href="{{ route('courses.show', [$member_id, $course->id]) }}"
