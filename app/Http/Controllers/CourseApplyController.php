@@ -69,6 +69,8 @@ class CourseApplyController extends Controller
 
         $category = CourseCategory::where('id', $type)->first();
 
+        $applyViaLine = false;
+
 
 
         return view('apply.course_table', compact('courses', 'category', 'lang', 'id', 'regis'));
@@ -117,6 +119,22 @@ class CourseApplyController extends Controller
 
         $course = Course::findOrFail($courseId);
         $courseCat = CourseCategory::findOrFail($course->category_id);
+
+        $applyCount = $this->getApplyCount($courseId);
+
+
+        $totalCount = $applyCount->male + $applyCount->female;
+        $courseLimit = $this->getCourseLimit($course->category_id, $course->location_id);
+
+        $applyViaLine = false;
+        $limit_apply =  $courseLimit['max_limit'];
+
+        $percent_apply = ($totalCount / $limit_apply) * 100;
+
+        if ($percent_apply > 80 && $limit_apply != 0) {
+            $applyViaLine = true;
+        }
+
 
         $course->date_start_txt = $th($course->date_start);
         $course->date_end_txt   = $th($course->date_end);
@@ -188,6 +206,7 @@ class CourseApplyController extends Controller
             'course'     => $course,
             'course_cat' => $courseCat,
             'lang'       => $lang,
+            'applyViaLine' => $applyViaLine,
             'vm' => [
                 'place_name' => $placeName,
                 'place_name_en' => $placeNameEn,
@@ -908,6 +927,7 @@ class CourseApplyController extends Controller
 
             $totalCount = $applyCount->male + $applyCount->female;
 
+
             if ($applyCount->male > $courseLimit['male_limit'] || $applyCount->female > $courseLimit['female_limit'] || $totalCount > $courseLimit['max_limit']) {
                 $isNeedConfirm = true;
             }
@@ -1016,13 +1036,17 @@ class CourseApplyController extends Controller
     public function getApplyCount($course_id)
     {
         $applyList = Apply::where('course_id', $course_id)
-            ->where('cancel', "!=", 1)
+            ->where(function ($query) {
+                $query->where('cancel', '!=', 1)
+                    ->orWhereNull('cancel');
+            })
             ->with('member')
             ->get();
 
         $male_count = $applyList->where('member.gender', 'ชาย')->count();
         $female_count = $applyList->where('member.gender', 'หญิง')->count();
         $total_count = $applyList->count();
+
 
         return (object) [
             'male' => $male_count,
