@@ -176,8 +176,11 @@
                         <td class="text-center eprint">สัญชาติ</td>
                         <td class="text-center eprint" style="width: 20px;">ศิษย์</td>
                         <td class="text-center eprint" style="width: 20px;">รถตู้</td>
+                        <td class="text-center eprint" style="display: none;">ติดต่อทาง</td>
                         <td class="text-center eprint" style="display: none;">โทร</td>
-                        <td class="text-center " style="display: none;">อีเมล</td>
+                        <td class="text-center eprint" style="display: none;">อีเมล</td>
+                        <td class="text-center eprint" style="display: none;">line</td>
+                        <td class="text-center eprint" style="display: none;">whatsapp</td>
                         {{-- <td class="text-center eprint">role</td> --}}
                         <td class="text-center">ที่พัก</td>
                         <td class="text-center eprint" style="display: none;">ที่พัก</td>
@@ -270,12 +273,20 @@
                             </td>
 
 
-
+                            <td class="text-left" style="display: none">
+                                {{ $member->contact_via }}
+                            </td>
                             <td class="text-left" style="display: none">
                                 {{ $member->phone }}
                             </td>
                             <td class="text-left" style="display: none">
                                 {!! $member->email !!}
+                            </td>
+                            <td class="text-left" style="display: none">
+                                {{ $member->line }}
+                            </td>
+                            <td class="text-left" style="display: none">
+                                {{ $member->whatsapp }}
                             </td>
 
                             {{-- <td class="text-center">{{ $member->role }}</td> --}}

@@ -61,6 +61,14 @@
                                         'phone2' => 'โทรศัพท์ที่ 2',
                                         'gender' => 'เพศ',
                                         'line' => 'ไลน์',
+                                        'whatsapp' => 'Whatsapp',
+                                        'contact_via' => 'ช่องทางที่สะดวกให้ติดต่อ',
+                                        'select_contact' => 'เลือกช่องทาง',
+                                        'contact_phone' => 'โทรศัพท์',
+                                        'contact_email' => 'อีเมล',
+                                        'contact_line' => 'ไลน์',
+                                        'contact_whatsapp' => 'Whatsapp',
+                                        'contact_missing' => 'กรุณากรอกข้อมูลช่องทางที่เลือกให้ติดต่อ',
                                         'dob' => 'วันเกิด',
                                         'day' => 'วัน',
                                         'month' => 'เดือน',
@@ -71,7 +79,8 @@
                                         'province' => 'จังหวัดที่อยู่ในไทย',
                                         'select_province' => '-- เลือกจังหวัด --',
                                         'country' => 'ประเทศ',
-                                        'disease' => 'โรคประจำตัว / ภาวะสุขภาพที่ควรแจ้ง',
+                                        'disease' => 'ข้อจำกัดทางด้านสุขภาพ (Dietary Restriction/Health Condition)',
+                                        'disease_placeholder' => 'ระบุข้อจำกัดด้านอาหารหรือสุขภาพ เช่น ไม่ทานไข่ แพ้ถั่ว มีโรคประจำตัว (อาหารในคอร์สไม่มีเนื้อสัตว์อยู่แล้ว)',
                                         'header_edu' => 'การศึกษา และ อาชีพ',
                                         'education' => 'ระดับการศึกษา',
                                         'organization' => 'องค์กร',
@@ -112,6 +121,14 @@
                                         'phone2' => 'Phone 2',
                                         'gender' => 'Gender',
                                         'line' => 'Line ID',
+                                        'whatsapp' => 'WhatsApp',
+                                        'contact_via' => 'Preferred contact channel',
+                                        'select_contact' => 'Select channel',
+                                        'contact_phone' => 'Phone',
+                                        'contact_email' => 'Email',
+                                        'contact_line' => 'Line',
+                                        'contact_whatsapp' => 'WhatsApp',
+                                        'contact_missing' => 'Please fill in the selected contact channel.',
                                         'dob' => 'Date of Birth',
                                         'day' => 'Day',
                                         'month' => 'Month',
@@ -122,7 +139,8 @@
                                         'province' => 'Province (in Thailand)',
                                         'select_province' => '-- Select Province --',
                                         'country' => 'Country',
-                                        'disease' => 'Congenital Disease / Health Condition',
+                                        'disease' => 'Dietary Restriction / Health Condition',
+                                        'disease_placeholder' => 'Specify dietary or health restrictions, e.g. no egg, nut allergy, medical condition (course meals are already meat-free)',
                                         'header_edu' => 'Education & Career',
                                         'education' => 'Education Level',
                                         'organization' => 'Organization',
@@ -280,9 +298,9 @@
                                     @endif
                                 </div>
                                 <div class="col-md-6" @if ($member_new == false && $member->email != null && $member->email != '') hidden @endif>
-                                    <label class="form-label">{{ $txt['email'] }} *</label>
+                                    <label class="form-label">{{ $txt['email'] }}</label>
                                     <input type="text" name="email" class="form-control"
-                                        value="{{ old('email', $member->email) }}" required>
+                                        value="{{ old('email', $member->email) }}">
                                 </div>
 
                                 <div class="col-md-3" @if ($member_new == false && $member->phone != null && $member->phone != '') hidden @endif>
@@ -331,6 +349,31 @@
                                     <label class="form-label">{{ $txt['line'] }}</label>
                                     <input type="text" name="line" class="form-control"
                                         value="{{ old('line', $member->line) }}">
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">{{ $txt['whatsapp'] }}</label>
+                                    <input type="text" name="whatsapp" class="form-control"
+                                        value="{{ old('whatsapp', $member->whatsapp) }}">
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">{{ $txt['contact_via'] }}</label>
+                                    <select name="contact_via" id="contact_via" class="form-select">
+                                        <option value="">{{ $txt['select_contact'] }}</option>
+                                        <option value="phone"
+                                            {{ old('contact_via', $member->contact_via) == 'phone' ? 'selected' : '' }}>
+                                            {{ $txt['contact_phone'] }}</option>
+                                        <option value="email"
+                                            {{ old('contact_via', $member->contact_via) == 'email' ? 'selected' : '' }}>
+                                            {{ $txt['contact_email'] }}</option>
+                                        <option value="line"
+                                            {{ old('contact_via', $member->contact_via) == 'line' ? 'selected' : '' }}>
+                                            {{ $txt['contact_line'] }}</option>
+                                        <option value="whatsapp"
+                                            {{ old('contact_via', $member->contact_via) == 'whatsapp' ? 'selected' : '' }}>
+                                            {{ $txt['contact_whatsapp'] }}</option>
+                                    </select>
                                 </div>
 
                                 <div class="col-md-6" @if ($member_new == false) hidden @endif>
@@ -408,7 +451,7 @@
                                                     <option value="{{ $year }}"
                                                         {{ $year === $defY ? 'selected' : '' }}>
                                                         @if ($lang === 'th')
-                                                            {{ $year + 543 }}
+                                                            {{ $year + 543 }} ({{ $year }})
                                                         @else
                                                             {{ $year }}
                                                         @endif
@@ -422,13 +465,14 @@
                                 </div>
 
                                 <div class="col-md-6" @if ($member_new == false) hidden @endif>
-                                    <label class="form-label">{{ $txt['nationality'] }}</label>
+                                    <label class="form-label">{{ $txt['nationality'] }} *</label>
+                                    @php $selectedNation = old('nationality', $member->nationality ?: 'ไทย'); @endphp
                                     <select name="nationality" class="form-select">
                                         <option value="">{{ $txt['select_nation'] }}</option>
                                         @foreach ($nations as $nation)
                                             <option value="{{ $nation }}"
-                                                {{ old('nationality', $member->nationality) == $nation ? 'selected' : '' }}>
-                                                {{ $nation }}
+                                                {{ $selectedNation == $nation ? 'selected' : '' }}>
+                                                {{ $nation === 'ไทย' ? 'ไทย (Thailand)' : $nation }}
                                             </option>
                                         @endforeach
                                     </select>
@@ -458,7 +502,8 @@
 
                                 <div class="col-md-12" @if ($member_new == false) hidden @endif>
                                     <label class="form-label">{{ $txt['disease'] }}</label>
-                                    <textarea name="disease" class="form-control" rows="2">{{ old('disease', $member->medical_condition) }}</textarea>
+                                    <textarea name="disease" class="form-control" rows="2"
+                                        placeholder="{{ $txt['disease_placeholder'] }}">{{ old('disease', $member->medical_condition) }}</textarea>
                                     {{-- ถ้าคุณใช้ column อื่นสำหรับโรคประจำตัว ให้ปรับตรงนี้ --}}
                                 </div>
                             </div>
@@ -583,6 +628,8 @@
                     let missingFields = [];
                     let invalidFields = [];
                     let thaiOnlyFields = []; // หน้าไทย: ชื่อ-นามสกุล ต้องเป็นภาษาไทยเท่านั้น
+                    let contactMissing = false; // ช่องทางติดต่อที่เลือก ต้องมีข้อมูลจริง
+                    const contactMissingMsg = @json($txt['contact_missing']);
 
                     // Define field names for display
                     const fieldNames = {
@@ -590,13 +637,15 @@
                             name: 'ชื่อ',
                             surname: 'นามสกุล',
                             email: 'อีเมล',
-                            phone: 'เบอร์โทรศัพท์'
+                            phone: 'เบอร์โทรศัพท์',
+                            nationality: 'สัญชาติ'
                         },
                         en: {
                             name: 'First Name',
                             surname: 'Last Name',
                             email: 'Email',
-                            phone: 'Phone'
+                            phone: 'Phone',
+                            nationality: 'Nationality'
                         }
                     };
 
@@ -607,15 +656,18 @@
                         .getClientRects()
                         .length);
 
-                    // Fields to validate: name, surname, email, phone
-                    const fields = ['name', 'surname', 'email', 'phone'];
+                    // Fields to validate: name, surname, email, phone, nationality
+                    const fields = ['name', 'surname', 'email', 'phone', 'nationality'];
 
                     fields.forEach(field => {
                         const input = form.querySelector(`[name="${field}"]`);
                         if (input && isVisible(input)) {
                             const val = input.value.trim();
                             if (!val) {
-                                missingFields.push(currentNames[field]);
+                                // อีเมลเป็น optional — ไม่บังคับกรอก
+                                if (field !== 'email') {
+                                    missingFields.push(currentNames[field]);
+                                }
                             } else {
                                 if (field === 'email') {
                                     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -642,7 +694,22 @@
                         }
                     });
 
-                    if (missingFields.length > 0 || invalidFields.length > 0 || thaiOnlyFields.length > 0) {
+                    // ช่องทางที่สะดวกให้ติดต่อ: optional (เลือกหรือไม่ก็ได้)
+                    // แต่ถ้าเลือกแล้ว ช่องที่เลือกต้องมีข้อมูลจริง
+                    const contactSelect = form.querySelector('[name="contact_via"]');
+                    if (contactSelect && isVisible(contactSelect)) {
+                        const choice = contactSelect.value;
+                        if (choice) {
+                            const target = form.querySelector(`[name="${choice}"]`);
+                            const targetVal = target ? target.value.trim() : '';
+                            if (!targetVal) {
+                                contactMissing = true;
+                            }
+                        }
+                    }
+
+                    if (missingFields.length > 0 || invalidFields.length > 0 || thaiOnlyFields.length > 0 ||
+                        contactMissing) {
                         e.preventDefault(); // Stop submission
 
                         let title = lang === 'en' ? 'Information Error' : 'ข้อมูลไม่ถูกต้อง';
@@ -661,6 +728,9 @@
                         }
                         if (thaiOnlyFields.length > 0) {
                             textMsgs.push('กรุณากรอกเป็นภาษาไทยเท่านั้นสำหรับ:\n' + thaiOnlyFields.join(', '));
+                        }
+                        if (contactMissing) {
+                            textMsgs.push(contactMissingMsg);
                         }
 
                         let text = textMsgs.join('\n\n');

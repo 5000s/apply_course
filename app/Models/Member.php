@@ -62,7 +62,9 @@ class Member extends Model
         'level_4_date',
         'death_date',
         'leave_date',
-        'leave_description'
+        'leave_description',
+        'contact_via',
+        'whatsapp'
     ];
 
     protected $dates = ['birthdate'];
