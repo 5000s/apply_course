@@ -577,6 +577,7 @@
                     const lang = "{{ $lang ?? 'th' }}"; // 'th' or 'en'
                     let missingFields = [];
                     let invalidFields = [];
+                    let thaiOnlyFields = []; // หน้าไทย: ชื่อ-นามสกุล ต้องเป็นภาษาไทยเท่านั้น
 
                     // Define field names for display
                     const fieldNames = {
@@ -625,11 +626,18 @@
                                         invalidFields.push(currentNames[field]);
                                     }
                                 }
+                                // หน้าไทย: ชื่อ/นามสกุล ต้องเป็นตัวอักษรไทยเท่านั้น (อนุญาตเว้นวรรค)
+                                if (lang !== 'en' && (field === 'name' || field === 'surname')) {
+                                    const thaiRegex = /^[฀-๿\s]+$/;
+                                    if (!thaiRegex.test(val)) {
+                                        thaiOnlyFields.push(currentNames[field]);
+                                    }
+                                }
                             }
                         }
                     });
 
-                    if (missingFields.length > 0 || invalidFields.length > 0) {
+                    if (missingFields.length > 0 || invalidFields.length > 0 || thaiOnlyFields.length > 0) {
                         e.preventDefault(); // Stop submission
 
                         let title = lang === 'en' ? 'Information Error' : 'ข้อมูลไม่ถูกต้อง';
@@ -645,6 +653,9 @@
                             textMsgs.push((lang === 'en' ?
                                 'Please enter correct format for:\n' :
                                 'กรุณากรอกข้อมูลให้ถูกต้องสำหรับ:\n') + invalidFields.join(', '));
+                        }
+                        if (thaiOnlyFields.length > 0) {
+                            textMsgs.push('กรุณากรอกเป็นภาษาไทยเท่านั้นสำหรับ:\n' + thaiOnlyFields.join(', '));
                         }
 
                         let text = textMsgs.join('\n\n');
