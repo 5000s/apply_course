@@ -83,6 +83,22 @@
         $member = $apply->member;
         $course = $apply->course;
 
+        // คำนำหน้าชื่อผู้สมัครตามสถานะ (buddhism): ฆราวาส=คุณ, ภิกษุ=พระคุณเจ้า, แม่ชี=แม่ชี
+        if ($lang === 'en') {
+            $namePrefixMap = [
+                'ฆราวาส' => $member->gender === 'ชาย' ? 'Mr.' : 'Ms.',
+                'ภิกษุ' => 'Venerable',
+                'แม่ชี' => 'Maechee',
+            ];
+        } else {
+            $namePrefixMap = [
+                'ฆราวาส' => 'คุณ',
+                'ภิกษุ' => 'พระคุณเจ้า',
+                'แม่ชี' => 'แม่ชี',
+            ];
+        }
+        $namePrefix = $namePrefixMap[$member->buddhism] ?? '';
+
         $formatDate = function ($start, $end) use ($lang) {
             $s = \Carbon\Carbon::parse($start);
             $e = \Carbon\Carbon::parse($end);
@@ -172,7 +188,7 @@
                                     <tbody>
                                         <tr>
                                             <th scope="row" style="width: 140px;">{{ $txt['name_label'] }}</th>
-                                            <td>{{ $member->name }} {{ $member->surname }}</td>
+                                            <td>{{ $namePrefix ? $namePrefix . ' ' : '' }}{{ $member->name }} {{ $member->surname }}</td>
                                         </tr>
                                         {{-- <tr>
                                             <th scope="row" style="width: 140px;">{{ $txt['email'] }}</th>
@@ -195,8 +211,13 @@
                                                 @endif
                                                 @php $emergencyPhone = $location->phone ?? null; @endphp
                                                 @if ($emergencyPhone)
+                                                    @php $noticeParts = explode(':phone', $txt['emergency_notice']); @endphp
                                                     <div class="mt-2 text-muted small">
-                                                        {{ str_replace(':phone', $emergencyPhone, $txt['emergency_notice']) }}
+                                                        {{ trim($noticeParts[0]) }}
+                                                        <strong class="fs-5 text-dark"
+                                                            style="white-space: nowrap;">{{ $emergencyPhone }}</strong>{{ $lang === 'en' ? '.' : '' }}
+                                                        <br>
+                                                        {{ trim($noticeParts[1] ?? '') }}
                                                     </div>
                                                 @endif
                                             </td>

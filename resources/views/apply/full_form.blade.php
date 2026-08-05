@@ -87,6 +87,7 @@
                                         'travel_van' =>
                                             'โดยรถตู้ที่จัดเตรียมให้ สำหรับไปยัง อ.แก่งคอย จ.สระบุรี ขึ้นรถที่อ่อนนุช ซ.8',
                                         'submit' => 'ยืนยันการสมัครเข้าคอร์ส',
+                                        'confirm_notice' => 'กรุณาตรวจสอบความถูกต้อง และกดปุ่มยืนยันการสมัครเข้าคอร์สด้านล่าง',
                                         'female' => 'หญิง',
                                         'male' => 'ชาย',
                                         'buddhism' => 'พุทธบริษัท / สถานะทางธรรม',
@@ -137,6 +138,7 @@
                                         'travel_van' =>
                                             'By provided van to Kaeng Khoi, Saraburi (Depart from On Nut Soi 8)',
                                         'submit' => 'Confirm Application',
+                                        'confirm_notice' => 'Please review your information and click the button below to confirm your course registration.',
                                         'female' => 'Female',
                                         'male' => 'Male',
                                         'buddhism' => 'Buddhist Status',
@@ -556,6 +558,9 @@
                         </div>
                     @endif
 
+                    <p class="text-center text-danger fw-semibold mb-3">
+                        {{ $txt['confirm_notice'] }}
+                    </p>
                     <div class="text-end">
                         <button type="submit" class="btn btn-primary btn-lg">
                             {{ $txt['submit'] }}
