@@ -114,18 +114,14 @@
             $lang === 'th' ? $courseCategory->show_name : $courseCategory->show_name_en ?? $courseCategory->show_name;
 
         // URL หลักเกณฑ์/กฎระเบียบของแต่ละสถานที่ ดึงจากฐานข้อมูล (locations.url_th / url_en)
-        $defaultUrl =
-            $lang === 'en'
-                ? 'https://bodhidhammayan.org/en/type-of-courseand-schedule-en/'
-                : 'https://bodhidhammayan.org/th/type-of-courseand-schedule-th/';
-        $url =
-            $lang === 'en'
-                ? ($location->url_en ?:
-                ($location->url_th ?:
-                $defaultUrl))
-                : ($location->url_th ?:
-                ($location->url_en ?:
-                $defaultUrl));
+        if ($lang === 'en') {
+            $defaultUrl = 'https://bodhidhammayan.org/en/type-of-courseand-schedule-en/';
+            $url = $location->url_en ?: $defaultUrl;
+        } else {
+            // ค่าเริ่มต้นเป็นภาษาไทย (ไม่ fallback ไป url ภาษาอังกฤษ)
+            $defaultUrl = 'https://bodhidhammayan.org/th/type-of-courseand-schedule-th/';
+            $url = $location->url_th ?: $defaultUrl;
+        }
     @endphp
 
     <div class="container py-5">
