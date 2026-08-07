@@ -61,7 +61,6 @@
                                         'phone2' => 'โทรศัพท์ที่ 2',
                                         'gender' => 'เพศ',
                                         'line' => 'ไลน์',
-                                        'whatsapp' => 'Whatsapp',
                                         'contact_via' => 'ช่องทางที่สะดวกให้ติดต่อ',
                                         'select_contact' => 'เลือกช่องทาง',
                                         'contact_phone' => 'โทรศัพท์',
@@ -121,7 +120,6 @@
                                         'phone2' => 'Phone 2',
                                         'gender' => 'Gender',
                                         'line' => 'Line ID',
-                                        'whatsapp' => 'WhatsApp',
                                         'contact_via' => 'Preferred contact channel',
                                         'select_contact' => 'Select channel',
                                         'contact_phone' => 'Phone',
@@ -349,12 +347,6 @@
                                     <label class="form-label">{{ $txt['line'] }}</label>
                                     <input type="text" name="line" class="form-control"
                                         value="{{ old('line', $member->line) }}">
-                                </div>
-
-                                <div class="col-md-6">
-                                    <label class="form-label">{{ $txt['whatsapp'] }}</label>
-                                    <input type="text" name="whatsapp" class="form-control"
-                                        value="{{ old('whatsapp', $member->whatsapp) }}">
                                 </div>
 
                                 <div class="col-md-6">
@@ -700,7 +692,9 @@
                     if (contactSelect && isVisible(contactSelect)) {
                         const choice = contactSelect.value;
                         if (choice) {
-                            const target = form.querySelector(`[name="${choice}"]`);
+                            // Whatsapp ใช้เบอร์จากช่อง Phone
+                            const targetName = choice === 'whatsapp' ? 'phone' : choice;
+                            const target = form.querySelector(`[name="${targetName}"]`);
                             const targetVal = target ? target.value.trim() : '';
                             if (!targetVal) {
                                 contactMissing = true;

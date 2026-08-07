@@ -878,7 +878,6 @@ class CourseApplyController extends Controller
             $member->surname_emergency = trim($request->input('surname_emergency')) != "" ? $request->input('surname_emergency') : $member->surname_emergency;
             $member->phone_emergency = trim($request->input('phone_emergency')) != "" ? $request->input('phone_emergency') : $member->phone_emergency;
             $member->relation_emergency = trim($request->input('relation_emergency')) != "" ? $request->input('relation_emergency') : $member->relation_emergency;
-            $member->whatsapp = trim($request->input('whatsapp')) != "" ? $request->input('whatsapp') : $member->whatsapp;
             $member->contact_via = trim($request->input('contact_via')) != "" ? $request->input('contact_via') : $member->contact_via;
             $member->is_temp = false;
             $member->save();
