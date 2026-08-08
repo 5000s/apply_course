@@ -129,11 +129,14 @@ class CourseApplyController extends Controller
         $applyViaLine = false;
         $limit_apply =  $courseLimit['max_limit'];
 
-        $percent_apply = ($totalCount / $limit_apply) * 100;
+        if ($limit_apply > 0) {
+            $percent_apply = ($totalCount / $limit_apply) * 100;
 
-        if ($percent_apply > 80 && $limit_apply != 0) {
-            $applyViaLine = true;
+            if ($percent_apply > 80 && $limit_apply != 0) {
+                $applyViaLine = true;
+            }
         }
+
 
 
         $course->date_start_txt = $th($course->date_start);
