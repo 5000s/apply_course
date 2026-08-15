@@ -130,7 +130,7 @@ class CourseApplyController extends Controller
         $limit_apply =  $courseLimit['max_limit'];
 
         if ($limit_apply > 0) {
-            $percent_apply = ($totalCount / $limit_apply) * 100;
+            $percent_apply = ($totalCount / $limit_apply) * 200;
 
             if ($percent_apply > 80 && $limit_apply != 0) {
                 $applyViaLine = true;
