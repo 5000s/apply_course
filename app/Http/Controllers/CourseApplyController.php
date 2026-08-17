@@ -127,15 +127,15 @@ class CourseApplyController extends Controller
         $courseLimit = $this->getCourseLimit($course->category_id, $course->location_id);
 
         $applyViaLine = false;
-        $limit_apply =  $courseLimit['max_limit'];
+        // $limit_apply =  $courseLimit['max_limit'];
 
-        if ($limit_apply > 0) {
-            $percent_apply = ($totalCount / $limit_apply) * 200;
+        // if ($limit_apply > 0) {
+        //     $percent_apply = ($totalCount / $limit_apply) * 100;
 
-            if ($percent_apply > 80 && $limit_apply != 0) {
-                $applyViaLine = true;
-            }
-        }
+        //     if ($percent_apply > 80 && $limit_apply != 0) {
+        //         $applyViaLine = true;
+        //     }
+        // }
 
 
 
