@@ -1,6 +1,9 @@
 @php
     // เมื่อถึงวันปิดรับสมัครในระบบ ให้สมัครทางไลน์ (LINE OA) แทน
     $lineOaUrl = 'https://lin.ee/NrJTIDn';
+
+    // สีปุ่มสมัครสำหรับคอร์สที่รับเฉพาะชาวต่างชาติ
+    $foreignerColor = '#0d6efd';
 @endphp
 <!DOCTYPE html>
 <html lang="th">
@@ -189,14 +192,12 @@
                         @if ($isClose)
                         @elseif ($canRegister && !$isClose)
                             <a href="{{ route('apply.direct', ['course_id' => $course->id]) }}&lang={{ $lang }}"
-                                target="_blank" class="btn-register">
+                                target="_blank" class="btn-register"
+                                @if (!empty($course->only_foreigner)) style="background-color: {{ $foreignerColor }};" @endif>
                                 @if ($lang == 'th')
                                     สมัคร
                                 @else
                                     Register
-                                @endif
-                                @if (!empty($course->only_foreigner))
-                                    *
                                 @endif
                             </a>
                         @elseif ($isEarlyClose)
@@ -219,12 +220,23 @@
         </ul>
 
         @if ($courses->contains(fn($c) => !empty($c->only_foreigner)))
-            <div style="padding: 10px 15px; font-size: 0.85em; color: #666;">
-                @if ($lang == 'th')
-                    * = คอร์สนี้สำหรับชาวต่างชาติเท่านั้น
-                @else
-                    * = This course is for foreigners only
-                @endif
+            <div
+                style="padding: 10px 15px; font-size: 0.85em; color: #666; display: flex; align-items: center; gap: 8px;">
+                <span
+                    style="display:inline-block; background-color: {{ $foreignerColor }}; color:#fff; padding:4px 12px; border-radius:5px; font-size:0.9em;">
+                    @if ($lang == 'th')
+                        สมัคร
+                    @else
+                        Register
+                    @endif
+                </span>
+                <span>
+                    @if ($lang == 'th')
+                        = คอร์สนี้สำหรับชาวต่างชาติเท่านั้น
+                    @else
+                        = This course is for foreigners only
+                    @endif
+                </span>
             </div>
         @endif
     </div>
