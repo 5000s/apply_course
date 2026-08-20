@@ -195,6 +195,9 @@
                                 @else
                                     Register
                                 @endif
+                                @if (!empty($course->only_foreigner))
+                                    *
+                                @endif
                             </a>
                         @elseif ($isEarlyClose)
                             {{-- ถึงวันปิดรับสมัครในระบบ → สมัครทางไลน์ (LINE OA) --}}
@@ -214,6 +217,16 @@
                 <li class="no-course">ไม่มีรอบคอร์สที่เปิดรับสมัครในขณะนี้</li>
             @endforelse
         </ul>
+
+        @if ($courses->contains(fn($c) => !empty($c->only_foreigner)))
+            <div style="padding: 10px 15px; font-size: 0.85em; color: #666;">
+                @if ($lang == 'th')
+                    * = คอร์สนี้สำหรับชาวต่างชาติเท่านั้น
+                @else
+                    * = This course is for foreigners only
+                @endif
+            </div>
+        @endif
     </div>
 
     <script>
