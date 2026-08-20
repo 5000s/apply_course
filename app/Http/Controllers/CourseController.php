@@ -76,6 +76,7 @@ class CourseController extends Controller
         $course->category_id  = $request->input('category_id');
         $course->state        = $request->input('state');
         $course->description        = $request->input('description');
+        $course->only_foreigner = $request->input('only_foreigner') ? 1 : null; // ไม่ติ๊ก = null
         $location = Location::where("id",  $course->location_id)->first()->name;
         $category = CourseCategory::where("id", $course->category_id)->first()->name;
 
@@ -162,6 +163,7 @@ class CourseController extends Controller
         $course->category_id  = $request->input('category_id');
         $course->state        = $request->input('state');
         $course->description        = $request->input('description');
+        $course->only_foreigner = $request->input('only_foreigner') ? 1 : null; // ไม่ติ๊ก = null
         $location = Location::where("id",  $course->location_id)->first()->name;
         $category = CourseCategory::where("id", $course->category_id)->first()->name;
 
@@ -213,6 +215,7 @@ class CourseController extends Controller
         $now_year = Carbon::now()->year;
         $year = $request->input('year', $now_year);
         $month = $request->input('month', 0);
+        $only_foreigner = $request->input('only_foreigner'); // ตัวกรอง: เฉพาะคอร์สต่างชาติ
 
         // Query builder with Eloquent
         $courses = DB::table('courses as c')
@@ -265,6 +268,11 @@ class CourseController extends Controller
             $query->whereYear('c.date_start', $year)
                 ->orWhereYear('c.date_end', $year);
         });
+
+        // เฉพาะคอร์สต่างชาติ
+        if ($only_foreigner) {
+            $courses = $courses->where('c.only_foreigner', 1);
+        }
 
 
         // Group by and get results

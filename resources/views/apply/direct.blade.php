@@ -49,6 +49,8 @@
                                         'course' => 'คอร์ส',
                                         'date' => 'วันที่',
                                         'status' => 'สถานะ',
+                                        'note_label' => 'หมายเหตุ',
+                                        'foreigner_only' => 'คอร์สนี้เปิดรับเฉพาะชาวต่างชาติเท่านั้น',
                                         'state_open' => 'เปิดรับสมัคร',
                                         'state_soon' => 'ใกล้เริ่มแล้ว',
                                         'state_closed' => 'สิ้นสุดการรับสมัคร',
@@ -131,6 +133,8 @@
                                         'course' => 'Course Category',
                                         'date' => 'Date',
                                         'status' => 'Status',
+                                        'note_label' => 'Note',
+                                        'foreigner_only' => 'This course is open to foreigners only',
                                         'state_open' => 'Open',
                                         'state_soon' => 'Starting Soon',
                                         'state_closed' => 'Closed',
@@ -284,6 +288,13 @@
                                                     class="badge {{ $badgeClass }} px-3 py-2">{{ $displayState }}</span>
                                             </td>
                                         </tr>
+                                        @if (!empty($course->only_foreigner))
+                                            <tr>
+                                                <th scope="row" class="text-muted fw-semibold">
+                                                    {{ $txt['note_label'] }}</th>
+                                                <td class="fs-5">{{ $txt['foreigner_only'] }}</td>
+                                            </tr>
+                                        @endif
                                     </tbody>
                                 </table>
                             </div>

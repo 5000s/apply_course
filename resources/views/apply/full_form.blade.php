@@ -50,6 +50,8 @@
                                         'course' => 'คอร์ส',
                                         'date' => 'วันที่',
                                         'status' => 'สถานะ',
+                                        'note_label' => 'หมายเหตุ',
+                                        'foreigner_only' => 'คอร์สนี้เปิดรับเฉพาะชาวต่างชาติเท่านั้น',
                                         'state_open' => 'เปิดรับสมัคร',
                                         'state_soon' => 'ใกล้เริ่มแล้ว',
                                         'state_closed' => 'สิ้นสุดการรับสมัคร',
@@ -109,6 +111,8 @@
                                         'course' => 'Course',
                                         'date' => 'Date',
                                         'status' => 'Status',
+                                        'note_label' => 'Note',
+                                        'foreigner_only' => 'This course is open to foreigners only',
                                         'state_open' => 'Open',
                                         'state_soon' => 'Starting Soon',
                                         'state_closed' => 'Closed',
@@ -238,6 +242,13 @@
                                                     class="badge {{ $badgeClass }} px-3 py-2">{{ $displayState }}</span>
                                             </td>
                                         </tr>
+                                        @if (!empty($course->only_foreigner))
+                                            <tr>
+                                                <th scope="row" class="text-muted fw-semibold">
+                                                    {{ $txt['note_label'] }}</th>
+                                                <td class="fs-5">{{ $txt['foreigner_only'] }}</td>
+                                            </tr>
+                                        @endif
                                     </tbody>
                                 </table>
                             </div>
@@ -295,13 +306,13 @@
                                             value="{{ old('surname', $member->surname) }}">
                                     @endif
                                 </div>
-                                <div class="col-md-6" @if ($member_new == false && $member->email != null && $member->email != '') hidden @endif>
+                                <div class="col-md-6" id="wrap_email" @if ($member_new == false && $member->email != null && $member->email != '') hidden @endif>
                                     <label class="form-label">{{ $txt['email'] }}</label>
                                     <input type="text" name="email" class="form-control"
                                         value="{{ old('email', $member->email) }}">
                                 </div>
 
-                                <div class="col-md-3" @if ($member_new == false && $member->phone != null && $member->phone != '') hidden @endif>
+                                <div class="col-md-3" id="wrap_phone" @if ($member_new == false && $member->phone != null && $member->phone != '') hidden @endif>
                                     <label class="form-label">{{ $txt['phone'] }} *</label>
                                     <input type="text" name="phone" class="form-control"
                                         value="{{ old('phone', $member->phone) }}" required>
@@ -343,12 +354,6 @@
                                     </select>
                                 </div>
 
-                                <div class="col-md-6" @if ($member_new == false) hidden @endif>
-                                    <label class="form-label">{{ $txt['line'] }}</label>
-                                    <input type="text" name="line" class="form-control"
-                                        value="{{ old('line', $member->line) }}">
-                                </div>
-
                                 <div class="col-md-6">
                                     <label class="form-label">{{ $txt['contact_via'] }}</label>
                                     <select name="contact_via" id="contact_via" class="form-select">
@@ -366,6 +371,12 @@
                                             {{ old('contact_via', $member->contact_via) == 'whatsapp' ? 'selected' : '' }}>
                                             {{ $txt['contact_whatsapp'] }}</option>
                                     </select>
+                                </div>
+
+                                <div class="col-md-6" id="wrap_line" @if ($member_new == false) hidden @endif>
+                                    <label class="form-label">{{ $txt['line'] }}</label>
+                                    <input type="text" name="line" class="form-control"
+                                        value="{{ old('line', $member->line) }}">
                                 </div>
 
                                 <div class="col-md-6" @if ($member_new == false) hidden @endif>
@@ -739,6 +750,44 @@
                         });
                     }
                 });
+
+                // เผยช่องกรอกช่องทางติดต่อที่เลือก ถ้ายังไม่มีข้อมูล (สำหรับสมาชิกที่มีข้อมูลอยู่แล้ว)
+                const contactSelectEl = form.querySelector('[name="contact_via"]');
+                const contactWraps = {
+                    phone: document.getElementById('wrap_phone'),
+                    email: document.getElementById('wrap_email'),
+                    line: document.getElementById('wrap_line')
+                };
+                const contactTargetOf = (choice) => (choice === 'whatsapp' ? 'phone' : choice);
+
+                function syncContactInput() {
+                    if (!contactSelectEl) return;
+                    const target = contactTargetOf(contactSelectEl.value);
+
+                    // ซ่อนช่องที่เคยเปิดไว้อัตโนมัติ และไม่ใช่ช่องที่เลือกอยู่
+                    Object.keys(contactWraps).forEach(function(key) {
+                        const wrap = contactWraps[key];
+                        if (wrap && wrap.dataset.forced === '1' && key !== target) {
+                            wrap.setAttribute('hidden', '');
+                            delete wrap.dataset.forced;
+                        }
+                    });
+
+                    // ถ้าช่องที่เลือกยังไม่มีข้อมูล ให้เปิดช่องกรอกให้
+                    if (target && contactWraps[target]) {
+                        const input = form.querySelector(`[name="${target}"]`);
+                        const isEmpty = !input || !input.value.trim();
+                        if (isEmpty) {
+                            contactWraps[target].removeAttribute('hidden');
+                            contactWraps[target].dataset.forced = '1';
+                        }
+                    }
+                }
+
+                if (contactSelectEl) {
+                    contactSelectEl.addEventListener('change', syncContactInput);
+                    syncContactInput(); // ตรวจตอนโหลดครั้งแรก
+                }
             }
         });
     </script>

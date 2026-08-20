@@ -228,6 +228,14 @@
                                     value="{{ $course->description ?? '' }}">
                             </div>
 
+                            <!-- only foreigner -->
+                            <div class="mb-3 form-check">
+                                <input class="form-check-input" type="checkbox" id="only_foreigner"
+                                    name="only_foreigner" value="1"
+                                    {{ old('only_foreigner', $course->only_foreigner ?? null) ? 'checked' : '' }}>
+                                <label class="form-check-label" for="only_foreigner">สำหรับต่างชาติเท่านั้น</label>
+                            </div>
+
                             <!-- listed -->
                             <div class="mb-3">
                                 <label for="listed" class="form-label">Listed</label>

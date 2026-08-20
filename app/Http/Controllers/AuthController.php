@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Member;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
@@ -155,6 +156,7 @@ class AuthController extends Controller
 
                 // อัปเดตรหัสผ่านใหม่ให้กับผู้ใช้
                 $user->password = Hash::make($newPassword);
+                $user->email_verified_at = Carbon::now();
                 $user->save();
 
                 // สร้างเนื้อหา HTML สำหรับอีเมล

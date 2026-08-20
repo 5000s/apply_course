@@ -185,6 +185,13 @@
                                 </select>
                             </div>
 
+                            <div class="form-check align-self-center">
+                                <input class="form-check-input" type="checkbox" id="only_foreigner"
+                                    name="only_foreigner" value="1"
+                                    {{ request()->query('only_foreigner') ? 'checked' : '' }}>
+                                <label class="form-check-label" for="only_foreigner">เฉพาะต่างชาติ</label>
+                            </div>
+
                             <div class="d-flex gap-2">
                                 <button type="submit" class="btn btn-primary">ค้นหา</button>
                                 <a class="btn btn-success" href="{{ route('admin.courses.create') }}">

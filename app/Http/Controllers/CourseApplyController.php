@@ -910,6 +910,18 @@ class CourseApplyController extends Controller
             return response()->json(['ok' => false, 'message' => 'ไม่พบข้อมูลสมาชิก'], 404);
         }
 
+        // คอร์สสำหรับชาวต่างชาติเท่านั้น: ถ้าชื่อเป็นภาษาไทย ไม่อนุญาตให้สมัคร
+        if (!empty($course->only_foreigner) && preg_match('/[\x{0E00}-\x{0E7F}]/u', (string) $member->name)) {
+            $lang = $request->input('lang', 'th');
+            $message = $lang === 'en'
+                ? 'This course is for foreigners only.'
+                : 'คอร์สนี้สำหรับชาวต่างชาติเท่านั้น';
+
+            return redirect()->route('apply.direct', ['course_id' => $course_id, 'lang' => $lang])
+                ->withErrors(['course_id' => $message])
+                ->withInput();
+        }
+
         if (!$apply) {
             $apply = new Apply();
             $apply->member_id = $member_id;
