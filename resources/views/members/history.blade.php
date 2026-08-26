@@ -17,7 +17,18 @@
             @endif
         </div>
 
-        @php $isEn = app()->getLocale() === 'en'; @endphp
+        @php
+            $isEn = app()->getLocale() === 'en';
+            // แผนที่แปลบทบาทที่เข้าคอร์ส (role) เป็นภาษาอังกฤษ
+            $roleMap = [
+                'ผู้เข้าอบรม' => 'Trainee',
+                'ธรรมะบริกร' => 'Dhamma Volunteer',
+                'แม่ครัว' => 'Cook',
+                'ผู้ช่วยแม่ครัว' => 'Assistant Cook',
+                'อาจารย์ผู้ช่วยสอน' => 'Assistant Teacher',
+                'ผู้ดูแลคอร์ส' => 'Course Supervisor',
+            ];
+        @endphp
 
         <div class="card shadow-sm p-3">
             <div class="table-responsive">
@@ -30,6 +41,7 @@
                             <th class="text-center">{{ __('messages.course_name') }}</th>
                             <th class="text-center">{{ __('messages.course_date') }}</th>
                             <th class="text-center">{{ __('messages.application') }}</th>
+                            <th class="text-center">{{ $isEn ? 'Role' : 'บทบาท' }}</th>
                             <th class="text-center">{{ __('messages.cancle') }}</th>
                         </tr>
                     </thead>
@@ -65,7 +77,8 @@
                                 <td class="text-center">
                                     {{ $isEn ? $apply->course_name_en : $apply->course_name }}
                                 </td>
-                                <td class="text-center">
+                                <td class="text-center"
+                                    data-order="{{ \Carbon\Carbon::parse($apply->date_start)->format('Y-m-d') }}">
                                     {{ $isEn ? $apply->date_range_en ?? $apply->date_range : $apply->date_range }}
                                 </td>
 
@@ -74,6 +87,16 @@
                                         <i class="{{ $badge['icon'] }}"></i>
                                         {{ __('apply_history.state.' . $stateKey) }}
                                     </span>
+                                </td>
+
+                                <td class="text-center">
+                                    @if ($apply->role)
+                                        <span class="badge bg-light text-dark border">
+                                            {{ $isEn ? $roleMap[$apply->role] ?? $apply->role : $apply->role }}
+                                        </span>
+                                    @else
+                                        <span class="text-muted">-</span>
+                                    @endif
                                 </td>
 
                                 <td class="text-center">
@@ -135,6 +158,9 @@
                 paging: true,
                 ordering: true,
                 info: true,
+                order: [
+                    [2, 'desc']
+                ], // เรียงตามวันที่คอร์ส ล่าสุดก่อน
                 language: dtLang,
             });
 
