@@ -301,9 +301,10 @@ class ApplyController extends Controller
             $data['allow_types'] = CourseCategory::where('allow_techo', 1)->pluck('id')->all();
         }
 
-
-
-
+        if($location_id == 6 || $location_id == 7){
+            $data['allow_types'] = CourseCategory::where('allow_new', 1)->pluck('id')->all();
+        }
+       
 
         return view('courses.index', $data); // Return the view with the courses list
     }
