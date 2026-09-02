@@ -28,8 +28,7 @@
                 'phone' => 'เบอร์โทรศัพท์ :',
                 'course_label' => 'คอร์สที่สมัคร :',
                 'date_prefix' => 'วันที่',
-                'time_label' => 'เวลา:',
-                'time_punctual' => '(กรุณาตรงต่อเวลา)',
+                'arrive_before' => 'ผู้ปฏิบัติควรมาถึงก่อนเวลา :time ของวันเริ่มคอร์ส',
                 'emergency_notice' =>
                     'กรณีเกิดเหตุฉุกเฉินจนไม่สามารถเข้าร่วมคอร์สได้ กรุณาแจ้งเจ้าหน้าที่มูลนิธิฯ ที่หมายเลข :phone ทั้งนี้ มูลนิธิฯ ขอสงวนสิทธิ์งดรับสมัครเข้าร่วมคอร์สในอนาคต หากไม่มาเข้าคอร์สโดยไม่แจ้งล่วงหน้า',
                 'note_header' => 'หมายเหตุ :',
@@ -63,8 +62,7 @@
                 'phone' => 'Phone :',
                 'course_label' => 'Applied Course :',
                 'date_prefix' => 'Date',
-                'time_label' => 'Time:',
-                'time_punctual' => '(Please be on time)',
+                'arrive_before' => 'Participants should arrive before :time on the first day of the course',
                 'emergency_notice' =>
                     'In the event of an emergency that prevents attendance, please notify the staff at :phone The Foundation reserves the right to deny course registration in the future to those who fail to attend without prior notice.',
                 'note_header' => 'Note :',
@@ -207,7 +205,7 @@
                                                 {{ $txt['date_prefix'] }} {{ $dateStr }}
                                                 @if ($startTime)
                                                     <br>
-                                                    {{ $txt['time_label'] }} {{ $startTime }} {{ $txt['time_punctual'] }}
+                                                    {{ str_replace(':time', $startTime, $txt['arrive_before']) }}
                                                 @endif
                                                 @php $emergencyPhone = $location->phone ?? null; @endphp
                                                 @if ($emergencyPhone)

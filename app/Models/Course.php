@@ -209,7 +209,7 @@ class Course extends Model
             } elseif ($days === 4) {
                 $time = '9:00';
             } elseif ($days > 4) {
-                $time = '9:30';
+                $time = '9:00';
             }
         }
 
