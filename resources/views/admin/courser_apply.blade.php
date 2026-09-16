@@ -148,7 +148,7 @@
                 {!! $makeTab('femalespecial', 'หญิง กุฏิพิเศษ', $stats['femalespecial'] ?? 0) !!}
                 {!! $makeTab('walkin', 'สมัครหน้างาน', $stats['walkin'] ?? 0) !!}
                 {!! $makeTab('volunteer', 'ธรรมบริกร', $stats['volunteer'] ?? 0) !!}
-                {!! $makeTab('cook', 'แม่ครัว', $stats['cook'] ?? 0) !!}
+                {!! $makeTab('cook', 'แม่ครัว/ผู้ช่วย', $stats['cook'] ?? 0) !!}
                 {!! $makeTab('cancel', 'ยกเลิก', $stats['cancel'] ?? 0) !!}
             </div>
         </div>
@@ -386,6 +386,19 @@
 
                             <td class="text-center" style="font-size: 12px">
                                 <span class="state-display">{{ $member->state }}</span>
+                                @php
+                                    $cookRoleLabel =
+                                        $member->role === 'แม่ครัว'
+                                            ? 'แม่ครัว'
+                                            : ($member->role === 'ผู้ช่วยแม่ครัว'
+                                                ? 'ผู้ช่วย'
+                                                : null);
+                                @endphp
+                                @if ($cookRoleLabel)
+                                    <div>
+                                        <span class="badge bg-warning text-dark">{{ $cookRoleLabel }}</span>
+                                    </div>
+                                @endif
                                 <div class="dropdown dropdown-hover">
                                     <div tabindex="0" role="button" class="btn btn-sm btn-active">แก้ไข</div>
                                     <ul tabindex="0"
