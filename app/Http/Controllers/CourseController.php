@@ -794,6 +794,14 @@ class CourseController extends Controller
             $apply->is_volunteer = null;
             $apply->updated_by = $admin->name;
             $apply->save();
+        } else if ($status == 'cook_assistant') {
+            $apply = Apply::where("id", $apply_id)->first();
+            $apply->role = "ผู้ช่วยแม่ครัว";
+            $apply->is_cook = 1;
+            $apply->is_walkin = null;
+            $apply->is_volunteer = null;
+            $apply->updated_by = $admin->name;
+            $apply->save();
         } else if ($status == 'walk_in') {
             $apply = Apply::where("id", $apply_id)->first();
             $apply->role = "ผู้เข้าอบรม";

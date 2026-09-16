@@ -456,6 +456,10 @@
                                             </li>
                                             <li>
                                                 <a class="status-update-link"
+                                                    href="{{ route('admin.courseApplyStatus', ['course_id' => $member->course_id, 'apply_id' => $member->apply_id, 'status' => 'cook_assistant']) }}">ผช.แม่ครัว</a>
+                                            </li>
+                                            <li>
+                                                <a class="status-update-link"
                                                     href="{{ route('admin.courseApplyStatus', ['course_id' => $member->course_id, 'apply_id' => $member->apply_id, 'status' => 'walk_in']) }}">walk
                                                     in</a>
                                             </li>
