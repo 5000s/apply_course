@@ -392,13 +392,11 @@
                                             ? 'แม่ครัว'
                                             : ($member->role === 'ผู้ช่วยแม่ครัว'
                                                 ? 'ผู้ช่วย'
-                                                : null);
+                                                : '');
                                 @endphp
-                                @if ($cookRoleLabel)
-                                    <div>
-                                        <span class="badge bg-warning text-dark">{{ $cookRoleLabel }}</span>
-                                    </div>
-                                @endif
+                                <div class="cook-role-wrap" @if (!$cookRoleLabel) style="display: none;" @endif>
+                                    <span class="badge bg-warning text-dark cook-role-display">{{ $cookRoleLabel }}</span>
+                                </div>
                                 <div class="dropdown dropdown-hover">
                                     <div tabindex="0" role="button" class="btn btn-sm btn-active">แก้ไข</div>
                                     <ul tabindex="0"
@@ -1052,6 +1050,18 @@
                             $tr.find('.state-display').text(res.state);
                             $tr.find('.updated-by-display').text(res.updated_by ===
                                 'Anonymous' ? 'NA' : res.updated_by);
+
+                            // อัปเดตป้ายบทบาทครัว (แม่ครัว/ผู้ช่วย) ตามที่เลือก
+                            var cookLabel = res.role === 'แม่ครัว' ? 'แม่ครัว' :
+                                (res.role === 'ผู้ช่วยแม่ครัว' ? 'ผู้ช่วย' : '');
+                            var $cookWrap = $tr.find('.cook-role-wrap');
+                            if (cookLabel) {
+                                $cookWrap.find('.cook-role-display').text(cookLabel);
+                                $cookWrap.show();
+                            } else {
+                                $cookWrap.hide();
+                            }
+
                             // Also drop the menu
                             if (document.activeElement) {
                                 document.activeElement.blur();
