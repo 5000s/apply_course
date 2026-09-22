@@ -51,7 +51,7 @@
                 <input type="date" class="form-control" id="date_end" name="date_end"
                     value="{{ request('date_end', now()->format('Y-m-d')) }}">
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <label for="course_location" class="form-label">Course Location</label>
                 <select class="form-select" id="course_location" name="course_location[]" multiple>
                     @foreach ($locations as $loc)
@@ -62,10 +62,18 @@
                     @endforeach
                 </select>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <label for="course_type" class="form-label">Course Type</label>
                 <select class="form-select" id="course_type" name="course_type[]" multiple disabled>
                     {{-- Populated via JS --}}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label for="status" class="form-label">สถานะ</label>
+                <select class="form-select" id="status" name="status">
+                    <option value="all" {{ request('status', 'all') === 'all' ? 'selected' : '' }}>ทั้งหมด</option>
+                    <option value="passed" {{ request('status') === 'passed' ? 'selected' : '' }}>ผ่านการอบรม
+                    </option>
                 </select>
             </div>
             <div class="col-12 text-end">

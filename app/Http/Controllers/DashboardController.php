@@ -39,6 +39,7 @@ class DashboardController extends Controller
             : Carbon::now();
         $typeIds = (array) $request->input('course_type', []);
         $locIds  = (array) $request->input('course_location', []);
+        $status  = $request->input('status', 'all'); // 'all' | 'passed'
 
         // 1) Build Course query & pluck IDs
         $courseQ = Course::query();
@@ -60,6 +61,7 @@ class DashboardController extends Controller
         // 2) Load Applies for those courses
         $apps = Apply::with(['member', 'course'])
             ->when(count($courseIds), fn($q) => $q->whereIn('course_id', $courseIds))
+            ->when($status === 'passed', fn($q) => $q->where('state', 'ผ่านการอบรม'))
             ->whereNotNull('member_id')
             ->whereNotNull('course_id')
             ->whereHas('course')              // << ต้องมี course จริง
@@ -152,7 +154,7 @@ class DashboardController extends Controller
             SUM(CASE WHEN m.gender = 'ชาย' AND ((m.nationality IS NOT NULL AND m.nationality <> 'ไทย') OR (m.nationality IS NULL AND (m.country IS NULL OR m.country <> 'Thailand'))) THEN 1 ELSE 0 END) as male_for,
             SUM(CASE WHEN m.gender = 'หญิง' AND ((m.nationality IS NOT NULL AND m.nationality <> 'ไทย') OR (m.nationality IS NULL AND (m.country IS NULL OR m.country <> 'Thailand'))) THEN 1 ELSE 0 END) as female_for
         ")
-            ->where('a.state', 'ผ่านการอบรม')
+            ->when($status === 'passed', fn($q) => $q->where('a.state', 'ผ่านการอบรม'))
             ->whereBetween('c.date_start', [$start, $end])
             ->when(count($typeIds), fn($q) => $q->whereIn('c.category_id', $typeIds))
             ->when(count($locIds),  fn($q) => $q->whereIn('c.location_id', $locIds))
