@@ -440,13 +440,13 @@ class CourseApplyController extends Controller
 
                 if (!$is_range_course_more_than_4 && $is_special_shelter == false && $isAdmin == false) {
 
-                    $lineButton = '<br><a href="https://lin.ee/NrJTIDn" target="_blank" class="btn btn-success btn-lg mt-2">'
-                        . '<i class="bi bi-chat-dots-fill me-2"></i> LINE @bodhidhammayan'
+                    $emailButton = '<br><a href="mailto:info@bodhidhammayan.org" class="btn btn-success btn-lg mt-2">'
+                        . '<i class="bi bi-envelope-fill me-2"></i> info@bodhidhammayan.org'
                         . '</a>';
 
                     $message_eng =  "You have registered for less than 4 consecutive Vipassana meditation courses. Please take a break of at least 4 courses.";
-                    $message_eng .= "<br>If you need to attend the course, please register via Line.";
-                    $message_eng .= $lineButton;
+                    $message_eng .= "<br>If you need to attend the course, please register via Email.";
+                    $message_eng .= $emailButton;
 
                     $index = 1;
                     foreach ($courseInRangeApplyCourses as $courseInRangeApplyCourse) {
@@ -455,8 +455,8 @@ class CourseApplyController extends Controller
 
 
                     $message_th = "คุณได้มีการลงสมัครคอร์ส วิปัสสนากรรมฐาน ติดกันน้อยกว่า 4 คอร์ส กรุณาเว้นระยะห่างอย่างน้อย 4 คอร์ส";
-                    $message_th .= "<br>ถ้ามีความจำเป็นต้องเข้าคอร์ส โปรดสมัครผ่าน Line";
-                    $message_th .= $lineButton;
+                    $message_th .= "<br>ถ้ามีความจำเป็นต้องเข้าคอร์ส โปรดสมัครผ่าน Email";
+                    $message_th .= $emailButton;
 
                     $index = 1;
                     foreach ($courseInRangeApplyCourses as $courseInRangeApplyCourse) {

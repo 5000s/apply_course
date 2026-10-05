@@ -1,6 +1,6 @@
 @php
-    // เมื่อถึงวันปิดรับสมัครในระบบ ให้สมัครทางไลน์ (LINE OA) แทน
-    $lineOaUrl = 'https://lin.ee/NrJTIDn';
+    // เมื่อถึงวันปิดรับสมัครในระบบ ให้สมัครทาง Email แทน
+    $applyEmailUrl = 'mailto:info@bodhidhammayan.org';
 
     // สีปุ่มสมัครสำหรับคอร์สที่รับเฉพาะชาวต่างชาติ
     $foreignerColor = '#0d6efd';
@@ -201,14 +201,14 @@
                                 @endif
                             </a>
                         @elseif ($isEarlyClose)
-                            {{-- ถึงวันปิดรับสมัครในระบบ → สมัครทางไลน์ (LINE OA) --}}
-                            <a href="{{ $lineOaUrl }}" target="_blank" class="btn-register"
-                                style="background-color: #06C755;">
-                                <i class="fab fa-line"></i>
+                            {{-- ถึงวันปิดรับสมัครในระบบ → สมัครทาง Email --}}
+                            <a href="{{ $applyEmailUrl }}" class="btn-register"
+                                style="background-color: #17a2b8;">
+                                <i class="fas fa-envelope"></i>
                                 @if ($lang == 'th')
-                                    สมัครทางไลน์
+                                    สมัครทาง Email
                                 @else
-                                    Apply via LINE
+                                    Apply via Email
                                 @endif
                             </a>
                         @endif

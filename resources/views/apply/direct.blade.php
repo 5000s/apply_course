@@ -80,7 +80,7 @@
                                         'msg_closed_online' => 'คอร์สนี้ปิดรับสมัครทางออนไลน์แล้ว',
                                         'msg_contact_seat' => 'กรุณาติดต่อมูลนิธิฯ เพื่อตรวจสอบที่นั่งว่างได้ที่',
                                         'msg_near_full' => 'คอร์สนี้มีจำนวนผู้สมัครใกล้เต็มแล้ว',
-                                        'msg_apply_via_line' => 'โปรดสมัครผ่าน Line',
+                                        'msg_apply_via_email' => 'โปรดสมัครผ่าน Email ได้ที่',
                                         'email_label' => 'อีเมล',
                                         'tel_label' => 'โทร',
                                         // Modal & JS
@@ -164,7 +164,7 @@
                                         'msg_contact_seat' =>
                                             'Please contact the foundation to check for available seats at:',
                                         'msg_near_full' => 'This course is almost full.',
-                                        'msg_apply_via_line' => 'Please apply via LINE',
+                                        'msg_apply_via_email' => 'Please apply via Email at',
                                         'email_label' => 'Email',
                                         'tel_label' => 'Tel',
                                         // Modal & JS
@@ -329,17 +329,17 @@
                         </div>
                     </div>
                 @elseif ($applyViaLine && $vm['is_open'])
-                    {{-- คอร์สใกล้เต็ม → ให้สมัครผ่าน LINE OA แทนการกรอกฟอร์ม --}}
+                    {{-- คอร์สใกล้เต็ม → ให้สมัครผ่าน Email แทนการกรอกฟอร์ม --}}
                     <div class="card shadow-sm border-success mt-4">
                         <div class="card-body text-center p-4 p-md-5">
                             <h4 class="text-success mb-3 fw-bold">
                                 <i class="bi bi-people-fill me-2"></i> {{ $txt['msg_near_full'] }}
                             </h4>
                             <p class="fs-5 mb-4 text-muted">
-                                {{ $txt['msg_apply_via_line'] }}
+                                {{ $txt['msg_apply_via_email'] }}
                             </p>
-                            <a href="https://lin.ee/NrJTIDn" target="_blank" class="btn btn-success btn-lg">
-                                <i class="bi bi-chat-dots-fill me-2"></i> LINE {{ '@bodhidhammayan' }}
+                            <a href="mailto:info@bodhidhammayan.org" class="btn btn-success btn-lg">
+                                <i class="bi bi-envelope-fill me-2"></i> info@bodhidhammayan.org
                             </a>
                         </div>
                     </div>

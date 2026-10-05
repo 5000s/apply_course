@@ -109,7 +109,7 @@ return [
 
     'notice' => [
         'close_30days' => 'Registration closes',
-        'apply_via_line' => 'Apply via LINE',
+        'apply_via_email' => 'Apply via Email',
     ],
 
 

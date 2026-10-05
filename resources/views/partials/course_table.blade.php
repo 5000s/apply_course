@@ -2,8 +2,8 @@
     use Carbon\Carbon;
     $now = Carbon::now();
 
-    // เมื่อถึงวันปิดรับสมัครในระบบ ให้สมัครทางไลน์ (LINE OA) แทน
-    $lineOaUrl = 'https://lin.ee/NrJTIDn';
+    // เมื่อถึงวันปิดรับสมัครในระบบ ให้สมัครทาง Email แทน
+    $applyEmailUrl = 'mailto:info@bodhidhammayan.org';
 @endphp
 
 <div class="card shadow-lg border-0">
@@ -57,9 +57,9 @@
                                     <span class="badge bg-danger"><i class="fas fa-times-circle"></i>
                                         {{ $state }}</span>
                                 @elseif ($isEarlyClose)
-                                    <a href="{{ $lineOaUrl }}" target="_blank"
-                                        class="badge bg-success text-decoration-none">
-                                        <i class="fab fa-line"></i> {{ __('messages.notice.apply_via_line') }}
+                                    <a href="{{ $applyEmailUrl }}"
+                                        class="badge bg-info text-dark text-decoration-none">
+                                        <i class="fas fa-envelope"></i> {{ __('messages.notice.apply_via_email') }}
                                     </a>
                                 @elseif ($course->state === 'เปิดรับสมัคร')
                                     <span class="badge bg-success"><i class="fas fa-check-circle"></i>
