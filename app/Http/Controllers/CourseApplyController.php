@@ -139,6 +139,7 @@ class CourseApplyController extends Controller
 
 
 
+
         $course->date_start_txt = $th($course->date_start);
         $course->date_end_txt   = $th($course->date_end);
 
@@ -500,6 +501,25 @@ class CourseApplyController extends Controller
 
                 return back()
                     ->withErrors(['course_id' => $lang == 'en' ? $message_eng : $message_th])  // หรือข้อความอื่น
+                    ->withInput();
+            }
+
+            // ผ่านคอร์ส 1 วันครบ 3 ครั้งแล้ว ไม่ให้สมัคร ให้สมัครคอร์ส 3-4 วันแทน
+            $oneDayCategoryIds = CourseCategory::where('day', '<', 1)->pluck('id');
+
+            $oneDayPassedCount = Apply::where('member_id', $member->id)
+                ->where('state', 'ผ่านการอบรม')
+                ->whereHas('course', function ($q) use ($oneDayCategoryIds) {
+                    $q->whereIn('category_id', $oneDayCategoryIds);
+                })
+                ->count();
+
+            if ($oneDayPassedCount >= 3) {
+                $message_eng = "You have completed the 1-day course 3 times. Please register for a 3 or 4-day course instead.";
+                $message_th = "ท่านผ่านการอบรมคอร์ส 1 วันครบ 3 ครั้งแล้ว กรุณาสมัครคอร์ส 3-4 วันแทน";
+
+                return back()
+                    ->withErrors(['course_id' => $lang == 'en' ? $message_eng : $message_th])
                     ->withInput();
             }
         }
@@ -891,7 +911,7 @@ class CourseApplyController extends Controller
         $course = Course::find($course_id);
         $location = Location::find($course->location_id);
 
-
+        // Get Course Type
         $courseCategory = CourseCategory::find($course->category_id);
 
 
@@ -922,6 +942,8 @@ class CourseApplyController extends Controller
                 ->withInput();
         }
 
+
+        // Create Apply Data
         if (!$apply) {
             $apply = new Apply();
             $apply->member_id = $member_id;
@@ -937,28 +959,42 @@ class CourseApplyController extends Controller
         $apply->save();
 
 
-
+        // Set Language for next page
         $lang = $request->input('lang', 'th');
 
+        // Check need Confirm?
         $isNeedConfirm = false;
 
-        if (str_contains($course->category, "วิปัสสนา") || $courseCategory->day >= 1) {
+        // มีวิปัสสนาต้อง Confirm
+        // อานาปานสติ: ที่นั่ง ≤ 90% → Confirm ทันที, เกิน 90% (90-110%) → Waiting (รอเจ้าหน้าที่ Confirm)
+        $vipassanaCategoryIds = [1, 2, 3, 4, 6, 8, 10, 12, 15, 16]; // ชื่อบางหมวดสะกด "วิปัสสานา" จึงเช็ค id ด้วย
+
+        if (str_contains($course->category, "วิปัสสนา") || in_array($course->category_id, $vipassanaCategoryIds)) {
             $isNeedConfirm = true;
         } else {
+
             $courseLimit = $this->getCourseLimit($course->category_id, $location->id);
+
+            // ใบสมัครนี้ถูก save ไปแล้วด้านบน จึงนับรวมอยู่ใน getApplyCount แล้ว (ไม่ต้อง +1)
             $applyCount = $this->getApplyCount($course_id);
-
-            if ($member->gender == "ชาย") {
-                $applyCount->male = $applyCount->male + 1;
-            } else {
-                $applyCount->female = $applyCount->female + 1;
-            }
-
             $totalCount = $applyCount->male + $applyCount->female;
 
+            $genderCount = $member->gender == "ชาย" ? $applyCount->male : $applyCount->female;
+            $genderLimit = $member->gender == "ชาย" ? $courseLimit['male_limit'] : $courseLimit['female_limit'];
 
-            if ($applyCount->male > $courseLimit['male_limit'] || $applyCount->female > $courseLimit['female_limit'] || $totalCount > $courseLimit['max_limit']) {
+            // เกิน 90% ของที่นั่ง (หรือไม่ได้กำหนดที่นั่ง = 0) → Waiting
+            $confirmPercent = 90;
+            $isOverConfirm = fn($count, $limit) => $limit <= 0 || ($count / $limit) * 100 > $confirmPercent;
+
+            if ($isOverConfirm($genderCount, $genderLimit) || $isOverConfirm($totalCount, $courseLimit['max_limit'])) {
                 $isNeedConfirm = true;
+            }
+
+            // Close Course if >>110 : ผู้สมัครรวมถึง 110% ของที่นั่งแล้ว → ปิดรับสมัคร
+            $closePercent = 110;
+            if ($courseLimit['max_limit'] > 0 && ($totalCount / $courseLimit['max_limit']) * 100 >= $closePercent) {
+                $course->state = 'ปิดรับสมัคร';
+                $course->save();
             }
         }
 
