@@ -59,6 +59,8 @@
                                         'name' => 'ชื่อ',
                                         'surname' => 'นามสกุล',
                                         'phone' => 'โทรศัพท์',
+                                        'phone_placeholder' => 'กรอกเบอร์โทรศัพท์',
+                                        'phone_warn' => 'กรุณาตรวจสอบเบอร์ของท่าน เพื่อให้เจ้าหน้าที่ติดต่อกลับ',
                                         'email' => 'อีเมล',
                                         'phone2' => 'โทรศัพท์ที่ 2',
                                         'gender' => 'เพศ',
@@ -121,6 +123,8 @@
                                         'surname' => 'Last Name',
                                         'email' => 'Email',
                                         'phone' => 'Phone',
+                                        'phone_placeholder' => 'Enter phone number',
+                                        'phone_warn' => 'Please verify your phone number so staff can contact you.',
                                         'phone2' => 'Phone 2',
                                         'gender' => 'Gender',
                                         'line' => 'Line ID',
@@ -312,10 +316,15 @@
                                         value="{{ old('email', $member->email) }}">
                                 </div>
 
-                                <div class="col-md-3" id="wrap_phone" @if ($member_new == false && $member->phone != null && $member->phone != '') hidden @endif>
+                                <div class="col-md-6" id="wrap_phone">
                                     <label class="form-label">{{ $txt['phone'] }} *</label>
+                                    {{-- ให้กรอกเบอร์ใหม่ทุกครั้ง ไม่แสดงเบอร์เดิม --}}
                                     <input type="text" name="phone" class="form-control"
-                                        value="{{ old('phone', $member->phone) }}" required>
+                                        value="{{ old('phone') }}" autocomplete="off"
+                                        placeholder="{{ $txt['phone_placeholder'] }}" required>
+                                    <div class="text-danger small mt-1">
+                                        <i class="fas fa-exclamation-circle"></i> {{ $txt['phone_warn'] }}
+                                    </div>
                                 </div>
 
                                 <div class="col-md-3" @if ($member_new == false) hidden @endif>
@@ -753,8 +762,8 @@
 
                 // เผยช่องกรอกช่องทางติดต่อที่เลือก ถ้ายังไม่มีข้อมูล (สำหรับสมาชิกที่มีข้อมูลอยู่แล้ว)
                 const contactSelectEl = form.querySelector('[name="contact_via"]');
+                // หมายเหตุ: ช่องโทรศัพท์แสดงตลอดและบังคับกรอกอยู่แล้ว จึงไม่รวมไว้ในตรรกะเผย/ซ่อน
                 const contactWraps = {
-                    phone: document.getElementById('wrap_phone'),
                     email: document.getElementById('wrap_email'),
                     line: document.getElementById('wrap_line')
                 };

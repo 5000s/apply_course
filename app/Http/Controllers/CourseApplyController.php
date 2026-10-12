@@ -886,7 +886,21 @@ class CourseApplyController extends Controller
             $member->surname = trim($request->input('surname')) != "" ? $request->input('surname') : $member->surname;
             $member->birthdate = trim($request->input('birthdate')) != "" ? $request->input('birthdate') : $member->birthdate;
             $member->email = trim($request->input('email')) != "" ? $request->input('email') : $member->email;
-            $member->phone = trim($request->input('phone')) != "" ? $request->input('phone') : $member->phone;
+
+            // เบอร์โทร: ถ้ากรอกเบอร์ใหม่ไม่ตรงกับเบอร์เดิม ให้เก็บทั้งสองเบอร์ คั่นด้วย , (เบอร์เดิม , เบอร์ใหม่)
+            // การเทียบว่าซ้ำกันหรือไม่ จะตัด "-" และช่องว่างออกก่อน (0812345678 = 081-234-5678)
+            $newPhone = trim($request->input('phone'));
+            if ($newPhone != "") {
+                $oldPhone = trim((string) $member->phone);
+                $normalize = fn($p) => str_replace([' ', '-'], '', (string) $p);
+                $existingNormalized = array_map($normalize, array_filter(array_map('trim', explode(',', $oldPhone))));
+
+                if ($oldPhone === "" || in_array($normalize($newPhone), $existingNormalized, true)) {
+                    $member->phone = $oldPhone === "" ? $newPhone : $oldPhone;
+                } else {
+                    $member->phone = $oldPhone . ' , ' . $newPhone;
+                }
+            }
             $member->phone_new = trim($request->input('phone_2')) != "" ? $request->input('phone_2') : $member->phone_new;
             $member->line = trim($request->input('line')) != "" ? $request->input('line') : $member->line;
             $member->nationality = trim($request->input('nationality')) != "" ? $request->input('nationality') : $member->nationality;

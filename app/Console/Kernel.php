@@ -4,6 +4,7 @@ namespace App\Console;
 
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\CronController;
+use App\Http\Controllers\SmsController;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -35,6 +36,11 @@ class Kernel extends ConsoleKernel
         $schedule->call(function () {
             (new CronController)->updateMemberStatus();
         })->daily();
+
+        // SMS เตือนการเข้าคอร์ส ก่อนวันเริ่มคอร์ส 2 วัน
+        $schedule->call(function () {
+            (new SmsController)->runCourseReminder();
+        })->dailyAt('09:00');
     }
 
     /**

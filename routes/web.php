@@ -183,6 +183,7 @@ Route::prefix('admin')->middleware('auth', 'admin')->group(function () {
     Route::get('/cron/checkAndCancelPastApplications', [CronController::class, 'checkAndCancelPastApplications'])->name('admin.cron.checkAndCancelPastApplications');
     Route::get('/cron/closeCourseAuto', [CronController::class, 'closeCourseAuto'])->name('admin.cron.closeCourseAuto');
     Route::get('/cron/updateMemberStatus', [CronController::class, 'updateMemberStatus'])->name('admin.cron.updateMemberStatus');
+    Route::get('/cron/smsCourseReminder', [SmsController::class, 'remindUpcomingCourses'])->name('admin.cron.smsCourseReminder');
 });
 
 
