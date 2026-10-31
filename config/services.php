@@ -23,6 +23,8 @@ return [
         'url'    => env('SMSKUB_API_URL', 'https://console.sms-kub.com/api/messages'),
         'key'    => env('SMSKUB_API_KEY'),
         'sender' => env('SMSKUB_SENDER', 'KBO staff'),
+        // เบอร์แอดมินที่รับแจ้งเตือนผู้สมัครใหม่ (คั่นด้วยคอมมา เช่น 0812345678,0898765432)
+        'admin_phones' => env('SMSKUB_ADMIN_PHONES', ''),
     ],
 
     'mailgun' => [

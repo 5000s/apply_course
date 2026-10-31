@@ -41,6 +41,12 @@ class Kernel extends ConsoleKernel
         $schedule->call(function () {
             (new SmsController)->runCourseReminder();
         })->dailyAt('09:00');
+
+        // SMS แจ้งแอดมินรายการผู้สมัครใหม่ (ของเมื่อวาน; วันจันทร์รวม ศ-ส-อา)
+        // ส่งเฉพาะ จ-ศ เวลา 08:00 (อยู่ในกรอบ 08:00-17:00)
+        $schedule->call(function () {
+            (new SmsController)->runAdminNewApplyNotify();
+        })->weekdays()->dailyAt('08:00');
     }
 
     /**
