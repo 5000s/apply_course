@@ -342,6 +342,18 @@ class CourseApplyController extends Controller
         // 4) Prepare View Model (Same as directApply)
         $courseCat = CourseCategory::findOrFail($course->category_id);
 
+        // ถ้าสมาชิกเดิมเคยสมัครคอร์สนี้แล้ว (ทุกสถานะ รวมยกเลิก) → แสดงหน้าสรุปเดิม + ปุ่มยกเลิก/สมัครอีกครั้ง
+        if (!$member_new) {
+            $existingApply = Apply::where('member_id', $member->id)
+                ->where('course_id', $course->id)
+                ->orderByDesc('id')
+                ->first();
+
+            if ($existingApply) {
+                return $this->showAlreadyApplied($course, $courseCat, $member, $existingApply, $lang);
+            }
+        }
+
         $need_check_vipassana_history_apply = false;
         $need_check_onlynew_history_apply = false;
         if (Str::contains($courseCat->show_name ?? '', 'วิปัสสนา')) {
@@ -890,9 +902,27 @@ class CourseApplyController extends Controller
             // เบอร์โทร: ถ้ากรอกเบอร์ใหม่ไม่ตรงกับเบอร์เดิม ให้เก็บทั้งสองเบอร์ คั่นด้วย , (เบอร์เดิม , เบอร์ใหม่)
             // การเทียบว่าซ้ำกันหรือไม่ จะตัด "-" และช่องว่างออกก่อน (0812345678 = 081-234-5678)
             $newPhone = trim($request->input('phone'));
+
+            // ถ้าเลือกรหัสประเทศที่ไม่ใช่ไทย ให้เติมรหัสประเทศไว้หน้าเบอร์
+            $countryCode = trim((string) $request->input('phone_country_code'));
+            if ($newPhone != "" && $countryCode != "" && $countryCode != '+66') {
+                $newPhone = $countryCode . ' ' . $newPhone;
+            }
+
+            // อนุญาตให้ติดต่อผ่าน WhatsApp → เก็บ contact_via = whatsapp (ไม่ติ๊ก = ล้างค่า)
+            $member->contact_via = $request->boolean('allow_whatsapp') ? 'whatsapp' : null;
+
             if ($newPhone != "") {
                 $oldPhone = trim((string) $member->phone);
-                $normalize = fn($p) => str_replace([' ', '-'], '', (string) $p);
+                // เทียบแบบ canonical: เอาเฉพาะตัวเลข ตัดรหัสประเทศไทย (66) และ 0 นำหน้า
+                // เพื่อให้ 0897xxxx88 = 897xxxx88 = 66897xxxx88 ถือเป็นเบอร์เดียวกัน
+                $normalize = function ($p) {
+                    $d = preg_replace('/\D+/', '', (string) $p);
+                    if (str_starts_with($d, '66')) {
+                        $d = substr($d, 2);
+                    }
+                    return ltrim($d, '0');
+                };
                 $existingNormalized = array_map($normalize, array_filter(array_map('trim', explode(',', $oldPhone))));
 
                 if ($oldPhone === "" || in_array($normalize($newPhone), $existingNormalized, true)) {
@@ -915,7 +945,6 @@ class CourseApplyController extends Controller
             $member->surname_emergency = trim($request->input('surname_emergency')) != "" ? $request->input('surname_emergency') : $member->surname_emergency;
             $member->phone_emergency = trim($request->input('phone_emergency')) != "" ? $request->input('phone_emergency') : $member->phone_emergency;
             $member->relation_emergency = trim($request->input('relation_emergency')) != "" ? $request->input('relation_emergency') : $member->relation_emergency;
-            $member->contact_via = trim($request->input('contact_via')) != "" ? $request->input('contact_via') : $member->contact_via;
             $member->is_temp = false;
             $member->save();
         }
@@ -1026,6 +1055,54 @@ class CourseApplyController extends Controller
         $apply->save();
 
         return view('apply.complete_ana', ['apply' => $apply, 'course' => $course, 'location' => $location, 'courseCategory' => $courseCategory, 'lang' => $lang]);
+    }
+
+    // แสดงหน้า "เคยสมัครคอร์สนี้แล้ว" พร้อมปุ่มยกเลิก หรือ ยืนยันอีกครั้ง (ถ้าสถานะเดิมเป็นยกเลิก)
+    private function showAlreadyApplied($course, $courseCat, $member, $existingApply, $lang)
+    {
+        $location = $course->location_id ? Location::find($course->location_id) : null;
+
+        $rawImg = $location->image ?? null;
+        if ($rawImg) {
+            $imageUrl = Str::startsWith($rawImg, ['http://', 'https://', '/']) ? $rawImg : asset('images/' . $rawImg);
+        } else {
+            $imageUrl = 'https://placehold.co/800x450?text=Course+Image';
+        }
+
+        $isCancelled = $existingApply->cancel == 1 || $existingApply->state === 'ยกเลิกสมัคร';
+
+        return view('apply.already_applied', [
+            'course'       => $course,
+            'courseCat'    => $courseCat,
+            'member'       => $member,
+            'apply'        => $existingApply,
+            'location'     => $location,
+            'imageUrl'     => $imageUrl,
+            'isCancelled'  => $isCancelled,
+            'lang'         => $lang === 'en' ? 'en' : 'th',
+        ]);
+    }
+
+    // ยกเลิกการสมัครคอร์ส (flow สาธารณะ อ้างจาก course_id + member_id)
+    public function directCancel(Request $request, $course_id, $member_id)
+    {
+        $lang = $request->input('lang', 'th');
+
+        $apply = Apply::where('course_id', $course_id)
+            ->where('member_id', $member_id)
+            ->orderByDesc('id')
+            ->first();
+
+        if ($apply) {
+            $apply->state = 'ยกเลิกสมัคร';
+            $apply->cancel = 1;
+            $apply->cancel_at = now();
+            $apply->updated_by = 'USER';
+            $apply->save();
+        }
+
+        return redirect()->route('apply.direct', ['course_id' => $course_id, 'lang' => $lang])
+            ->with('status', $lang === 'en' ? 'Your registration has been cancelled.' : 'ยกเลิกการสมัครคอร์สเรียบร้อยแล้ว');
     }
 
     public function sendApplyCourseImformationToEmail($member_id, $course_id, $isConfirmed = false)
@@ -1350,24 +1427,20 @@ class CourseApplyController extends Controller
 
     private function emailReportToAdmin(ReportCase $reportCase)
     {
+        $fullName = trim($reportCase->name . ' ' . $reportCase->surname);
+        $subject = "ไม่พบข้อมูลสมัคร (" . $fullName . ")";
+        $emailTo = env('EMAIL_ADMIN', 'info@bodhidhammayan.org');
 
-        $html = "<p>Report Case (แจ้งข้อมูลไม่พบในระบบ)</p>";
-        $html .= "<p>Gender: " . $reportCase->gender . "</p>";
-        $html .= "<p>First Name: " . $reportCase->name . "</p>";
-        $html .= "<p>Last Name: " . $reportCase->surname . "</p>";
-        $html .= "<p>Birth Date: " . $reportCase->birthdate . "</p>";
-        $html .= "<p>Phone: " . $reportCase->phone . "</p>";
-        $html .= "<p>Email: " . $reportCase->email . "</p>";
-
-        $subject = "แจ้งข้อมูลไม่พบในระบบ (" . $reportCase->name . " " . $reportCase->surname . ")";
-
-        $emailService = new EmailService();
-        $emailTo = env('EMAIL_ADMIN');
-        $emailService->sendemail($html, $emailTo, $subject);
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Email sent successfully',
-        ]);
+        try {
+            // ใช้ GmailApiService ตัวเดียวกับอีเมลยืนยันคอร์ส (ส่งผ่าน Blade view)
+            (new GmailApiService())->sendEmail($emailTo, $subject, 'emails.report_not_found', [
+                'reportCase' => $reportCase,
+            ]);
+            return true;
+        } catch (\Throwable $e) {
+            // การส่งอีเมลล้มเหลวต้องไม่ทำให้การแจ้งปัญหาพัง
+            Log::error("Failed to email report case {$reportCase->id} to admin: " . $e->getMessage());
+            return false;
+        }
     }
 }

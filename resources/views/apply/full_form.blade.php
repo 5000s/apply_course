@@ -61,6 +61,16 @@
                                         'phone' => 'โทรศัพท์',
                                         'phone_placeholder' => 'กรอกเบอร์โทรศัพท์',
                                         'phone_warn' => 'กรุณาตรวจสอบเบอร์ของท่าน เพื่อให้เจ้าหน้าที่ติดต่อกลับ',
+                                        'confirm_phone_q' => 'ข้อมูลเบอร์โทรถูกต้องหรือไม่?',
+                                        'confirm_email_q' => 'อีเมลถูกต้องหรือไม่?',
+                                        'answer_correct' => 'ถูกต้อง',
+                                        'answer_edit' => 'ไม่ถูกต้องและแก้ไข',
+                                        'no_email' => 'ไม่มีอีเมล',
+                                        'edit_contact' => 'แก้ไขข้อมูล',
+                                        'contact_edit_note' => 'กรุณากรอกข้อมูลที่ถูกต้อง เพื่อให้เจ้าหน้าที่มูลนิธิฯ สามารถติดต่อได้',
+                                        'country_code' => 'รหัสประเทศ',
+                                        'allow_whatsapp' => 'อนุญาตให้เจ้าหน้าที่ยืนยันคอร์สผ่าน WhatsApp',
+                                        'no_email_note' => 'ท่านจะไม่ได้รับอีเมลยืนยันการสมัครจากระบบ',
                                         'email' => 'อีเมล',
                                         'phone2' => 'โทรศัพท์ที่ 2',
                                         'gender' => 'เพศ',
@@ -125,6 +135,16 @@
                                         'phone' => 'Phone',
                                         'phone_placeholder' => 'Enter phone number',
                                         'phone_warn' => 'Please verify your phone number so staff can contact you.',
+                                        'confirm_phone_q' => 'Is this phone number correct?',
+                                        'confirm_email_q' => 'Is this email correct?',
+                                        'answer_correct' => 'Correct',
+                                        'answer_edit' => 'Incorrect, edit',
+                                        'no_email' => 'No email',
+                                        'edit_contact' => 'Edit',
+                                        'contact_edit_note' => 'Please provide correct contact info so foundation staff can reach you.',
+                                        'country_code' => 'Country code',
+                                        'allow_whatsapp' => 'Allow staff to confirm the course via WhatsApp',
+                                        'no_email_note' => 'You will not receive the confirmation email from the system.',
                                         'phone2' => 'Phone 2',
                                         'gender' => 'Gender',
                                         'line' => 'Line ID',
@@ -173,6 +193,64 @@
                                     ],
                                 ];
                                 $txt = $t[$lang];
+
+                                // ปิดบังเบอร์โทร: เก็บ 3 ตัวแรก + 2 ตัวท้าย ที่เหลือเป็น x (รองรับหลายเบอร์คั่น ,)
+                                $maskPhone = function ($raw) {
+                                    $parts = array_filter(array_map('trim', explode(',', (string) $raw)));
+                                    $masked = array_map(function ($p) {
+                                        $d = preg_replace('/\D+/', '', $p);
+                                        if (strlen($d) < 5) {
+                                            return str_repeat('x', max(1, strlen($d)));
+                                        }
+                                        return substr($d, 0, 3) . str_repeat('x', strlen($d) - 5) . substr($d, -2);
+                                    }, $parts);
+                                    return implode(', ', $masked);
+                                };
+
+                                // ปิดบังอีเมล: แสดง 2 ตัวแรกของ local part ที่เหลือเป็น * แล้วต่อด้วย @domain
+                                $maskEmail = function ($email) {
+                                    $email = (string) $email;
+                                    $at = strpos($email, '@');
+                                    if ($at === false) {
+                                        return $email;
+                                    }
+                                    $local = substr($email, 0, $at);
+                                    $domain = substr($email, $at);
+                                    return mb_substr($local, 0, 2) . str_repeat('*', max(1, mb_strlen($local) - 2)) . $domain;
+                                };
+
+                                // รหัสประเทศสำหรับ dropdown เบอร์โทร (ไทยเป็นค่าเริ่มต้น)
+                                $countryCodes = [
+                                    '+66' => 'ไทย (+66)',
+                                    '+1' => 'USA/Canada (+1)',
+                                    '+44' => 'UK (+44)',
+                                    '+61' => 'Australia (+61)',
+                                    '+64' => 'New Zealand (+64)',
+                                    '+65' => 'Singapore (+65)',
+                                    '+60' => 'Malaysia (+60)',
+                                    '+62' => 'Indonesia (+62)',
+                                    '+63' => 'Philippines (+63)',
+                                    '+84' => 'Vietnam (+84)',
+                                    '+95' => 'Myanmar (+95)',
+                                    '+856' => 'Laos (+856)',
+                                    '+855' => 'Cambodia (+855)',
+                                    '+86' => 'China (+86)',
+                                    '+852' => 'Hong Kong (+852)',
+                                    '+886' => 'Taiwan (+886)',
+                                    '+81' => 'Japan (+81)',
+                                    '+82' => 'South Korea (+82)',
+                                    '+91' => 'India (+91)',
+                                    '+49' => 'Germany (+49)',
+                                    '+33' => 'France (+33)',
+                                    '+39' => 'Italy (+39)',
+                                    '+34' => 'Spain (+34)',
+                                    '+41' => 'Switzerland (+41)',
+                                    '+31' => 'Netherlands (+31)',
+                                    '+46' => 'Sweden (+46)',
+                                    '+7' => 'Russia (+7)',
+                                    '+971' => 'UAE (+971)',
+                                    '+972' => 'Israel (+972)',
+                                ];
 
                                 $formatDate = function ($d) use ($lang) {
                                     if (!$d) {
@@ -310,20 +388,77 @@
                                             value="{{ old('surname', $member->surname) }}">
                                     @endif
                                 </div>
-                                <div class="col-md-6" id="wrap_email" @if ($member_new == false && $member->email != null && $member->email != '') hidden @endif>
-                                    <label class="form-label">{{ $txt['email'] }}</label>
-                                    <input type="text" name="email" class="form-control"
-                                        value="{{ old('email', $member->email) }}">
-                                </div>
+                                {{-- ข้อมูลติดต่อ: แสดงแบบปิดบัง + ปุ่มแก้ไข (สมาชิกเดิมที่มีข้อมูล) / ฟอร์มกรอก (สมาชิกใหม่) --}}
+                                @php $hasExistingContact = $member_new == false && ($member->phone || $member->email); @endphp
+                                <div class="col-12" id="wrap_phone">
+                                    @if ($hasExistingContact)
+                                        <div id="contact_summary"
+                                            class="d-flex flex-wrap justify-content-between align-items-center gap-2 p-3 bg-light border rounded">
+                                            <div>
+                                                @if ($member->phone)
+                                                    <div>{{ $txt['phone'] }}: <span
+                                                            class="fw-semibold">{{ $maskPhone($member->phone) }}</span>
+                                                    </div>
+                                                @endif
+                                                @if ($member->email)
+                                                    <div>{{ $txt['email'] }}: <span
+                                                            class="fw-semibold">{{ $maskEmail($member->email) }}</span>
+                                                    </div>
+                                                @endif
+                                            </div>
+                                            <button type="button" class="btn btn-primary" id="btn_edit_contact">
+                                                <i class="fas fa-pen"></i> {{ $txt['edit_contact'] }}
+                                            </button>
+                                        </div>
+                                    @endif
 
-                                <div class="col-md-6" id="wrap_phone">
-                                    <label class="form-label">{{ $txt['phone'] }} *</label>
-                                    {{-- ให้กรอกเบอร์ใหม่ทุกครั้ง ไม่แสดงเบอร์เดิม --}}
-                                    <input type="text" name="phone" class="form-control"
-                                        value="{{ old('phone') }}" autocomplete="off"
-                                        placeholder="{{ $txt['phone_placeholder'] }}" required>
-                                    <div class="text-danger small mt-1">
-                                        <i class="fas fa-exclamation-circle"></i> {{ $txt['phone_warn'] }}
+                                    <div id="contact_edit_wrap" class="row g-3" @if ($hasExistingContact) hidden @endif>
+                                        <div class="col-12">
+                                            <div class="alert alert-warning py-2 mb-0">
+                                                <i class="fas fa-exclamation-circle"></i> {{ $txt['contact_edit_note'] }}
+                                            </div>
+                                        </div>
+
+                                        {{-- เบอร์โทรศัพท์ + รหัสประเทศ + whatsapp --}}
+                                        <div class="col-md-6">
+                                            <label class="form-label">{{ $txt['phone'] }} *</label>
+                                            <div class="input-group">
+                                                <select name="phone_country_code" class="form-select"
+                                                    style="max-width: 150px;" aria-label="{{ $txt['country_code'] }}">
+                                                    @foreach ($countryCodes as $code => $cLabel)
+                                                        <option value="{{ $code }}"
+                                                            {{ old('phone_country_code', '+66') == $code ? 'selected' : '' }}>
+                                                            {{ $cLabel }}</option>
+                                                    @endforeach
+                                                </select>
+                                                <input type="text" name="phone" class="form-control"
+                                                    value="{{ old('phone') }}" autocomplete="off"
+                                                    placeholder="{{ $txt['phone_placeholder'] }}">
+                                            </div>
+                                            <div class="form-check mt-1">
+                                                <input class="form-check-input" type="checkbox" name="allow_whatsapp"
+                                                    id="allow_whatsapp" value="1"
+                                                    {{ old('allow_whatsapp', $member->contact_via == 'whatsapp' ? '1' : '') ? 'checked' : '' }}>
+                                                <label class="form-check-label"
+                                                    for="allow_whatsapp">{{ $txt['allow_whatsapp'] }}</label>
+                                            </div>
+                                        </div>
+
+                                        {{-- อีเมล + ไม่มีอีเมล --}}
+                                        <div class="col-md-6">
+                                            <label class="form-label">{{ $txt['email'] }}</label>
+                                            <input type="text" name="email" class="form-control" id="email_input"
+                                                value="{{ old('email', $hasExistingContact ? '' : $member->email) }}"
+                                                autocomplete="off" placeholder="{{ $txt['email'] }}">
+                                            <div class="form-check mt-1">
+                                                <input class="form-check-input" type="checkbox" id="no_email">
+                                                <label class="form-check-label"
+                                                    for="no_email">{{ $txt['no_email'] }}</label>
+                                            </div>
+                                            <div id="no_email_note" class="text-danger small mt-1" hidden>
+                                                * {{ $txt['no_email_note'] }}
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -360,25 +495,6 @@
                                         <option value="แม่ชี"
                                             {{ old('buddhism', $member->buddhism) == 'แม่ชี' ? 'selected' : '' }}>
                                             {{ $txt['nun'] }}</option>
-                                    </select>
-                                </div>
-
-                                <div class="col-md-6">
-                                    <label class="form-label">{{ $txt['contact_via'] }}</label>
-                                    <select name="contact_via" id="contact_via" class="form-select">
-                                        <option value="">{{ $txt['select_contact'] }}</option>
-                                        <option value="phone"
-                                            {{ old('contact_via', $member->contact_via) == 'phone' ? 'selected' : '' }}>
-                                            {{ $txt['contact_phone'] }}</option>
-                                        <option value="email"
-                                            {{ old('contact_via', $member->contact_via) == 'email' ? 'selected' : '' }}>
-                                            {{ $txt['contact_email'] }}</option>
-                                        <option value="line"
-                                            {{ old('contact_via', $member->contact_via) == 'line' ? 'selected' : '' }}>
-                                            {{ $txt['contact_line'] }}</option>
-                                        <option value="whatsapp"
-                                            {{ old('contact_via', $member->contact_via) == 'whatsapp' ? 'selected' : '' }}>
-                                            {{ $txt['contact_whatsapp'] }}</option>
                                     </select>
                                 </div>
 
@@ -640,8 +756,6 @@
                     let missingFields = [];
                     let invalidFields = [];
                     let thaiOnlyFields = []; // หน้าไทย: ชื่อ-นามสกุล ต้องเป็นภาษาไทยเท่านั้น
-                    let contactMissing = false; // ช่องทางติดต่อที่เลือก ต้องมีข้อมูลจริง
-                    const contactMissingMsg = @json($txt['contact_missing']);
 
                     // Define field names for display
                     const fieldNames = {
@@ -706,24 +820,7 @@
                         }
                     });
 
-                    // ช่องทางที่สะดวกให้ติดต่อ: optional (เลือกหรือไม่ก็ได้)
-                    // แต่ถ้าเลือกแล้ว ช่องที่เลือกต้องมีข้อมูลจริง
-                    const contactSelect = form.querySelector('[name="contact_via"]');
-                    if (contactSelect && isVisible(contactSelect)) {
-                        const choice = contactSelect.value;
-                        if (choice) {
-                            // Whatsapp ใช้เบอร์จากช่อง Phone
-                            const targetName = choice === 'whatsapp' ? 'phone' : choice;
-                            const target = form.querySelector(`[name="${targetName}"]`);
-                            const targetVal = target ? target.value.trim() : '';
-                            if (!targetVal) {
-                                contactMissing = true;
-                            }
-                        }
-                    }
-
-                    if (missingFields.length > 0 || invalidFields.length > 0 || thaiOnlyFields.length > 0 ||
-                        contactMissing) {
+                    if (missingFields.length > 0 || invalidFields.length > 0 || thaiOnlyFields.length > 0) {
                         e.preventDefault(); // Stop submission
 
                         let title = lang === 'en' ? 'Information Error' : 'ข้อมูลไม่ถูกต้อง';
@@ -743,9 +840,6 @@
                         if (thaiOnlyFields.length > 0) {
                             textMsgs.push('กรุณากรอกเป็นภาษาไทยเท่านั้นสำหรับ:\n' + thaiOnlyFields.join(', '));
                         }
-                        if (contactMissing) {
-                            textMsgs.push(contactMissingMsg);
-                        }
 
                         let text = textMsgs.join('\n\n');
                         let confirmBtn = lang === 'en' ? 'OK' : 'ตกลง';
@@ -760,42 +854,29 @@
                     }
                 });
 
-                // เผยช่องกรอกช่องทางติดต่อที่เลือก ถ้ายังไม่มีข้อมูล (สำหรับสมาชิกที่มีข้อมูลอยู่แล้ว)
-                const contactSelectEl = form.querySelector('[name="contact_via"]');
-                // หมายเหตุ: ช่องโทรศัพท์แสดงตลอดและบังคับกรอกอยู่แล้ว จึงไม่รวมไว้ในตรรกะเผย/ซ่อน
-                const contactWraps = {
-                    email: document.getElementById('wrap_email'),
-                    line: document.getElementById('wrap_line')
-                };
-                const contactTargetOf = (choice) => (choice === 'whatsapp' ? 'phone' : choice);
-
-                function syncContactInput() {
-                    if (!contactSelectEl) return;
-                    const target = contactTargetOf(contactSelectEl.value);
-
-                    // ซ่อนช่องที่เคยเปิดไว้อัตโนมัติ และไม่ใช่ช่องที่เลือกอยู่
-                    Object.keys(contactWraps).forEach(function(key) {
-                        const wrap = contactWraps[key];
-                        if (wrap && wrap.dataset.forced === '1' && key !== target) {
-                            wrap.setAttribute('hidden', '');
-                            delete wrap.dataset.forced;
-                        }
+                // ปุ่ม "แก้ไขข้อมูล": แสดงฟอร์มแก้ไขเบอร์/อีเมล แล้วซ่อนสรุปแบบปิดบัง
+                const btnEditContact = document.getElementById('btn_edit_contact');
+                const contactSummary = document.getElementById('contact_summary');
+                const contactEditWrap = document.getElementById('contact_edit_wrap');
+                if (btnEditContact && contactEditWrap) {
+                    btnEditContact.addEventListener('click', function() {
+                        contactEditWrap.hidden = false;
+                        if (contactSummary) contactSummary.hidden = true;
+                        const phoneInput = contactEditWrap.querySelector('[name="phone"]');
+                        if (phoneInput) phoneInput.focus();
                     });
-
-                    // ถ้าช่องที่เลือกยังไม่มีข้อมูล ให้เปิดช่องกรอกให้
-                    if (target && contactWraps[target]) {
-                        const input = form.querySelector(`[name="${target}"]`);
-                        const isEmpty = !input || !input.value.trim();
-                        if (isEmpty) {
-                            contactWraps[target].removeAttribute('hidden');
-                            contactWraps[target].dataset.forced = '1';
-                        }
-                    }
                 }
 
-                if (contactSelectEl) {
-                    contactSelectEl.addEventListener('change', syncContactInput);
-                    syncContactInput(); // ตรวจตอนโหลดครั้งแรก
+                // "ไม่มีอีเมล": ปิด/ล้างช่องอีเมล และแสดงหมายเหตุว่าจะไม่ได้รับอีเมลยืนยัน
+                const emailInput = document.getElementById('email_input');
+                const noEmailChk = document.getElementById('no_email');
+                const noEmailNote = document.getElementById('no_email_note');
+                if (noEmailChk && emailInput) {
+                    noEmailChk.addEventListener('change', function() {
+                        emailInput.disabled = this.checked;
+                        if (this.checked) emailInput.value = '';
+                        if (noEmailNote) noEmailNote.hidden = !this.checked;
+                    });
                 }
             }
         });

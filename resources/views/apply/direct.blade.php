@@ -109,6 +109,8 @@
                                         'js_new_member_msg_2' =>
                                             '<u> หากท่านเป็นสมาชิกใหม่ </u> สามารถกด "ฉันเป็นผู้สมัครใหม่" เพื่อสมัครได้ทันที <br><u> หากท่านเป็นศิษย์เก่า </u> แต่หาข้อมูลไม่พบ กรุณากดปุ่ม',
                                         'js_btn_not_found' => 'แจ้งไม่พบข้อมูล',
+                                        'js_alumni_not_found' => 'ฉันเป็นศิษย์เก่า แต่ไม่พบข้อมูลของฉัน',
+                                        'js_contact_admin' => 'ติดต่อแอดมิน',
                                         'js_found_header' => 'พบข้อมูลที่อาจเป็นท่าน :count รายการ',
                                         'js_vipassana' => 'ศิษย์วิปัสสนา',
                                         'js_new_applicant' => 'ฉันเป็นผู้สมัครใหม่ (ไม่เคยสมัครมาก่อน)',
@@ -193,6 +195,8 @@
                                         'js_new_member_msg_2' =>
                                             '<u>If you are a new member</u>, you can click "I am a new applicant" to apply immediately. <br><u>If you are an old student</u> but cannot find data, please click',
                                         'js_btn_not_found' => 'Report Not Found',
+                                        'js_alumni_not_found' => 'I am a returning student but my information is not found',
+                                        'js_contact_admin' => 'Contact Admin',
                                         'js_found_header' => 'Found :count possible matches',
                                         'js_vipassana' => 'Vipassana Student',
                                         'js_new_applicant' => 'I am a new applicant (never applied before)',
@@ -803,7 +807,7 @@
                                         <div>
                                             <strong>${TRANS.js_not_found_header}</strong><br>
                                            ${TRANS.js_new_member_msg}
-                                           <button type="button" class="btn btn-primary" onclick="showNotFoundModal()">${TRANS.js_btn_not_found}</button>
+                                           <button type="button" class="btn btn-primary" onclick="showNotFoundModal()">${TRANS.js_contact_admin}</button>
 
                                         </div>
                                     </div>`;
@@ -855,14 +859,12 @@
                             html += `</div></div>`;
 
 
-                            html += `<div class="alert alert-success d-flex align-items-center">
-                                        <i class="bi bi-person-check-fill fs-3 me-3"></i>
-                                        <div>
-            
-                                           ${TRANS.js_new_member_msg_2}
-                                           <button type="button" class="btn btn-primary" onclick="showNotFoundModal()">${TRANS.js_btn_not_found}</button>
-
-                                        </div>
+                            // ศิษย์เก่าแต่ไม่พบข้อมูล → ติดต่อแอดมิน (เปิด popup แจ้งปัญหา)
+                            html += `<div class="border border-dark rounded p-3 mb-3 d-flex w-100 justify-content-between align-items-center flex-wrap gap-2">
+                                        <h5 class="mb-0 fs-5">${TRANS.js_alumni_not_found}</h5>
+                                        <button type="button" class="btn btn-primary rounded-pill px-3 py-2 fw-bold" onclick="showNotFoundModal()">
+                                            ${TRANS.js_contact_admin}
+                                        </button>
                                     </div>`;
 
                         }
