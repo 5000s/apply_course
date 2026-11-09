@@ -350,8 +350,13 @@
                 @elseif ($vm['is_open'])
                     {{-- ฟอร์มสมัคร (ไม่มี OTP แล้ว ใช้แค่ Captcha) --}}
                     <div class="card shadow-sm">
-                        <div class="card-header bg-white">
+                        <div class="card-header bg-white d-flex justify-content-between align-items-center flex-wrap gap-2">
                             <h5 class="mb-0">{{ $txt['form_header'] }}</h5>
+                            @if ($lang === 'th')
+                                {{-- ปุ่มสลับเป็นภาษาอังกฤษสำหรับชาวต่างชาติ (ไปหน้าเดิม + lang=en) --}}
+                                <a href="{{ route('apply.direct', ['course_id' => $course->id, 'lang' => 'en']) }}"
+                                    class="btn btn-primary rounded-pill px-3">For foreigners please click here</a>
+                            @endif
                         </div>
                         <div class="card-body">
 
