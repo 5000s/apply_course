@@ -67,6 +67,7 @@
                                         'answer_edit' => 'ไม่ถูกต้องและแก้ไข',
                                         'no_email' => 'ไม่มีอีเมล',
                                         'edit_contact' => 'แก้ไขข้อมูล',
+                                        'use_original' => 'ใช้ข้อมูลเดิม',
                                         'contact_edit_note' => 'กรุณากรอกข้อมูลที่ถูกต้อง เพื่อให้เจ้าหน้าที่มูลนิธิฯ สามารถติดต่อได้',
                                         'country_code' => 'รหัสประเทศ',
                                         'allow_whatsapp' => 'อนุญาตให้เจ้าหน้าที่ยืนยันคอร์สผ่าน WhatsApp',
@@ -141,6 +142,7 @@
                                         'answer_edit' => 'Incorrect, edit',
                                         'no_email' => 'No email',
                                         'edit_contact' => 'Edit',
+                                        'use_original' => 'Use original info',
                                         'contact_edit_note' => 'Please provide correct contact info so foundation staff can reach you.',
                                         'country_code' => 'Country code',
                                         'allow_whatsapp' => 'Allow staff to confirm the course via WhatsApp',
@@ -414,8 +416,18 @@
 
                                     <div id="contact_edit_wrap" class="row g-3" @if ($hasExistingContact) hidden @endif>
                                         <div class="col-12">
-                                            <div class="alert alert-warning py-2 mb-0">
-                                                <i class="fas fa-exclamation-circle"></i> {{ $txt['contact_edit_note'] }}
+                                            <div
+                                                class="alert alert-warning py-2 mb-0 d-flex flex-wrap justify-content-between align-items-center gap-2">
+                                                <span>
+                                                    <i class="fas fa-exclamation-circle"></i> {{ $txt['contact_edit_note'] }}
+                                                </span>
+                                                @if ($hasExistingContact)
+                                                    {{-- ปุ่มยกเลิกการแก้ไข: กลับไปใช้ข้อมูลเดิม (โหมดปิดบัง) --}}
+                                                    <button type="button" class="btn btn-sm btn-outline-secondary"
+                                                        id="btn_use_original">
+                                                        <i class="fas fa-rotate-left"></i> {{ $txt['use_original'] }}
+                                                    </button>
+                                                @endif
                                             </div>
                                         </div>
 
@@ -864,6 +876,26 @@
                         if (contactSummary) contactSummary.hidden = true;
                         const phoneInput = contactEditWrap.querySelector('[name="phone"]');
                         if (phoneInput) phoneInput.focus();
+                    });
+                }
+
+                // ปุ่ม "ใช้ข้อมูลเดิม": ยกเลิกการแก้ไข กลับไปสรุปแบบปิดบัง และล้างช่องที่กรอกไว้
+                const btnUseOriginal = document.getElementById('btn_use_original');
+                if (btnUseOriginal && contactEditWrap) {
+                    btnUseOriginal.addEventListener('click', function() {
+                        contactEditWrap.hidden = true;
+                        if (contactSummary) contactSummary.hidden = false;
+                        const phoneInput = contactEditWrap.querySelector('[name="phone"]');
+                        if (phoneInput) phoneInput.value = '';
+                        const emailField = document.getElementById('email_input');
+                        if (emailField) {
+                            emailField.value = '';
+                            emailField.disabled = false;
+                        }
+                        const noEmailField = document.getElementById('no_email');
+                        if (noEmailField) noEmailField.checked = false;
+                        const noEmailNoteEl = document.getElementById('no_email_note');
+                        if (noEmailNoteEl) noEmailNoteEl.hidden = true;
                     });
                 }
 
