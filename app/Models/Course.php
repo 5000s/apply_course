@@ -226,6 +226,25 @@ class Course extends Model
         return $time . ' น.';
     }
 
+    // คอร์สที่ยาวเกินกี่วัน (นับรวมวันเริ่มและวันจบ) ถือเป็นคอร์สวิปัสสนา
+    const VIPASSANA_OVER_DAYS = 6;
+
+    /**
+     * คอร์สวิปัสสนา = คอร์สที่ยาวเกิน 6 วัน
+     * ใช้เลือกชุดกฎระเบียบที่แสดงก่อนสมัคร (หน้า apply.direct)
+     */
+    public function isVipassana(): bool
+    {
+        if (!$this->date_start || !$this->date_end) {
+            return false;
+        }
+
+        // จำนวนวันแบบนับรวมวันเริ่มและวันจบ (inclusive)
+        $days = $this->date_start->diffInDays($this->date_end) + 1;
+
+        return $days > self::VIPASSANA_OVER_DAYS;
+    }
+
 
     public static function generateCourseName($start_date, $end_date)
     {

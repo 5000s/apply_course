@@ -221,6 +221,7 @@ class CourseApplyController extends Controller
                 'is_open'         => $isOpen,
                 'state'           => $state,
                 'hours_until_start' => $hoursUntilStart,
+                'is_vipassana'    => $course->isVipassana(), // คอร์ส > 6 วัน → แสดงกฎชุดวิปัสสนา
             ],
         ]);
     }

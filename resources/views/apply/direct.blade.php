@@ -348,7 +348,23 @@
                         </div>
                     </div>
                 @elseif ($vm['is_open'])
-                    {{-- ฟอร์มสมัคร (ไม่มี OTP แล้ว ใช้แค่ Captcha) --}}
+                    @php
+                        // กลับมาจากการส่งฟอร์มไม่ผ่าน (มี error / ค่าที่กรอกค้างไว้) = ยอมรับกฎไปแล้ว ไม่ต้องให้ติ๊กซ้ำ
+                        $rulesAccepted = $errors->any() || old('first_name') !== null;
+                    @endphp
+
+                    {{-- แสดงข้อความสำเร็จจาก session (ถ้ามี) เช่น ยกเลิกการสมัครแล้ว --}}
+                    @if (session('status'))
+                        <div class="alert alert-success fs-5">
+                            {{ session('status') }}
+                        </div>
+                    @endif
+
+                    {{-- กฎระเบียบ: ต้องยอมรับก่อน จึงจะเข้าสู่ขั้นตอนค้นหาชื่อเพื่อสมัคร --}}
+                    @include('apply.partials.rules')
+
+                    {{-- ฟอร์มสมัคร (ไม่มี OTP แล้ว ใช้แค่ Captcha) ซ่อนไว้จนกว่าจะยอมรับกฎ --}}
+                    <div id="applyFormWrap" class="{{ $rulesAccepted ? '' : 'd-none' }}">
                     <div class="card shadow-sm">
                         <div class="card-header bg-white d-flex justify-content-between align-items-center flex-wrap gap-2">
                             <h5 class="mb-0">{{ $txt['form_header'] }}</h5>
@@ -368,13 +384,6 @@
                                             <li>{!! $error !!}</li>
                                         @endforeach
                                     </ul>
-                                </div>
-                            @endif
-
-                            {{-- แสดงข้อความสำเร็จจาก session (ถ้ามี) --}}
-                            @if (session('status'))
-                                <div class="alert alert-success fs-5">
-                                    {{ session('status') }}
                                 </div>
                             @endif
 
@@ -590,6 +599,7 @@
                             </div>
                         </div>
                     </div>
+                    </div>{{-- /#applyFormWrap --}}
 
                 @endif
             </div>
