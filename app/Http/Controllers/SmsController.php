@@ -20,6 +20,9 @@ class SmsController extends Controller
     // ส่ง SMS เตือนการเข้าคอร์ส ล่วงหน้ากี่วันก่อนวันเริ่มคอร์ส
     private const REMINDER_DAYS_BEFORE = 2;
 
+    // เบอร์ติดต่อมูลนิธิ (ใช้ลงท้าย SMS เตือนเข้าคอร์ส)
+    private const CONTACT_PHONE = '02-117-4063';
+
     // แจ้งเตือนแอดมินเมื่อมีผู้สมัครใหม่: 1 SMS ไม่เกินกี่คน
     private const ADMIN_NOTIFY_MAX_PER_SMS = 3;
     // ช่วงเวลาที่อนุญาตให้ส่ง SMS แจ้งแอดมิน (จ-ศ เวลา 08:00-17:00)
@@ -287,7 +290,7 @@ class SmsController extends Controller
             . $course->getCourseLongDateTxtAttribute(true)
             . " ที่ {$course->location}"
             . ($time ? " กรุณามาถึงก่อน {$time}" : '')
-            . " - มูลนิธิโรงเรียนแห่งชีวิต";
+            . " โทร. " . self::CONTACT_PHONE;
     }
 
     private function reminderMessageEn(Course $course, ?string $categoryEn, ?string $locationEn): string
@@ -298,7 +301,7 @@ class SmsController extends Controller
             . $course->getCourseLongDateTxtEnAttribute(true)
             . " at " . ($locationEn ?: $course->location) . "."
             . ($time ? " Please arrive before {$time}." : '')
-            . " - Bodhidhammayan";
+            . " Tel. " . self::CONTACT_PHONE;
     }
 
     // รับเฉพาะเบอร์มือถือไทย 0[689]XXXXXXXX (แปลง +66/66 ให้)
