@@ -230,6 +230,8 @@
                             </p>
                         </div>
 
+                        @include('apply.partials.rule_images')
+
                         @if (!isset($is_email))
                             <div class="text-center mt-5">
                                 <p class="mb-1">{{ $txt['regards'] }}</p>

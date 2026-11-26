@@ -1149,6 +1149,8 @@ class CourseApplyController extends Controller
                 : ($lang === 'th' ? 'ได้รับใบสมัครของท่านแล้ว' : 'Application Received'))
                 . ' - ' . $courseTitle;
 
+            $ruleImages = $this->applyEmailRuleImages($course);
+
             $gmailService = new GmailApiService();
             $gmailService->sendEmail($member->email, $subject, $view, [
                 'apply' => $apply,
@@ -1156,8 +1158,9 @@ class CourseApplyController extends Controller
                 'location' => $location,
                 'courseCategory' => $courseCategory,
                 'lang' => $lang,
-                'is_email' => true
-            ]);
+                'is_email' => true,
+                'rule_images' => $ruleImages,
+            ], null, array_column($ruleImages, 'path', 'cid'));
 
             return true;
         } catch (\Throwable $e) {
@@ -1165,6 +1168,39 @@ class CourseApplyController extends Controller
             Log::error("Failed to send apply email to member {$member_id} course {$course_id}: " . $e->getMessage());
             return false;
         }
+    }
+
+    /**
+     * รูปกฎระเบียบที่ฝังท้ายอีเมลสมัครคอร์ส (ไฟล์อยู่ที่ public/images/rules, ฝังด้วย Content-ID)
+     * วิปัสสนา (> 6 วัน) = กฎวิปัสสนา, คอร์ส 1 วัน = กฎทั่วไป + การแต่งกายคอร์ส 1 วัน, นอกนั้น = กฎทั่วไป
+     *
+     * @return array<int, array{cid: string, path: string, src: string, alt: string}>
+     */
+    private function applyEmailRuleImages(Course $course): array
+    {
+        $image = function (string $file, string $alt) {
+            $cid = pathinfo($file, PATHINFO_FILENAME) . '@bodhidhammayan';
+
+            return [
+                'cid' => $cid,
+                'path' => public_path("images/rules/{$file}"),
+                'src' => "cid:{$cid}",
+                'alt' => $alt,
+            ];
+        };
+
+        if ($course->isVipassana()) {
+            return [$image('rules_vipassana.jpg', 'กฎระเบียบและข้อปฏิบัติในการเข้ารับการอบรมวิปัสสนากรรมฐาน')];
+        }
+
+        $rules = [$image('rules_general.jpg', 'กฎระเบียบและข้อปฏิบัติในการเข้าร่วมอบรม')];
+
+        $isOneDay = $course->date_start && $course->date_end && $course->date_start->isSameDay($course->date_end);
+        if ($isOneDay) {
+            $rules[] = $image('dress_one_day.jpg', 'การแต่งกายที่เหมาะสม สำหรับคอร์ส 1 วัน');
+        }
+
+        return $rules;
     }
 
     public function getCourseLimit($course_category_id, $location_id)
