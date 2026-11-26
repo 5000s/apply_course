@@ -25,6 +25,9 @@ class CourseCategory extends Model
     const ONE_DAY_MAX_DAY = 1;
     const VIPASSANA_MIN_DAY = 6;
 
+    // ผ่านการอบรมคอร์สในหมวดเหล่านี้ = ศิษย์เตโชวิปัสสนา (ใช้ทั้ง cron ปรับสถานะสมาชิก และ Auto Confirm)
+    const VIPASSANA_PASSED_CATEGORY_IDS = [1, 2, 3, 4, 6, 8, 10, 12];
+
     public static function limitGroupForDay($day): string
     {
         $day = (int) $day;

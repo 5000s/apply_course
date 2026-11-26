@@ -20,8 +20,9 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Auth;
 use function Symfony\Component\String\b;
 use App\Models\ReportCase;
-use App\Models\CourseLocationLimit;
 use App\Models\Shelter;
+use App\Services\ApplyNotifier;
+use App\Services\CourseAutoConfirmService;
 use App\Services\EmailService;
 use App\Services\GmailApiService;
 
@@ -160,6 +161,12 @@ class CourseApplyController extends Controller
             $state  = 'เปิดรับสมัคร';
         } else {
             $state = 'สิ้นสุดการรับสมัคร';
+        }
+
+        // ตัดรอบ 7 วันก่อนเริ่มคอร์ส → ปิดรับสมัครออนไลน์ (หน้าแสดงช่องทางติดต่อมูลนิธิฯ แทนฟอร์ม)
+        if ($isOpen && $course->isPastApplyCutoff()) {
+            $isOpen = false;
+            $state  = 'ใกล้เริ่มแล้ว';
         }
 
         // elseif ($daysUntilStart >= 0) {
@@ -564,6 +571,12 @@ class CourseApplyController extends Controller
             $state = 'ใกล้เริ่มแล้ว';
         } else {
             $state = 'สิ้นสุดการรับสมัคร';
+        }
+
+        // ตัดรอบ 7 วันก่อนเริ่มคอร์ส → กลับไปหน้าสมัคร ซึ่งจะแสดงว่าปิดรับสมัครออนไลน์แล้ว
+        if ($isOpen && $course->isPastApplyCutoff()) {
+            $isOpen = false;
+            $state  = 'ใกล้เริ่มแล้ว';
         }
 
         if (!$isOpen) {
@@ -986,6 +999,11 @@ class CourseApplyController extends Controller
                 ->withInput();
         }
 
+        // ตัดรอบ 7 วันก่อนเริ่มคอร์สแล้ว → ไม่รับใบสมัครออนไลน์ (กันกรณีเปิดฟอร์มค้างไว้ก่อนตัดรอบ)
+        if ($course->isPastApplyCutoff()) {
+            return redirect()->route('apply.direct', ['course_id' => $course_id, 'lang' => $request->input('lang', 'th')]);
+        }
+
 
         // Create Apply Data
         if (!$apply) {
@@ -1006,54 +1024,40 @@ class CourseApplyController extends Controller
         // Set Language for next page
         $lang = $request->input('lang', 'th');
 
-        // Check need Confirm?
-        $isNeedConfirm = false;
-
-        // มีวิปัสสนาต้อง Confirm
-        // อานาปานสติ: ที่นั่ง ≤ 90% → Confirm ทันที, เกิน 90% (90-110%) → Waiting (รอเจ้าหน้าที่ Confirm)
-        $vipassanaCategoryIds = [1, 2, 3, 4, 6, 8, 10, 12, 15, 16]; // ชื่อบางหมวดสะกด "วิปัสสานา" จึงเช็ค id ด้วย
-
-        if (str_contains($course->category, "วิปัสสนา") || in_array($course->category_id, $vipassanaCategoryIds)) {
+        // Auto Confirm (กฎทั้งหมดอยู่ใน CourseAutoConfirmService):
+        // - คอร์สวิปัสสนา: ศิษย์ใหม่ที่ยังไม่เคยเข้าวิปัสสนา → รอเจ้าหน้าที่ยืนยัน
+        // - นอกนั้น: ที่นั่งที่ยืนยันแล้วยังไม่ถึง 50% → ยืนยันทันที, ที่เหลือรอตัดรอบ 7 วันก่อนเริ่มคอร์ส
+        try {
+            $isNeedConfirm = !app(CourseAutoConfirmService::class)->shouldAutoConfirmOnApply($course, $member);
+        } catch (\Throwable $e) {
+            // ใบสมัครถูกบันทึกแล้ว: ถ้าตรวจที่นั่งไม่ได้ ให้รอเจ้าหน้าที่ยืนยันแทนการแสดงหน้า error
+            Log::error("Auto confirm check failed for member {$member_id} course {$course_id}: " . $e->getMessage());
             $isNeedConfirm = true;
-        } else {
-
-            $courseLimit = $this->getCourseLimit($course->category_id, $location->id);
-
-            // ใบสมัครนี้ถูก save ไปแล้วด้านบน จึงนับรวมอยู่ใน getApplyCount แล้ว (ไม่ต้อง +1)
-            $applyCount = $this->getApplyCount($course_id);
-            $totalCount = $applyCount->male + $applyCount->female;
-
-            $genderCount = $member->gender == "ชาย" ? $applyCount->male : $applyCount->female;
-            $genderLimit = $member->gender == "ชาย" ? $courseLimit['male_limit'] : $courseLimit['female_limit'];
-
-            // เกิน 90% ของที่นั่ง (หรือไม่ได้กำหนดที่นั่ง = 0) → Waiting
-            $confirmPercent = 90;
-            $isOverConfirm = fn($count, $limit) => $limit <= 0 || ($count / $limit) * 100 > $confirmPercent;
-
-            if ($isOverConfirm($genderCount, $genderLimit) || $isOverConfirm($totalCount, $courseLimit['max_limit'])) {
-                $isNeedConfirm = true;
-            }
-
-            // Close Course if >>110 : ผู้สมัครรวมถึง 110% ของที่นั่งแล้ว → ปิดรับสมัคร
-            $closePercent = 110;
-            if ($courseLimit['max_limit'] > 0 && ($totalCount / $courseLimit['max_limit']) * 100 >= $closePercent) {
-                $course->state = 'ปิดรับสมัคร';
-                $course->save();
-            }
         }
 
-
-        // Write sendemail process here
         if ($isNeedConfirm) {
-            $this->sendApplyCourseImformationToEmail($member_id, $course_id, false);
-            return view('apply.complete_non_confirm', ['apply' => $apply, 'course' => $course, 'location' => $location, 'courseCategory' => $courseCategory, 'lang' => $lang]);
+            $waitingPosition = $this->waitingListPosition($course, $apply);
+
+            if ($waitingPosition) {
+                // รายชื่อสำรอง: แจ้งลำดับทั้งอีเมลและ SMS
+                app(ApplyNotifier::class)->sendWaitingListNotice($apply, $waitingPosition, $lang);
+            } else {
+                // ศิษย์ใหม่วิปัสสนา / จำนวนรับเป็น 0 → รอเจ้าหน้าที่ยืนยัน (ข้อความเดิม)
+                $this->sendApplyCourseImformationToEmail($member_id, $course_id, false);
+            }
+
+            return view('apply.complete_non_confirm', [
+                'apply' => $apply, 'course' => $course, 'location' => $location, 'courseCategory' => $courseCategory,
+                'lang' => $lang, 'waiting_position' => $waitingPosition,
+            ]);
         }
 
-        $this->sendApplyCourseImformationToEmail($member_id, $course_id, true);
-
-        $apply->state = "ยืนยันแล้ว";
-        $apply->remark = "ระบบยืนยันการสมัคร";
+        $apply->state = CourseAutoConfirmService::STATE_CONFIRMED;
+        $apply->remark = CourseAutoConfirmService::REMARK_CONFIRM_ON_APPLY;
         $apply->save();
+
+        // ยืนยันแล้ว: แจ้งทั้งอีเมลและ SMS
+        app(ApplyNotifier::class)->sendConfirmedNotice($apply, $lang);
 
         return view('apply.complete_ana', ['apply' => $apply, 'course' => $course, 'location' => $location, 'courseCategory' => $courseCategory, 'lang' => $lang]);
     }
@@ -1084,146 +1088,80 @@ class CourseApplyController extends Controller
         ]);
     }
 
+    // ลำดับรายชื่อสำรอง (null = ไม่ใช่รายชื่อสำรอง หรือคำนวณไม่ได้ → ใช้ข้อความรอเจ้าหน้าที่ยืนยันแบบเดิม)
+    private function waitingListPosition(Course $course, Apply $apply): ?int
+    {
+        try {
+            return app(CourseAutoConfirmService::class)->waitingListPosition($course, $apply);
+        } catch (\Throwable $e) {
+            Log::error("Waiting list position failed for apply {$apply->id}: " . $e->getMessage());
+            return null;
+        }
+    }
+
     // ยกเลิกการสมัครคอร์ส (flow สาธารณะ อ้างจาก course_id + member_id)
+    // แสดงหน้าสรุปการยกเลิก + ส่งอีเมล/SMS ยืนยันการยกเลิก (ส่งครั้งเดียว: กดซ้ำ/รีเฟรชไม่ส่งซ้ำ)
     public function directCancel(Request $request, $course_id, $member_id)
     {
-        $lang = $request->input('lang', 'th');
+        $lang = $request->input('lang', 'th') === 'en' ? 'en' : 'th';
 
-        $apply = Apply::where('course_id', $course_id)
+        $apply = Apply::with(['member', 'course'])
+            ->where('course_id', $course_id)
             ->where('member_id', $member_id)
             ->orderByDesc('id')
             ->first();
 
-        if ($apply) {
-            $apply->state = 'ยกเลิกสมัคร';
+        if (!$apply || !$apply->member || !$apply->course) {
+            return redirect()->route('apply.direct', ['course_id' => $course_id, 'lang' => $lang])
+                ->with('status', $lang === 'en' ? 'Your registration has been cancelled.' : 'ยกเลิกการสมัครคอร์สเรียบร้อยแล้ว');
+        }
+
+        $wasActive = $apply->cancel != 1 && $apply->state !== CourseAutoConfirmService::STATE_CANCELLED;
+
+        if ($wasActive) {
+            $apply->state = CourseAutoConfirmService::STATE_CANCELLED;
             $apply->cancel = 1;
             $apply->cancel_at = now();
             $apply->updated_by = 'USER';
             $apply->save();
+
+            app(ApplyNotifier::class)->notifyCancelledByUser($apply, $lang);
         }
 
-        return redirect()->route('apply.direct', ['course_id' => $course_id, 'lang' => $lang])
-            ->with('status', $lang === 'en' ? 'Your registration has been cancelled.' : 'ยกเลิกการสมัครคอร์สเรียบร้อยแล้ว');
+        $course = $apply->course;
+
+        return view('apply.cancelled_by_user', [
+            'apply' => $apply,
+            'course' => $course,
+            'location' => Location::find($course->location_id),
+            'courseCategory' => CourseCategory::find($course->category_id),
+            'lang' => $lang,
+        ]);
     }
 
+    // อีเมลผลการสมัคร (ยืนยันแล้ว / รอยืนยัน) ภาษาตามหน้าที่ผู้สมัครใช้อยู่ — ส่งไม่สำเร็จไม่ทำให้การสมัครล้ม
     public function sendApplyCourseImformationToEmail($member_id, $course_id, $isConfirmed = false)
     {
-        try {
-            $member = Member::find($member_id);
-            if (!$member || trim((string) $member->email) === '') {
-                Log::warning("Apply email skipped: member {$member_id} not found or has no email");
-                return false;
-            }
+        $apply = Apply::with(['member', 'course'])
+            ->where('course_id', $course_id)
+            ->where('member_id', $member_id)
+            ->where(function ($query) {
+                $query->where('cancel', '!=', 1)
+                    ->orWhereNull('cancel');
+            })
+            ->first();
 
-            $course = Course::find($course_id);
-            if (!$course) {
-                Log::warning("Apply email skipped: course {$course_id} not found");
-                return false;
-            }
-
-            $apply = Apply::where('course_id', $course_id)
-                ->where('member_id', $member_id)
-                ->where(function ($query) {
-                    $query->where('cancel', '!=', 1)
-                        ->orWhereNull('cancel');
-                })
-                ->first();
-
-            if (!$apply) {
-                Log::warning("Apply email skipped: no active apply for member {$member_id} course {$course_id}");
-                return false;
-            }
-
-            $location = Location::find($course->location_id);
-            $courseCategory = CourseCategory::find($course->category_id);
-            $lang = request()->input('lang', 'th');
-
-            $view = $isConfirmed ? 'apply.complete_ana' : 'apply.complete_non_confirm';
-
-            $courseTitle = $lang === 'th'
-                ? ($courseCategory->show_name ?? $course->category)
-                : ($courseCategory->show_name_en ?? $courseCategory->show_name ?? $course->category);
-
-            $subject = ($isConfirmed
-                ? ($lang === 'th' ? 'ยืนยันสมัครคอร์สเรียบร้อย' : 'Application Confirmed')
-                : ($lang === 'th' ? 'ได้รับใบสมัครของท่านแล้ว' : 'Application Received'))
-                . ' - ' . $courseTitle;
-
-            $ruleImages = $this->applyEmailRuleImages($course);
-
-            $gmailService = new GmailApiService();
-            $gmailService->sendEmail($member->email, $subject, $view, [
-                'apply' => $apply,
-                'course' => $course,
-                'location' => $location,
-                'courseCategory' => $courseCategory,
-                'lang' => $lang,
-                'is_email' => true,
-                'rule_images' => $ruleImages,
-            ], null, array_column($ruleImages, 'path', 'cid'));
-
-            return true;
-        } catch (\Throwable $e) {
-            // Email failure must not break the apply flow
-            Log::error("Failed to send apply email to member {$member_id} course {$course_id}: " . $e->getMessage());
+        if (!$apply) {
+            Log::warning("Apply email skipped: no active apply for member {$member_id} course {$course_id}");
             return false;
         }
-    }
 
-    /**
-     * รูปกฎระเบียบที่ฝังท้ายอีเมลสมัครคอร์ส (ไฟล์อยู่ที่ public/images/rules, ฝังด้วย Content-ID)
-     * วิปัสสนา (> 6 วัน) = กฎวิปัสสนา, คอร์ส 1 วัน = กฎทั่วไป + การแต่งกายคอร์ส 1 วัน, นอกนั้น = กฎทั่วไป
-     *
-     * @return array<int, array{cid: string, path: string, src: string, alt: string}>
-     */
-    private function applyEmailRuleImages(Course $course): array
-    {
-        $image = function (string $file, string $alt) {
-            $cid = pathinfo($file, PATHINFO_FILENAME) . '@bodhidhammayan';
-
-            return [
-                'cid' => $cid,
-                'path' => public_path("images/rules/{$file}"),
-                'src' => "cid:{$cid}",
-                'alt' => $alt,
-            ];
-        };
-
-        if ($course->isVipassana()) {
-            return [$image('rules_vipassana.jpg', 'กฎระเบียบและข้อปฏิบัติในการเข้ารับการอบรมวิปัสสนากรรมฐาน')];
-        }
-
-        $rules = [$image('rules_general.jpg', 'กฎระเบียบและข้อปฏิบัติในการเข้าร่วมอบรม')];
-
-        $isOneDay = $course->date_start && $course->date_end && $course->date_start->isSameDay($course->date_end);
-        if ($isOneDay) {
-            $rules[] = $image('dress_one_day.jpg', 'การแต่งกายที่เหมาะสม สำหรับคอร์ส 1 วัน');
-        }
-
-        return $rules;
+        return app(ApplyNotifier::class)->sendApplyEmail($apply, (bool) $isConfirmed, request()->input('lang', 'th'));
     }
 
     public function getCourseLimit($course_category_id, $location_id)
     {
-        $courseLimit = CourseLocationLimit::where('course_category_id', $course_category_id)
-            ->where('location_id', $location_id)
-            ->first();
-
-        if ($courseLimit) {
-            $male_limit = $courseLimit->male_limit;
-            $female_limit = $courseLimit->female_limit;
-            $max_limit = $courseLimit->max_limit;
-        } else {
-            $male_limit = 99;
-            $female_limit = 99;
-            $max_limit = 99;
-        }
-
-        return [
-            'male_limit' => $male_limit,
-            'female_limit' => $female_limit,
-            'max_limit' => $max_limit,
-        ];
+        return app(CourseAutoConfirmService::class)->courseLimit($course_category_id, $location_id);
     }
 
     public function getApplyCount($course_id)

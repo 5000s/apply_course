@@ -7,7 +7,9 @@ use App\Models\Apply;
 use App\Models\Course;
 use App\Models\CourseCategory;
 use App\Models\Location;
+use App\Services\ApplyNotifier;
 use App\Services\SmsKubClient;
+use App\Services\SmsSender;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -17,11 +19,8 @@ use Illuminate\Validation\ValidationException;
 
 class SmsController extends Controller
 {
-    // ส่ง SMS เตือนการเข้าคอร์ส ล่วงหน้ากี่วันก่อนวันเริ่มคอร์ส
-    private const REMINDER_DAYS_BEFORE = 2;
-
-    // เบอร์ติดต่อมูลนิธิ (ใช้ลงท้าย SMS เตือนเข้าคอร์ส)
-    private const CONTACT_PHONE = '02-117-4063';
+    // ส่ง SMS + อีเมล เตือนการเข้าคอร์ส ล่วงหน้ากี่วันก่อนวันเริ่มคอร์ส
+    private const REMINDER_DAYS_BEFORE = 3;
 
     // แจ้งเตือนแอดมินเมื่อมีผู้สมัครใหม่: 1 SMS ไม่เกินกี่คน
     private const ADMIN_NOTIFY_MAX_PER_SMS = 3;
@@ -30,8 +29,8 @@ class SmsController extends Controller
     private const ADMIN_NOTIFY_HOUR_END   = 17;
 
     /**
-     * SMS เตือนการเข้าคอร์ส ก่อนวันเริ่มคอร์ส 2 วัน
-     * ส่งให้ทุกคนที่ได้รับอีเมลยืนยันแล้ว (state = ยืนยันแล้ว)
+     * SMS + อีเมล เตือนการเข้าคอร์ส ก่อนวันเริ่มคอร์ส 3 วัน
+     * ส่งให้ทุกคนที่ได้รับการยืนยันแล้ว (state = ยืนยันแล้ว)
      *
      * GET /admin/cron/smsCourseReminder        ส่งจริง
      * GET /admin/cron/smsCourseReminder?dry=1  แสดงรายการที่จะส่ง โดยไม่ส่งจริง
@@ -61,13 +60,13 @@ class SmsController extends Controller
                 ->where(fn($q) => $q->whereNull('cancel')->orWhere('cancel', '!=', 1))
                 ->get();
 
-            $summary = ['course_id' => $course->id, 'course' => $course->category, 'sent' => 0, 'skipped' => [], 'failed' => []];
+            $summary = ['course_id' => $course->id, 'course' => $course->category, 'sent' => 0, 'emails_sent' => 0, 'skipped' => [], 'failed' => []];
 
             foreach ($applies as $apply) {
                 $member = $apply->member;
-                $phone = $member
-                    ? ($this->normalizeThaiMobile($member->phone) ?? $this->normalizeThaiMobile($member->phone_new))
-                    : null;
+                $this->sendReminderEmail($apply, $dryRun, $summary);
+
+                $phone = app(SmsSender::class)->memberMobile($member);
 
                 if (!$phone) {
                     $summary['skipped'][] = ['apply_id' => $apply->id, 'reason' => 'no Thai mobile number'];
@@ -91,7 +90,7 @@ class SmsController extends Controller
                     continue;
                 }
 
-                if ($this->sendSmsKub($phone, $message)) {
+                if (app(SmsSender::class)->send($phone, $message)) {
                     $summary['sent']++;
                 } else {
                     Cache::forget($cacheKey); // ให้ส่งใหม่ได้รอบหน้า
@@ -105,6 +104,34 @@ class SmsController extends Controller
         Log::info('SMS course reminder', $result);
 
         return $result;
+    }
+
+    // อีเมลเตือนการเข้าคอร์ส (กันส่งซ้ำด้วย cache เหมือน SMS)
+    private function sendReminderEmail(Apply $apply, bool $dryRun, array &$summary): void
+    {
+        $email = trim((string) ($apply->member->email ?? ''));
+        if ($email === '') {
+            $summary['skipped'][] = ['apply_id' => $apply->id, 'reason' => 'no email'];
+            return;
+        }
+
+        if ($dryRun) {
+            $summary['skipped'][] = ['apply_id' => $apply->id, 'email' => $email, 'reason' => 'dry run (email)'];
+            return;
+        }
+
+        $cacheKey = "email_course_reminder_{$apply->id}";
+        if (!Cache::add($cacheKey, true, now()->addDays(self::REMINDER_DAYS_BEFORE + 1))) {
+            $summary['skipped'][] = ['apply_id' => $apply->id, 'reason' => 'email already sent'];
+            return;
+        }
+
+        if (app(ApplyNotifier::class)->sendReminderEmail($apply, self::REMINDER_DAYS_BEFORE)) {
+            $summary['emails_sent']++;
+        } else {
+            Cache::forget($cacheKey);
+            $summary['failed'][] = ['apply_id' => $apply->id, 'email' => $email];
+        }
     }
 
     /**
@@ -183,7 +210,7 @@ class SmsController extends Controller
             // ส่งให้แอดมินทุกเบอร์ ถือว่าสำเร็จถ้าส่งได้อย่างน้อย 1 เบอร์
             $anySent = false;
             foreach ($adminPhones as $phone) {
-                if ($this->sendSmsKub($phone, $message)) {
+                if (app(SmsSender::class)->send($phone, $message)) {
                     $anySent = true;
                     $result['sent_sms']++;
                 }
@@ -223,7 +250,7 @@ class SmsController extends Controller
 
         $phones = [];
         foreach (preg_split('/[,\s]+/', $raw, -1, PREG_SPLIT_NO_EMPTY) as $item) {
-            $phone = $this->normalizeThaiMobile($item);
+            $phone = app(SmsSender::class)->normalizeThaiMobile($item);
             if ($phone) {
                 $phones[$phone] = true;
             }
@@ -290,7 +317,7 @@ class SmsController extends Controller
             . $course->getCourseLongDateTxtAttribute(true)
             . " ที่ {$course->location}"
             . ($time ? " กรุณามาถึงก่อน {$time}" : '')
-            . " โทร. " . self::CONTACT_PHONE;
+            . " โทร. " . SmsSender::CONTACT_PHONE;
     }
 
     private function reminderMessageEn(Course $course, ?string $categoryEn, ?string $locationEn): string
@@ -301,48 +328,7 @@ class SmsController extends Controller
             . $course->getCourseLongDateTxtEnAttribute(true)
             . " at " . ($locationEn ?: $course->location) . "."
             . ($time ? " Please arrive before {$time}." : '')
-            . " Tel. " . self::CONTACT_PHONE;
-    }
-
-    // รับเฉพาะเบอร์มือถือไทย 0[689]XXXXXXXX (แปลง +66/66 ให้)
-    private function normalizeThaiMobile(?string $phone): ?string
-    {
-        $digits = preg_replace('/\D+/', '', (string) $phone);
-
-        if (str_starts_with($digits, '66') && strlen($digits) === 11) {
-            $digits = '0' . substr($digits, 2);
-        }
-
-        return preg_match('/^0[689]\d{8}$/', $digits) ? $digits : null;
-    }
-
-    // ส่ง SMS ผ่าน SMS-KUB (รูปแบบเดียวกับ CourseApplyController::sendSMS ที่ใช้ส่ง OTP)
-    private function sendSmsKub(string $phone, string $message): bool
-    {
-        $url    = config('services.smskub.url');
-        $apiKey = config('services.smskub.key');
-        $from   = config('services.smskub.sender', 'KBO staff');
-
-        if (!$url || !$apiKey) {
-            Log::warning("SMSKUB not configured. Skip SMS to {$phone}");
-            return false;
-        }
-
-        $response = Http::withHeaders([
-            'Content-Type' => 'application/json',
-            'key'          => $apiKey,
-        ])
-            ->timeout(10)
-            ->send('POST', $url, [
-                'body' => json_encode(['to' => [$phone], 'from' => $from, 'message' => $message], JSON_UNESCAPED_UNICODE),
-            ]);
-
-        if (!$response->successful()) {
-            Log::error('SMSKUB course reminder error', ['phone' => $phone, 'status' => $response->status(), 'body' => $response->body()]);
-            return false;
-        }
-
-        return true;
+            . " Tel. " . SmsSender::CONTACT_PHONE;
     }
 
     public function form()

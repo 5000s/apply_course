@@ -181,7 +181,7 @@ class CourseLimitController extends Controller
 
     /**
      * course_limit ทั้งหมด จัดกลุ่มตามคู่ คอร์ส x สถานที่
-     * ถ้ามีข้อมูลซ้ำคู่เดียวกัน ใช้แถวแรก (id น้อยสุด) ให้ตรงกับ CourseApplyController::getCourseLimit()
+     * ถ้ามีข้อมูลซ้ำคู่เดียวกัน ใช้แถวแรก (id น้อยสุด) ให้ตรงกับ CourseAutoConfirmService::courseLimit()
      */
     private function limitsByPair(): Collection
     {

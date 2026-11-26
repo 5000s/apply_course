@@ -245,6 +245,25 @@ class Course extends Model
         return $days > self::VIPASSANA_OVER_DAYS;
     }
 
+    // ตัดรอบรับสมัครออนไลน์ก่อนวันเริ่มคอร์สกี่วัน (วันตัดรอบ = วันเริ่มคอร์ส - 7 วัน)
+    const APPLY_CUTOFF_DAYS = 7;
+
+    // วันตัดรอบรับสมัคร (00:00 ของวันที่ 7 ก่อนวันเริ่มคอร์ส)
+    public function applyCutoffDate(): ?Carbon
+    {
+        return $this->date_start
+            ? $this->date_start->copy()->startOfDay()->subDays(self::APPLY_CUTOFF_DAYS)
+            : null;
+    }
+
+    // ถึงวันตัดรอบแล้ว = ปิดรับสมัครออนไลน์ (ระบบยืนยัน/ยกเลิกใบสมัครที่ค้างตอนตัดรอบ)
+    public function isPastApplyCutoff(?Carbon $now = null): bool
+    {
+        $cutoff = $this->applyCutoffDate();
+
+        return $cutoff !== null && ($now ?? now())->gte($cutoff);
+    }
+
 
     public static function generateCourseName($start_date, $end_date)
     {

@@ -37,6 +37,19 @@ class CronController extends Controller
             'date_threshold' => $twoWeeksAgo->toDateTimeString()
         ]);
     }
+    /**
+     * ตัดรอบ 7 วันก่อนเริ่มคอร์ส: ปิดรับสมัคร, ยืนยันอัตโนมัติจนเต็ม, ยกเลิกส่วนที่เกิน + แจ้งผู้สมัคร
+     *
+     * GET /admin/cron/applyCutoff        ทำจริง
+     * GET /admin/cron/applyCutoff?dry=1  แสดงผลที่จะเกิดขึ้น โดยไม่แก้ข้อมูลและไม่ส่งแจ้งเตือน
+     */
+    public function applyCutoff(Request $request)
+    {
+        return response()->json(
+            app(\App\Services\CourseAutoConfirmService::class)->runCutoff(null, $request->boolean('dry'))
+        );
+    }
+
     public function closeCourseAuto()
     {
         $today = \Carbon\Carbon::now()->toDateString();
@@ -53,7 +66,7 @@ class CronController extends Controller
 
     public function updateMemberStatus()
     {
-        $categoryIds = [1, 2, 3, 4, 6, 8, 10, 12];
+        $categoryIds = \App\Models\CourseCategory::VIPASSANA_PASSED_CATEGORY_IDS;
 
         // Find members who are not "ศิษย์เตโชวิปัสสนา" 
         // and have at least one apply with state "ผ่านการอบรม" 

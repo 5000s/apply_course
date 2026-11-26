@@ -1,6 +1,8 @@
 @extends('layouts.bodhi')
 
-@section('title', ($lang ?? 'th') === 'th' ? 'บันทึกคำขอสมัครคอร์สเรียบร้อย' : 'Application Saved')
+@section('title', !empty($waiting_position)
+    ? (($lang ?? 'th') === 'th' ? 'รายชื่อสำรองลำดับที่ ' . $waiting_position : 'Waiting List No. ' . $waiting_position)
+    : (($lang ?? 'th') === 'th' ? 'บันทึกคำขอสมัครคอร์สเรียบร้อย' : 'Application Saved'))
 
 @section('content')
     @php
@@ -16,6 +18,10 @@
                                 <strong>02-117-4063 ถึง 64</strong>
                                 ราว 1-3 สัปดาห์ก่อนเข้าคอร์ส <strong>*เท่านั้น*</strong> จึงเป็นผู้มีสิทธิ์เข้ารับการอบรม
                                 กรุณาบันทึกเบอร์โทรฯของมูลนิธิไว้เพื่อการติดต่อยืนยันการเข้าคอร์ส',
+                'waiting_header' => 'ใบสมัครของท่านอยู่ในรายชื่อสำรองลำดับที่ :position',
+                'waiting_msg' => '<p>การสมัครนี้ <strong>“ยังไม่ใช่”</strong> การยืนยันว่าท่านได้เข้ารับการอบรม โดยมูลนิธิฯ จะแจ้งยืนยันสถานะอีกครั้ง <strong>:days วันก่อนวันเริ่มคอร์ส</strong></p>
+                                <p>หากท่านมีเหตุจำเป็นที่ต้องเข้าร่วมคอร์ส กรุณาติดต่อเจ้าหน้าที่มูลนิธิฯ ที่หมายเลข <strong>02-117-4063–64</strong> ในวันและเวลาทำการ เพื่อให้พิจารณาเป็นรายกรณี</p>
+                                <p class="mb-0">ทั้งนี้ มูลนิธิฯ ขอสงวนสิทธิ์ในการพิจารณาใบสมัครตามความเหมาะสม</p>',
                 'read_rules' => '*** กรุณาอ่านหลักเกณฑ์เกี่ยวกับการรับสมัคร กฎ และ ระเบียบของธรรมสถานโดยละเอียด ได้ที่',
                 'strict_follow' => 'และปฏิบัติตามโดยเคร่งครัด *',
                 'rule_clothing' =>
@@ -50,6 +56,10 @@
                                 <strong>02-117-4063 to 64</strong>
                                 about 1-3 weeks before the course starts <strong>*ONLY*</strong> to be eligible.
                                 Please save the foundation number for contact.',
+                'waiting_header' => 'Your application is No. :position on the waiting list',
+                'waiting_msg' => '<p>This application is <strong>“NOT yet”</strong> a confirmation of your place on the course. The Foundation will confirm your status again <strong>:days days before the course starts</strong>.</p>
+                                <p>If you have an urgent need to attend this course, please contact the Foundation staff at <strong>02-117-4063–64</strong> during office hours for case-by-case consideration.</p>
+                                <p class="mb-0">The Foundation reserves the right to consider applications as appropriate.</p>',
                 'read_rules' => '*** Please read the rules and regulations details at',
                 'strict_follow' => 'and follow strictly *',
                 'rule_clothing' =>
@@ -77,6 +87,13 @@
             ],
         ];
         $txt = $t[$lang];
+
+        // รายชื่อสำรอง (รอตัดรอบ 7 วัน): เปลี่ยนหัวข้อเป็นลำดับสำรอง และข้อความในกล่องเหลือง
+        $waitingPosition = isset($waiting_position) ? (int) $waiting_position : null;
+        $waitingHeader = $waitingPosition ? str_replace(':position', $waitingPosition, $txt['waiting_header']) : null;
+        $waitingMsg = $waitingPosition
+            ? str_replace(':days', \App\Models\Course::APPLY_CUTOFF_DAYS, $txt['waiting_msg'])
+            : null;
 
         $member = $apply->member;
         $course = $apply->course;
@@ -157,15 +174,27 @@
                                         d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z" />
                                 </svg>
                             </div>
-                            <h2 class="fw-bold text-primary">{{ $txt['header_success'] }}</h2>
+                            @if ($waitingPosition)
+                                <div class="border border-secondary-subtle rounded-2 px-3 py-2 d-inline-block">
+                                    <h4 class="fw-bold text-primary mb-0">{{ $waitingHeader }}</h4>
+                                </div>
+                            @else
+                                <h2 class="fw-bold text-primary">{{ $txt['header_success'] }}</h2>
+                            @endif
                         </div>
 
-                        <div class="alert alert-warning border-warning bg-warning bg-opacity-10">
-                            <h5 class="alert-heading fw-bold">{{ $txt['dear_applicant'] }}</h5>
-                            <p class="mb-0">
-                                {!! $txt['warning_msg'] !!}
-                            </p>
-                        </div>
+                        @if ($waitingPosition)
+                            <div class="alert alert-warning border-warning bg-warning bg-opacity-25">
+                                {!! $waitingMsg !!}
+                            </div>
+                        @else
+                            <div class="alert alert-warning border-warning bg-warning bg-opacity-10">
+                                <h5 class="alert-heading fw-bold">{{ $txt['dear_applicant'] }}</h5>
+                                <p class="mb-0">
+                                    {!! $txt['warning_msg'] !!}
+                                </p>
+                            </div>
+                        @endif
 
                         <div class="mb-4">
                             <p>

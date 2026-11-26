@@ -5,6 +5,7 @@ namespace App\Console;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\CronController;
 use App\Http\Controllers\SmsController;
+use App\Services\CourseAutoConfirmService;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -37,7 +38,13 @@ class Kernel extends ConsoleKernel
             (new CronController)->updateMemberStatus();
         })->daily();
 
-        // SMS เตือนการเข้าคอร์ส ก่อนวันเริ่มคอร์ส 2 วัน
+        // ตัดรอบ 7 วันก่อนเริ่มคอร์ส: ปิดรับสมัคร, ยืนยันอัตโนมัติจนเต็ม, ยกเลิกส่วนที่เกิน + แจ้งอีเมล/SMS
+        // (หน้าเว็บปิดรับสมัครตั้งแต่ 00:00 ของวันตัดรอบอยู่แล้ว เวลานี้จึงกำหนดแค่ช่วงที่ส่งแจ้งเตือน)
+        $schedule->call(function () {
+            app(CourseAutoConfirmService::class)->runCutoff();
+        })->dailyAt('08:30');
+
+        // SMS + อีเมล เตือนการเข้าคอร์ส ก่อนวันเริ่มคอร์ส 3 วัน
         $schedule->call(function () {
             (new SmsController)->runCourseReminder();
         })->dailyAt('09:00');

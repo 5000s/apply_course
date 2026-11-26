@@ -171,8 +171,8 @@
                             $regis == 1 &&
                             $course->date_start->copy()->addDays(1)->gte(now()->startOfDay()))
                         @php
-                            // อ่อนนุช (id 4) ปิดรับสมัครก่อนถึงคอร์ส 2 วัน ที่อื่น 1 วัน
-                            $closeBefore = $course->location_id == 4 ? 2 : 1;
+                            // ปิดรับสมัครออนไลน์ก่อนเริ่มคอร์ส 7 วัน (ตัดรอบ Auto Confirm) หลังจากนั้นให้สมัครทาง Email
+                            $closeBefore = \App\Models\Course::APPLY_CUTOFF_DAYS;
                             $nowDate = now()->startOfDay();
                             $daysToStart = $nowDate->diffInDays($course->date_start, false);
                             $isClose = $daysToStart <= 0;

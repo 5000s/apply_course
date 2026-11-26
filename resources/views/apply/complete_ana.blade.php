@@ -9,11 +9,11 @@
         $t = [
             'th' => [
                 'header_success' => 'ยืนยันสมัครคอร์สเรียบร้อย',
+                'header_reminder' => 'แจ้งเตือนการเข้าคอร์ส',
+                'reminder_msg' => 'คอร์สที่ท่านได้รับการยืนยันแล้ว จะเริ่มในอีก <strong>:days วัน</strong> <br>
+                                กรุณาตรวจสอบรายละเอียดด้านล่างและเตรียมตัวให้พร้อม',
                 'dear_applicant' => 'เรียนท่านผู้สมัครหรือตัวแทน ที่นับถือ',
-                'warning_msg' => 'ทางมูลนิธิฯ ได้รับข้อมูลการสมัครของท่านเรียบร้อยแล้ว <br>
-                                โดยจะมีเจ้าหน้าที่โทรแจ้งยืนยันอีกครั้งด้วยหมายเลข <br>
-                                <strong>02-117-4063 ถึง 64</strong> <br>
-                                ราว 1-3 สัปดาห์ก่อนวันเริ่มคอร์ส',
+                'fallback_phone' => '02-117-4063 ถึง 64',
                 'read_rules' => '*** กรุณาอ่านหลักเกณฑ์เกี่ยวกับการรับสมัคร กฎ และ ระเบียบของธรรมสถานโดยละเอียด ได้ที่',
                 'strict_follow' => 'และปฏิบัติตามโดยเคร่งครัด *',
                 'rule_clothing' =>
@@ -29,11 +29,6 @@
                 'arrive_before' => 'ผู้ปฏิบัติควรมาถึงก่อนเวลา :time ของวันเริ่มคอร์ส',
                 'emergency_notice' =>
                     'กรณีเกิดเหตุฉุกเฉินจนไม่สามารถเข้าร่วมคอร์สได้ กรุณาแจ้งเจ้าหน้าที่มูลนิธิฯ ที่หมายเลข :phone ทั้งนี้ มูลนิธิฯ ขอสงวนสิทธิ์งดรับสมัครเข้าร่วมคอร์สในอนาคต หากไม่มาเข้าคอร์สโดยไม่แจ้งล่วงหน้า',
-                'note_header' => 'หมายเหตุ :',
-                'note_cancel' =>
-                    'หากท่านได้รับการสัมภาษณ์และได้ตอบรับการอบรมแล้ว แต่ไม่สามารถมาเข้าคอร์สได้ <strong>*กรุณาแจ้งยกเลิกล่วงหน้าไม่น้อยกว่า 10 วัน</strong> การไม่มาเข้ารับการอบรมโดยไม่แจ้ง หรือ การออกจากคอร์สก่อนโดยไม่ได้รับอนุญาต <strong>**ถือเป็นการขัดขวางทางธรรมของผู้อื่นและจะถูกตัดสิทธิ์ไม่ให้เข้ารับการอบรมไม่น้อยกว่า 2 ปี</strong>',
-                'note_water' =>
-                    '*** ขอความร่วมมือให้ผู้เข้าอบรมทุกท่าน เตรียมกระบอกน้ำส่วนตัวเพื่อใส่น้ำดื่มระหว่างการเข้าอบรม ธรรมสถานงดการแจกน้ำดื่มบรรจุในขวดพลาสติก ***',
                 'regards' => 'ด้วยความนับถือ',
                 'team' => 'ทีมงาน',
                 'back_home' => 'กลับสู่หน้าหลัก',
@@ -41,11 +36,11 @@
             ],
             'en' => [
                 'header_success' => 'Application Confirmed',
+                'header_reminder' => 'Course Reminder',
+                'reminder_msg' => 'Your confirmed course starts in <strong>:days days</strong>. <br>
+                                Please check the details below and get ready.',
                 'dear_applicant' => 'Dear Applicant',
-                'warning_msg' => 'The Foundation has received your application. <br>
-                                An officer will contact you by phone from <br>
-                                <strong>02-117-4063 to 64</strong> <br>
-                                approximately 1-3 weeks before the course starts.',
+                'fallback_phone' => '02-117-4063 to 64',
                 'read_rules' => '*** Please read the rules and regulations details at',
                 'strict_follow' => 'and follow strictly *',
                 'rule_clothing' =>
@@ -61,11 +56,6 @@
                 'arrive_before' => 'Participants should arrive before :time on the first day of the course',
                 'emergency_notice' =>
                     'In the event of an emergency that prevents attendance, please notify the staff at :phone The Foundation reserves the right to deny course registration in the future to those who fail to attend without prior notice.',
-                'note_header' => 'Note :',
-                'note_cancel' =>
-                    'If you are accepted but cannot attend, <strong>*Please cancel at least 10 days in advance.</strong> Failure to attend without notice or leaving early without permission <strong>**is considered obstructing others and will be banned for at least 2 years.</strong>',
-                'note_water' =>
-                    '*** Please bring your own personal water bottle. The center does not distribute bottled water. ***',
                 'regards' => 'Best Regards,',
                 'team' => 'Team',
                 'back_home' => 'Back to Home',
@@ -73,6 +63,15 @@
             ],
         ];
         $txt = $t[$lang];
+
+        // อีเมลแจ้งเตือนก่อนเริ่มคอร์ส ใช้หน้านี้โดยเปลี่ยนหัวข้อและข้อความด้านบน
+        $isReminder = !empty($is_reminder);
+        $headerText = $isReminder ? $txt['header_reminder'] : $txt['header_success'];
+        $reminderMessage = $isReminder ? str_replace(':days', (string) ($reminder_days ?? ''), $txt['reminder_msg']) : null;
+
+        // กล่องเหลือง: กรณีฉุกเฉินแจ้งเบอร์ของสถานที่ (ไม่มีเบอร์ = เบอร์มูลนิธิฯ)
+        $emergencyPhone = trim((string) ($location->phone ?? '')) ?: $txt['fallback_phone'];
+        $noticeParts = explode(':phone', $txt['emergency_notice']);
 
         $member = $apply->member;
         $course = $apply->course;
@@ -152,13 +151,19 @@
                                         d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z" />
                                 </svg>
                             </div>
-                            <h2 class="fw-bold text-success">{{ $txt['header_success'] }}</h2>
+                            <h2 class="fw-bold text-success">{{ $headerText }}</h2>
                         </div>
 
                         <div class="alert alert-warning border-warning bg-warning bg-opacity-10">
                             <h5 class="alert-heading fw-bold">{{ $txt['dear_applicant'] }}</h5>
-                            <p class="mb-0">
-                                {!! $txt['warning_msg'] !!}
+                            @if ($reminderMessage)
+                                <p>{!! $reminderMessage !!}</p>
+                            @endif
+                            <p class="mb-0 fs-5">
+                                {{ trim($noticeParts[0]) }}
+                                <strong style="white-space: nowrap;">{{ $emergencyPhone }}</strong>{{ $lang === 'en' ? '.' : '' }}
+                                <br>
+                                {{ trim($noticeParts[1] ?? '') }}
                             </p>
                         </div>
 
@@ -202,32 +207,11 @@
                                                     <br>
                                                     {{ str_replace(':time', $startTime, $txt['arrive_before']) }}
                                                 @endif
-                                                @php $emergencyPhone = $location->phone ?? null; @endphp
-                                                @if ($emergencyPhone)
-                                                    @php $noticeParts = explode(':phone', $txt['emergency_notice']); @endphp
-                                                    <div class="mt-2 text-muted small">
-                                                        {{ trim($noticeParts[0]) }}
-                                                        <strong class="fs-5 text-dark"
-                                                            style="white-space: nowrap;">{{ $emergencyPhone }}</strong>{{ $lang === 'en' ? '.' : '' }}
-                                                        <br>
-                                                        {{ trim($noticeParts[1] ?? '') }}
-                                                    </div>
-                                                @endif
                                             </td>
                                         </tr>
                                     </tbody>
                                 </table>
                             </div>
-                        </div>
-
-                        <div class="mb-4 text-muted small">
-                            <p class="fw-bold mb-1">{{ $txt['note_header'] }}</p>
-                            <p>
-                                {!! $txt['note_cancel'] !!}
-                            </p>
-                            <p class="mb-0">
-                                {!! $txt['note_water'] !!}
-                            </p>
                         </div>
 
                         @include('apply.partials.rule_images')
