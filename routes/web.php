@@ -17,6 +17,7 @@ use App\Http\Controllers\ApplyController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CourseApplyController;
 use App\Http\Controllers\CourseController;
+use App\Http\Controllers\CourseLimitController;
 use App\Http\Controllers\GoogleSheetController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MemberController;
@@ -148,6 +149,10 @@ Route::prefix('admin')->middleware('auth', 'admin')->group(function () {
 
     Route::get('shelters/auto-set-member', [SheltersController::class, 'autoSetMemberID'])->name('shelters.autoSetMemberID');
     Route::resource('shelters', SheltersController::class)->except(['show']);
+
+    // ตั้งค่าจำนวนรับ (course_limit) ต่อ ประเภทคอร์ส x สถานที่
+    Route::get('course-limits', [CourseLimitController::class, 'index'])->name('admin.courseLimits');
+    Route::post('course-limits', [CourseLimitController::class, 'save'])->name('admin.courseLimits.save');
 
     // Team-Member CRUD (all in TeamController)
     Route::prefix('teams/{team}')->name('teammembers.')->group(function () {

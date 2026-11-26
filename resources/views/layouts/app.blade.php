@@ -80,6 +80,10 @@
                                         <a class="dropdown-item" href="{{ route('admin.courses') }}">จัดการคอร์ส</a>
                                     </li>
                                     <li>
+                                        <a class="dropdown-item"
+                                            href="{{ route('admin.courseLimits') }}">ตั้งค่าจำนวนรับ</a>
+                                    </li>
+                                    <li>
                                         <a class="dropdown-item" href="{{ route('admin.members') }}">จัดการสมาชิก</a>
                                     </li>
                                     <li>
